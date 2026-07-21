@@ -25,6 +25,9 @@ on-screen keyboard projects.
 - **i18n**: per-locale key layouts (`layouts/en.json`, `layouts/ko.json`,
   ...) plus Qt Linguist translation of control-key labels (Enter, Backspace,
   Shift, ...).
+- **Hangul composition**: `qkw::HangulComposer` is an opt-in helper that
+  turns the jamo `layouts/ko.json` emits one at a time into precomposed
+  Hangul syllable blocks; see the note under [Layout format](#layout-format).
 
 ## Status
 
@@ -183,10 +186,14 @@ no code changes required. See `layouts/en.json` and `layouts/ko.json` for
 complete examples.
 
 > **Note on `layouts/ko.json`**: it emits individual Hangul jamo characters
-> (ㅂ, ㅏ, ...). Composing them into syllable blocks (e.g. ㄱ+ㅏ+ㄴ → 간) is
-> left to the receiving text field / OS IME; this library does not
-> implement Hangul syllable composition itself (tracked as a known
-> limitation in the issues).
+> (ㅂ, ㅏ, ...) one at a time, same as pressing each key on a physical
+> 2-beolsik keyboard. Composing them into syllable blocks (e.g. ㄱ+ㅏ+ㄴ →
+> 간) is an opt-in step: feed `KeyboardController::characterEntered` /
+> `backspaceRequested` through a `qkw::HangulComposer` (see
+> `include/qkeyboardwidget/hangul_composer.h` and
+> `examples/widgets_example/main.cpp`) before touching your text field. Left
+> unwired, jamo are inserted uncomposed and composition falls back to
+> whatever the receiving text field / OS IME does with them.
 
 ## Examples
 
