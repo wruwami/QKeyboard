@@ -25,11 +25,16 @@ on-screen keyboard projects.
 
 ## Status
 
-The core library, both views, and the `en`/`ko` layouts are implemented.
-The CMake build, example apps, and `.ts` translation files are tracked as
-open work in the repository's issues — see those before assuming this
-builds out of the box. Requires Qt 6.2+ (uses `QML_ELEMENT` and
-`qt_add_qml_module`-style registration).
+The core library, both views, the CMake build, and the `en`/`ko` layouts are
+implemented. Example apps and `.ts` translation files are tracked as open
+work in the repository's issues — see those before assuming this builds out
+of the box.
+
+Supports Qt5 (broad 5.x) through the latest Qt6: the QML types are
+registered imperatively with `qmlRegisterType()` (see
+[Using the QML view](#using-the-qml-view)) rather than the `QML_ELEMENT`
+macro, since `QML_ELEMENT` needs Qt 5.15+/Qt6 and this library doesn't
+assume that.
 
 ## Using the QWidget view
 
@@ -55,9 +60,23 @@ keyboard->theme()->setCornerRadius(10);
 
 ## Using the QML view
 
+Register the C++ types once, before loading any QML that imports
+`QKeyboardWidget`, and add `qml/` to the import path so the `qmldir` there
+(which declares the `KeyboardKey`/`KeyboardPanel` QML components) is found:
+
+```cpp
+#include <QQmlApplicationEngine>
+#include "qkeyboardwidget/qml_registration.h"
+
+QQmlApplicationEngine engine;
+qkw::registerQmlTypes(); // registers KeyboardController and KeyboardTheme
+engine.addImportPath(QStringLiteral(":/qkeyboardwidget/qml")); // or wherever qml/ is deployed
+engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+```
+
 ```qml
-import QtQuick
-import QKeyboardWidget
+import QtQuick 2.0
+import QKeyboardWidget 1.0
 
 Item {
     KeyboardController {
@@ -85,9 +104,10 @@ Item {
 }
 ```
 
-Requires linking `QtQuick`/`QtQuickLayouts` and building the QML module
-(module URI `QKeyboardWidget`) so the `import QKeyboardWidget` resolves —
-see the CMake build issue for current status.
+Requires linking `Qml`/`Quick` (`QKW_ENABLE_QML`, on by default in
+`CMakeLists.txt`). `qml/KeyboardKey.qml` and `qml/KeyboardPanel.qml` are
+shipped as plain files plus a hand-written `qml/qmldir` — not a compiled
+Qt6-only `qt_add_qml_module` — so the same setup works on Qt5 and Qt6.
 
 ## Switching languages at runtime
 

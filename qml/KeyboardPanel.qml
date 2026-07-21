@@ -1,6 +1,6 @@
-import QtQuick
-import QtQuick.Layouts
-import QKeyboardWidget
+import QtQuick 2.0
+import QtQuick.Layouts 1.0
+import QKeyboardWidget 1.0
 
 // Qt Quick view for a KeyboardController. Mirrors what KeyboardWidget does
 // for QWidget apps: render whatever `controller.rows` currently holds and
@@ -28,7 +28,7 @@ Item {
             model: root.controller ? root.controller.rows : []
 
             delegate: RowLayout {
-                required property var modelData
+                property var modelData
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -38,7 +38,7 @@ Item {
                     model: parent.modelData
 
                     delegate: KeyboardKey {
-                        required property var modelData
+                        property var modelData
 
                         keyData: modelData
                         theme: root.theme

@@ -4,21 +4,18 @@
 #include <QColor>
 #include <QFont>
 
-#ifdef QKW_ENABLE_QML
-#include <qqmlregistration.h>
-#endif
-
 namespace qkw {
 
 // Visual appearance knobs shared by the QWidget and QML views. Changing any
 // property re-renders the keyboard immediately (both views listen to the
 // changed signals) so a host application can re-skin a running keyboard.
+//
+// Registered for QML with qmlRegisterType() (see qml_registration.h) rather
+// than the QML_ELEMENT macro, since QML_ELEMENT requires Qt 5.15+/Qt6 and
+// this library targets Qt5 through the latest Qt6.
 class KeyboardTheme : public QObject
 {
     Q_OBJECT
-#ifdef QKW_ENABLE_QML
-    QML_ELEMENT
-#endif
 
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY changed)
     Q_PROPERTY(QColor keyColor READ keyColor WRITE setKeyColor NOTIFY changed)
