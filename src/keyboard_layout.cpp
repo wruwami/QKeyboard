@@ -59,6 +59,10 @@ bool parseKey(const QJsonValue &value, KeyDefinition *outKey, QString *errorMess
         *errorMessage = QStringLiteral("a 'shift'/'switch' key requires a 'target' page id");
         return false;
     }
+    if (action == KeyAction::Switch && key.labelId.isEmpty()) {
+        *errorMessage = QStringLiteral("a 'switch' key requires a non-empty 'labelId'");
+        return false;
+    }
 
     *outKey = key;
     return true;
