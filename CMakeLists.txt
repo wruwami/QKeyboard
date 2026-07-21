@@ -9,6 +9,7 @@ set(CMAKE_AUTORCC ON)
 
 option(QKW_ENABLE_QML "Build the Qt Quick (QML) view and register QML types" ON)
 option(QKW_ENABLE_COVERAGE "Enable gcov/lcov coverage instrumentation (GCC/Clang only)" OFF)
+option(QKW_BUILD_TRANSLATIONS "Compile i18n/*.ts UI-string translations into .qm files" ON)
 
 include(GNUInstallDirs)
 
@@ -65,6 +66,22 @@ endif()
 if(QKW_ENABLE_COVERAGE)
     target_compile_options(qkeyboardwidget PUBLIC --coverage -O0 -g)
     target_link_options(qkeyboardwidget PUBLIC --coverage)
+endif()
+
+if(QKW_BUILD_TRANSLATIONS)
+    find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS LinguistTools)
+
+    set(QKW_TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/i18n/qkeyboardwidget_ko.ts)
+
+    # English needs no .ts/.qm: QCoreApplication::translate() falls back to
+    # the (English) source text whenever no translator is installed for the
+    # active locale, so "en" is the implicit default with nothing to compile.
+    qt${QT_VERSION_MAJOR}_add_translation(QKW_QM_FILES ${QKW_TS_FILES})
+
+    add_custom_target(qkeyboardwidget_translations ALL DEPENDS ${QKW_QM_FILES})
+    add_dependencies(qkeyboardwidget qkeyboardwidget_translations)
+
+    install(FILES ${QKW_QM_FILES} DESTINATION ${CMAKE_INSTALL_DATADIR}/qkeyboardwidget/i18n)
 endif()
 
 install(TARGETS qkeyboardwidget
