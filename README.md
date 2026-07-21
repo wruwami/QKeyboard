@@ -1,5 +1,8 @@
 # QKeyboard
 
+[![CI](https://github.com/wruwami/QKeyboard/actions/workflows/ci.yml/badge.svg)](https://github.com/wruwami/QKeyboard/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/wruwami/QKeyboard/branch/main/graph/badge.svg)](https://codecov.io/gh/wruwami/QKeyboard)
+
 An on-screen keyboard widget for Qt, licensed under Apache-2.0. It supports
 both QWidget and QML (Qt Quick) applications from the same core, drives its
 key layout entirely from JSON (so adding a language or remapping keys never
@@ -25,9 +28,9 @@ on-screen keyboard projects.
 
 ## Status
 
-The core library, both views, the CMake build, the `en`/`ko` layouts, and
-UI-string translation are implemented. Example apps are tracked as open
-work in the repository's issues — see those before assuming this builds out
+The core library, both views, the CMake build, the `en`/`ko` layouts,
+UI-string translation, and the example apps are implemented. Check the
+repository's issues for anything still open before assuming this builds out
 of the box.
 
 Supports Qt5 (broad 5.x) through the latest Qt6: the QML types are
@@ -193,6 +196,22 @@ the `en`/`ko` layout at runtime, and a small `KeyboardTheme` override. Build
 them with the rest of the project (they're on by default) and run
 `qkw_widgets_example` / `qkw_qml_example` from the build directory.
 
+## Testing & CI
+
+```sh
+cmake -S . -B build -DQKW_ENABLE_COVERAGE=ON
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+`.github/workflows/ci.yml` runs this same build+test on both Qt 5.15 and
+Qt 6.7 on every push/PR (the two ends of the "Qt5 through the latest Qt6"
+support range), and uploads coverage from the Qt6 leg to Codecov. To get
+the Codecov badge actually reporting data, the repo owner needs to connect
+`wruwami/QKeyboard` at [codecov.io](https://codecov.io) and add the
+resulting upload token as a `CODECOV_TOKEN` repository secret — that step
+can't be done from CI itself.
+
 ## Repository layout
 
 ```
@@ -202,7 +221,7 @@ qml/                       Qt Quick components
 layouts/                   per-locale layout JSON
 assets/icons/              key icons (SVG)
 i18n/                      Qt Linguist translation sources
-examples/                  demo apps (in progress)
+examples/                  demo apps
 ```
 
 ## License

@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: Qt ${{ matrix.qt-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        qt-version: ['5.15.2', '6.7.3']
+
+    env:
+      QT_QPA_PLATFORM: offscreen
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt-version }}
+          # QtDeclarative (Qml/Quick) ships as part of the base desktop
+          # install on both Qt5 and Qt6 via aqt, not as an addon module —
+          # requesting it explicitly 404s ("packages ... were not found").
+          cache: true
+
+      - name: Install lcov
+        if: startsWith(matrix.qt-version, '6')
+        run: sudo apt-get update && sudo apt-get install -y lcov
+
+      - name: Configure
+        run: >
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=Debug
+          -DQKW_ENABLE_COVERAGE=${{ startsWith(matrix.qt-version, '6') && 'ON' || 'OFF' }}
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      # Coverage is only collected once (on the Qt6 leg) to avoid uploading
+      # duplicate reports to Codecov.
+      - name: Collect coverage
+        if: startsWith(matrix.qt-version, '6')
+        run: |
+          lcov --capture --directory build --output-file coverage.info --ignore-errors inconsistent,gcov,mismatch
+          lcov --remove coverage.info '/usr/*' '*/tests/*' '*/examples/*' --output-file coverage.info
+          lcov --list coverage.info
+
+      - name: Upload coverage to Codecov
+        if: startsWith(matrix.qt-version, '6')
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
