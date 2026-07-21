@@ -43,6 +43,12 @@ void KeyboardWidget::rebuildPages()
     while (_stack->count() > 0) {
         QWidget *page = _stack->widget(0);
         _stack->removeWidget(page);
+        // removeWidget() reparents the widget to nullptr on Qt5, but the
+        // behaviour is implementation-defined; explicitly clear the parent so
+        // the deleteLater() below is the sole owner and no double-delete can
+        // occur if the QStackedWidget is later destroyed before the deferred
+        // deletion fires.
+        page->setParent(nullptr);
         page->deleteLater();
     }
     _buttonsByPage.clear();
