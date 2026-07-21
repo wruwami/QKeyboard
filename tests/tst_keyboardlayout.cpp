@@ -13,6 +13,7 @@ private slots:
     void reportsErrorOnMalformedJson();
     void reportsErrorOnEmptyPages();
     void reportsErrorOnUnknownKeyType();
+    void reportsErrorOnSwitchKeyMissingLabelId();
     void findsPageIndexById();
 };
 
@@ -72,6 +73,22 @@ void TestKeyboardLayout::reportsErrorOnUnknownKeyType()
     const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
     QVERIFY(!layout.isValid());
     QVERIFY(error.contains(QStringLiteral("bogus")));
+}
+
+void TestKeyboardLayout::reportsErrorOnSwitchKeyMissingLabelId()
+{
+    const QByteArray json = R"({
+        "locale": "en",
+        "pages": [
+            { "id": "lower", "rows": [
+                [ { "type": "switch", "target": "numeric" } ]
+            ] }
+        ]
+    })";
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+    QVERIFY(!layout.isValid());
+    QVERIFY(error.contains(QStringLiteral("labelId")));
 }
 
 void TestKeyboardLayout::findsPageIndexById()

@@ -173,7 +173,7 @@ with the current source strings), list it in `QKW_TS_FILES` in
 |---|---|
 | `type` | `char`, `backspace`, `enter`, `space`, `shift`, or `switch`. |
 | `text` | Literal characters inserted for `char` keys. |
-| `labelId` | Translatable id for control-key display text (`enter`, `backspace`, `space`, `shift`, `numbers`, `letters`, `symbols`); falls back to a sane default per action if omitted. |
+| `labelId` | Translatable id for control-key display text (`enter`, `backspace`, `space`, `shift`, `numbers`, `letters`, `symbols`); falls back to a sane default per action if omitted, except `switch` keys, which must specify it explicitly (there is no single default label for a page-switch key). |
 | `icon` | Resource/file path for the key's icon (optional). |
 | `target` | Page `id` to jump to, for `shift`/`switch` keys. |
 | `span` | Grid column span (default 1). |
