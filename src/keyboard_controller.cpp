@@ -131,7 +131,7 @@ QVariantList KeyboardController::rowsForPage(int pageIndex) const
             map[QStringLiteral("text")] = resolveLabel(key);
             rowList.append(map);
         }
-        result.append(rowList);
+        result.append(QVariant(rowList));
     }
     return result;
 }
