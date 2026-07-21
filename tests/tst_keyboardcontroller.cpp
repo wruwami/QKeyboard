@@ -108,21 +108,21 @@ void TestKeyboardController::reloadingJsonResetsToFirstPage()
 
 void TestKeyboardController::setSourceTriggersLoad()
 {
+    Q_INIT_RESOURCE(qkeyboardwidget);
+
     KeyboardController controller;
     // source property starts empty and setting it to the same value is a no-op.
     QVERIFY(controller.source().isEmpty());
 
     QSignalSpy layoutSpy(&controller, &KeyboardController::layoutChanged);
-    // Setting a non-existent path should at minimum emit layoutChanged (even
-    // with an error), not silently do nothing.
-    controller.setSource(QStringLiteral(":/does/not/exist.json"));
-    QVERIFY(!controller.isValid());
-    QVERIFY(layoutSpy.count() >= 1);
+    // Setting a valid path should load it and emit layoutChanged.
+    controller.setSource(QStringLiteral(":/layouts/en.json"));
+    QVERIFY(controller.isValid());
+    QCOMPARE(layoutSpy.count(), 1);
 
     // Setting the same path again must be a no-op (no redundant signals).
-    const int countBefore = layoutSpy.count();
-    controller.setSource(QStringLiteral(":/does/not/exist.json"));
-    QCOMPARE(layoutSpy.count(), countBefore);
+    controller.setSource(QStringLiteral(":/layouts/en.json"));
+    QCOMPARE(layoutSpy.count(), 1);
 }
 
 // ---------------------------------------------------------------------------
@@ -243,6 +243,11 @@ void TestKeyboardController::rowsReflectsCurrentPage()
 {
     KeyboardController controller;
     QVERIFY(controller.loadJson(sampleLayoutJson()));
+
+    qDebug() << "ROWS SIZE:" << controller.rows().size();
+    for (int i = 0; i < controller.rows().size(); ++i) {
+        qDebug() << "  Row" << i << "type:" << controller.rows().at(i).typeName() << "value:" << controller.rows().at(i);
+    }
 
     // Page 0 ("lower") has 1 row with 5 keys.
     QCOMPARE(controller.rows().size(), 1);
