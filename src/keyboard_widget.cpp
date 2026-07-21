@@ -72,8 +72,14 @@ void KeyboardWidget::rebuildPages()
                 const int span = qMax(1, key.value(QStringLiteral("span")).toInt());
                 const int row_ = key.value(QStringLiteral("row")).toInt();
                 const int col_ = key.value(QStringLiteral("column")).toInt();
+                // KeyAction enum serialised as int: Shift=4, Switch=5.
+                // Mark these as accented so applyTheme() picks accentKeyColor,
+                // matching the isAccent logic in KeyboardKey.qml.
+                const int action = key.value(QStringLiteral("action")).toInt();
+                const bool accent = (action == 4 || action == 5);
 
                 auto *button = new KeyButton(text, icon, pageWidget);
+                button->setAccented(accent);
                 grid->addWidget(button, r, column, 1, span);
                 connect(button, &QPushButton::clicked, _controller,
                         [this, row_, col_]() { _controller->activateKeyAt(row_, col_); });

@@ -23,7 +23,7 @@ Rectangle {
     color: mouseArea.pressed
            ? (theme ? theme.keyPressedColor : "#636366")
            : isAccent
-             ? (theme ? theme.accentKeyColor : "#ff9500")
+             ? (theme ? theme.accentKeyColor : "#0a84ff")
              : (theme ? theme.keyColor : "#3a3a3c")
 
     Behavior on color { ColorAnimation { duration: 80 } }
@@ -38,17 +38,32 @@ Rectangle {
     }
 
     Text {
+        id: keyLabel
         // Show label text only when there is no icon. When both are present
         // the icon takes precedence (matches KeyButton behaviour in QWidget).
         visible: !(keyData && keyData.icon)
         anchors.centerIn: parent
         text: keyData ? keyData.text : ""
         color: theme ? theme.textColor : "white"
-        // Avoid binding to parent.font: Rectangle has no font property and
-        // the binding would produce a QML warning. Fall back to the Text
-        // element's own default font when no theme is set.
-        font: theme ? theme.font : font
+        // font is applied imperatively to avoid a binding-loop warning.
+        // A declarative 'font: theme ? theme.font : font' self-references the
+        // property and triggers "Binding loop detected" in QML. Using an
+        // onThemeChanged handler is safe on all Qt5/Qt6 versions.
         elide: Text.ElideNone
+    }
+
+    // Apply theme.font whenever the theme object itself changes. The 'changed'
+    // signal on KeyboardTheme (which fires for any property mutation) is wired
+    // via Connections below, so font updates propagate at runtime too.
+    onThemeChanged: {
+        if (theme) keyLabel.font = theme.font
+    }
+
+    Connections {
+        target: theme
+        // Update font whenever any theme property changes (the theme emits a
+        // single 'changed' signal for all properties).
+        function onChanged() { if (theme) keyLabel.font = theme.font }
     }
 
     MouseArea {
