@@ -7,6 +7,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
+# MSVC assumes the active system code page for narrow string-literal source
+# text unless told otherwise, silently mangling the non-ASCII (Hangul)
+# literals in hangul_composer.cpp/tst_hangulcomposer.cpp; force UTF-8 source
+# and execution character sets so they round-trip correctly on Windows. A
+# no-op on GCC/Clang, which already assume UTF-8 source.
+if(MSVC)
+    add_compile_options(/utf-8)
+endif()
+
 option(QKW_ENABLE_QML "Build the Qt Quick (QML) view and register QML types" ON)
 option(QKW_ENABLE_COVERAGE "Enable gcov/lcov coverage instrumentation (GCC/Clang only)" OFF)
 option(QKW_BUILD_TRANSLATIONS "Compile i18n/*.ts UI-string translations into .qm files" ON)

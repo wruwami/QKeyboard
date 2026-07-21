@@ -22,16 +22,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Qt 5.15/6.7 macOS binaries still reference the legacy AGL framework
-      # in their .prl files; recent Xcode SDKs dropped AGL entirely, which
-      # breaks linking ("ld: framework 'AGL' not found") against a runner's
-      # default (newest) Xcode. Pin an older Xcode whose SDK still ships it.
-      - name: Select Xcode (macOS AGL framework workaround)
-        if: matrix.os == 'macos-latest'
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '15.4'
-
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
@@ -40,6 +30,18 @@ jobs:
           # install on both Qt5 and Qt6 via aqt, not as an addon module —
           # requesting it explicitly 404s ("packages ... were not found").
           cache: true
+
+      # Qt 5.15/6.7 macOS binaries reference the legacy AGL framework in
+      # their .prl link metadata; the runner's Xcode SDKs have dropped AGL
+      # entirely (across every available Xcode version, so pinning an older
+      # one isn't an option here), breaking every link step with
+      # "ld: framework 'AGL' not found". Nothing in a modern Qt/macOS build
+      # actually calls into AGL — it's vestigial — so stripping the
+      # reference from the .prl files is safe.
+      - name: Strip legacy AGL framework reference from Qt .prl files (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          grep -rl -- '-framework AGL' "$QT_ROOT_DIR" | xargs sed -i '' 's/-framework AGL//g' || true
 
       # lcov/gcov-based coverage only works with the GCC toolchain used on
       # ubuntu-latest; Windows (MSVC) and macOS (Clang) legs skip it and just
