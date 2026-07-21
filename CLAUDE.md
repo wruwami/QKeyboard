@@ -50,6 +50,52 @@ re-stated.
 - Track work as GitHub issues; reference them in commit messages/PR bodies
   (e.g. `Closes #N`).
 
+## Engineering discipline
+
+These exist because each was violated in practice — see the issues opened
+2026-07-21 from a hostile self-review (#44-#55) for the concrete incidents.
+Treat them as checks to run before opening or merging a PR, not aspirations.
+
+1. **A change to one view's rendering/interaction logic needs the matching
+   change in the other view, in the same PR.** Geometry, sizing (icon size,
+   font auto-fit), accent/theme handling, and press feedback must match
+   between `KeyboardWidget`/`KeyButton` (QWidget) and
+   `KeyboardPanel.qml`/`KeyboardKey.qml` (QML) — this is project goal #2,
+   applied concretely. State in the PR description how parity was checked
+   (both example apps run side by side against the same layout/theme, or an
+   automated test). A PR that touches key rendering in only one view is a
+   sign something was missed, not a sign the other view didn't need it.
+2. **Never re-derive enum-backed logic from raw literals in more than one
+   place.** If QML needs to branch on a C++ enum (e.g. `KeyAction`), expose
+   it as a named field from the core (`KeyDefinition::toVariantMap()`,
+   `Q_ENUM`) — don't hardcode the same magic-number comparison
+   independently in `KeyboardWidget` and `KeyboardKey.qml`.
+3. **Parsers validate everything they accept, not just presence.**
+   `KeyboardLayout`'s stated design goal is reporting malformed input as an
+   error rather than defaulting around it silently. A new JSON field needs
+   both an existence check and a validity check (numeric ranges,
+   cross-references to other parsed data such as a `target` page id
+   actually existing) before `parseKey()`/`fromJson()` accept it.
+4. **Remove a workaround in the same change that supersedes it.** If a fix
+   in `CMakeLists.txt`, CI config, or app code turns out not to work (or a
+   different fix replaces it), delete the ineffective one immediately —
+   don't leave inert code that looks load-bearing for the next reader.
+   Relatedly: if the same problem could plausibly be fixed in two places
+   (e.g. `CMakeLists.txt` vs. `.github/workflows/ci.yml`), fix it in exactly
+   one — prefer CI-level for environment-specific issues (toolchain/SDK
+   quirks), `CMakeLists.txt` for anything a downstream consumer also needs.
+5. **One branch stays scoped to one concern.** A branch/PR that's already
+   merged is done — per the existing "one branch per issue/feature" rule
+   below, a new fix, feature, or unrelated CI change gets a new branch, even
+   if it's tempting to keep pushing to a branch that's still checked out.
+6. **A bug fix ships with a regression test in the same PR.** This
+   project's actual shipped bugs (#24's nested-`Repeater` `modelData`
+   shadowing, #25's `QStackedWidget` double-delete) were caught by manual
+   review, not tests. A fix to `KeyboardWidget`, `KeyButton`, or a QML view
+   without an accompanying QtTest/Qt Quick Test regression test is
+   incomplete — and coverage numbers are only meaningful if they include
+   the view code, not just the framework-agnostic core.
+
 ## Versioning
 
 Semantic Versioning; current version is `0.1.0` (pre-1.0, API not yet
