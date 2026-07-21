@@ -25,7 +25,9 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ matrix.qt-version }}
-          modules: ${{ startsWith(matrix.qt-version, '5') && 'qtdeclarative' || '' }}
+          # QtDeclarative (Qml/Quick) ships as part of the base desktop
+          # install on both Qt5 and Qt6 via aqt, not as an addon module —
+          # requesting it explicitly 404s ("packages ... were not found").
           cache: true
 
       - name: Install lcov
