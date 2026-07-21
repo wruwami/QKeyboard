@@ -63,7 +63,9 @@ Rectangle {
         target: theme
         // Update font whenever any theme property changes (the theme emits a
         // single 'changed' signal for all properties).
-        function onChanged() { if (theme) keyLabel.font = theme.font }
+        // Note: 'function onChanged()' syntax requires Qt 5.15+; use the
+        // 'onChanged:' property form which works on all Qt5/Qt6 versions.
+        onChanged: { if (theme) keyLabel.font = theme.font }
     }
 
     MouseArea {
