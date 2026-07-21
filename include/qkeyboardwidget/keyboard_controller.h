@@ -5,10 +5,6 @@
 
 #include "qkeyboardwidget/keyboard_layout.h"
 
-#ifdef QKW_ENABLE_QML
-#include <qqmlregistration.h>
-#endif
-
 namespace qkw {
 
 // Framework-agnostic keyboard state machine: owns the parsed KeyboardLayout,
@@ -17,12 +13,13 @@ namespace qkw {
 // QWidget view (KeyboardWidget) and the QML view (KeyboardPanel.qml) drive
 // themselves purely from this class, so there is exactly one place that
 // understands the layout JSON and one place that understands typing logic.
+//
+// Registered for QML with qmlRegisterType() (see qml_registration.h) rather
+// than the QML_ELEMENT macro, since QML_ELEMENT requires Qt 5.15+/Qt6 and
+// this library targets Qt5 through the latest Qt6.
 class KeyboardController : public QObject
 {
     Q_OBJECT
-#ifdef QKW_ENABLE_QML
-    QML_ELEMENT
-#endif
 
     Q_PROPERTY(QString source READ source WRITE setSource NOTIFY sourceChanged)
     Q_PROPERTY(bool valid READ isValid NOTIFY layoutChanged)

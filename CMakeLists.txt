@@ -10,7 +10,12 @@ set(CMAKE_AUTORCC ON)
 option(QKW_ENABLE_QML "Build the Qt Quick (QML) view and register QML types" ON)
 option(QKW_ENABLE_COVERAGE "Enable gcov/lcov coverage instrumentation (GCC/Clang only)" OFF)
 
-find_package(Qt6 6.2 REQUIRED COMPONENTS Core Widgets)
+include(GNUInstallDirs)
+
+# Qt5 (broad 5.x) through the latest Qt6 are all supported: find whichever
+# major version is available first, then request components from it.
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets)
 
 set(QKW_SOURCES
     src/key_definition.cpp
@@ -38,20 +43,23 @@ target_include_directories(qkeyboardwidget PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(qkeyboardwidget PUBLIC Qt6::Core Qt6::Widgets)
+target_link_libraries(qkeyboardwidget PUBLIC Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Widgets)
 
 if(QKW_ENABLE_QML)
-    find_package(Qt6 REQUIRED COMPONENTS Qml Quick)
-    target_compile_definitions(qkeyboardwidget PUBLIC QKW_ENABLE_QML)
-    target_link_libraries(qkeyboardwidget PUBLIC Qt6::Qml Qt6::Quick)
-
-    qt6_add_qml_module(qkeyboardwidget
-        URI QKeyboardWidget
-        VERSION 1.0
-        QML_FILES
-            qml/KeyboardKey.qml
-            qml/KeyboardPanel.qml
+    find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Qml Quick)
+    target_sources(qkeyboardwidget PRIVATE
+        src/qml_registration.cpp
+        include/qkeyboardwidget/qml_registration.h
     )
+    target_compile_definitions(qkeyboardwidget PUBLIC QKW_ENABLE_QML)
+    target_link_libraries(qkeyboardwidget PUBLIC Qt${QT_VERSION_MAJOR}::Qml Qt${QT_VERSION_MAJOR}::Quick)
+
+    # qml/KeyboardKey.qml and qml/KeyboardPanel.qml plus the hand-written
+    # qml/qmldir are shipped as plain files (not a compiled qt_add_qml_module,
+    # which is Qt6-only): host apps add this directory to the QML import
+    # path and call qkw::registerQmlTypes() before loading QML that imports
+    # "QKeyboardWidget". See README.md.
+    install(DIRECTORY qml/ DESTINATION ${CMAKE_INSTALL_DATADIR}/qkeyboardwidget/qml)
 endif()
 
 if(QKW_ENABLE_COVERAGE)
@@ -59,7 +67,6 @@ if(QKW_ENABLE_COVERAGE)
     target_link_options(qkeyboardwidget PUBLIC --coverage)
 endif()
 
-include(GNUInstallDirs)
 install(TARGETS qkeyboardwidget
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
