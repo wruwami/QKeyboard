@@ -185,6 +185,14 @@ complete examples.
 > implement Hangul syllable composition itself (tracked as a known
 > limitation in the issues).
 
+## Examples
+
+`examples/widgets_example` and `examples/qml_example` are both minimal demo
+apps: a text field driven entirely by the keyboard, a combo box that swaps
+the `en`/`ko` layout at runtime, and a small `KeyboardTheme` override. Build
+them with the rest of the project (they're on by default) and run
+`qkw_widgets_example` / `qkw_qml_example` from the build directory.
+
 ## Repository layout
 
 ```
