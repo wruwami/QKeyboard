@@ -25,6 +25,7 @@ set(QKW_SOURCES
     src/keyboard_theme.cpp
     src/key_button.cpp
     src/keyboard_widget.cpp
+    src/hangul_composer.cpp
 )
 
 set(QKW_HEADERS
@@ -34,6 +35,7 @@ set(QKW_HEADERS
     include/qkeyboardwidget/keyboard_theme.h
     include/qkeyboardwidget/key_button.h
     include/qkeyboardwidget/keyboard_widget.h
+    include/qkeyboardwidget/hangul_composer.h
 )
 
 add_library(qkeyboardwidget STATIC ${QKW_SOURCES} ${QKW_HEADERS} resources/qkeyboardwidget.qrc)

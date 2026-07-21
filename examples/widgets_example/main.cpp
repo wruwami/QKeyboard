@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+#include "qkeyboardwidget/hangul_composer.h"
 #include "qkeyboardwidget/keyboard_controller.h"
 #include "qkeyboardwidget/keyboard_theme.h"
 #include "qkeyboardwidget/keyboard_widget.h"
@@ -40,12 +41,17 @@ int main(int argc, char *argv[])
     keyboard->theme()->setAccentKeyColor(QColor(QStringLiteral("#ff9500")));
     keyboard->theme()->setCornerRadius(10);
 
-    QObject::connect(keyboard->controller(), &qkw::KeyboardController::characterEntered, lineEdit,
+    auto *composer = new qkw::HangulComposer(keyboard->controller(), central);
+
+    QObject::connect(composer, &qkw::HangulComposer::characterEntered, lineEdit,
                       [lineEdit](const QString &text) { lineEdit->insert(text); });
-    QObject::connect(keyboard->controller(), &qkw::KeyboardController::backspaceRequested, lineEdit,
+    QObject::connect(composer, &qkw::HangulComposer::backspaceRequested, lineEdit,
                       [lineEdit]() { lineEdit->backspace(); });
     QObject::connect(keyboard->controller(), &qkw::KeyboardController::enterRequested, lineEdit,
-                      [lineEdit]() { lineEdit->clear(); });
+                      [lineEdit, composer]() {
+                          composer->commit();
+                          lineEdit->clear();
+                      });
 
     QObject::connect(localeBox, QOverload<int>::of(&QComboBox::currentIndexChanged), keyboard->controller(),
                       [keyboard, localeBox](int index) {

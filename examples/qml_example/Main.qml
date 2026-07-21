@@ -12,13 +12,20 @@ ApplicationWindow {
     KeyboardController {
         id: controller
         source: "qrc:/layouts/en.json"
+        onEnterRequested: {
+            composer.commit()
+            inputField.text = ""
+        }
+    }
 
+    HangulComposer {
+        id: composer
+        controller: controller
         onCharacterEntered: (text) => inputField.insert(inputField.cursorPosition, text)
         onBackspaceRequested: {
             const from = Math.max(0, inputField.cursorPosition - 1)
             inputField.remove(from, inputField.cursorPosition)
         }
-        onEnterRequested: inputField.text = ""
     }
 
     KeyboardTheme {
