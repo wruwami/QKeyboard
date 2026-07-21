@@ -231,6 +231,13 @@ i18n/                      Qt Linguist translation sources
 examples/                  demo apps
 ```
 
+## Versioning
+
+This project follows [Semantic Versioning](https://semver.org/); see
+[`VERSIONING.md`](VERSIONING.md) for the exact rules (the project is
+currently pre-1.0, so the public API isn't stable yet) and
+[`CHANGELOG.md`](CHANGELOG.md) for what changed in each release.
+
 ## License
 
 Apache-2.0 — see [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
