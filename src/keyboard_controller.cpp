@@ -11,8 +11,7 @@ KeyboardController::KeyboardController(QObject *parent) : QObject(parent)
 bool KeyboardController::loadFile(const QString &filePath)
 {
     QString path = filePath;
-    if (path.startsWith(QLatin1String("qrc:")))
-        path = path.mid(3);
+    if (path.startsWith(QLatin1String("qrc:"))) path = path.mid(3);
 
     QString error;
     KeyboardLayout layout = KeyboardLayout::fromFile(path, &error);
@@ -186,22 +185,12 @@ void KeyboardController::activateKeyAt(int row, int column)
 
     const KeyDefinition &key = rowVec.at(column);
     switch (key.action) {
-        case KeyAction::Character:
-            emit characterEntered(key.text);
-            break;
-        case KeyAction::Space:
-            emit characterEntered(QStringLiteral(" "));
-            break;
-        case KeyAction::Backspace:
-            emit backspaceRequested();
-            break;
-        case KeyAction::Enter:
-            emit enterRequested();
-            break;
+        case KeyAction::Character: emit characterEntered(key.text); break;
+        case KeyAction::Space: emit characterEntered(QStringLiteral(" ")); break;
+        case KeyAction::Backspace: emit backspaceRequested(); break;
+        case KeyAction::Enter: emit enterRequested(); break;
         case KeyAction::Shift:
-        case KeyAction::Switch:
-            setPageById(key.target);
-            break;
+        case KeyAction::Switch: setPageById(key.target); break;
     }
 }
 

@@ -9,11 +9,11 @@ namespace {
 //   syllable = 0xAC00 + (choseongIndex * 21 + jungseongIndex) * 28 + jongseongIndex
 // This is the same block layouts/ko.json's "char" keys emit one at a time.
 const QString kChoseong = QStringLiteral("ㄱㄲㄴㄷㄸㄹㅁㅂ"
-                                          "ㅃㅅㅆㅇㅈㅉㅊㅋ"
-                                          "ㅌㅍㅎ");
+                                         "ㅃㅅㅆㅇㅈㅉㅊㅋ"
+                                         "ㅌㅍㅎ");
 const QString kJungseong = QStringLiteral("ㅏㅐㅑㅒㅓㅔㅕㅖ"
-                                           "ㅗㅘㅙㅚㅛㅜㅝㅞ"
-                                           "ㅟㅠㅡㅢㅣ");
+                                          "ㅗㅘㅙㅚㅛㅜㅝㅞ"
+                                          "ㅟㅠㅡㅢㅣ");
 
 int choseongIndexOf(QChar c)
 {
@@ -30,23 +30,23 @@ int jungseongIndexOf(QChar c)
 int choseongToSingleJongseong(int choseongIndex)
 {
     switch (choseongIndex) {
-        case 0: return 1;    // ㄱ -> ㄱ
-        case 1: return 2;    // ㄲ -> ㄲ
-        case 2: return 4;    // ㄴ -> ㄴ
-        case 3: return 7;    // ㄷ -> ㄷ
-        case 5: return 8;    // ㄹ -> ㄹ
-        case 6: return 16;   // ㅁ -> ㅁ
-        case 7: return 17;   // ㅂ -> ㅂ
-        case 9: return 19;   // ㅅ -> ㅅ
-        case 10: return 20;  // ㅆ -> ㅆ
-        case 11: return 21;  // ㅇ -> ㅇ
-        case 12: return 22;  // ㅈ -> ㅈ
-        case 14: return 23;  // ㅊ -> ㅊ
-        case 15: return 24;  // ㅋ -> ㅋ
-        case 16: return 25;  // ㅌ -> ㅌ
-        case 17: return 26;  // ㅍ -> ㅍ
-        case 18: return 27;  // ㅎ -> ㅎ
-        default: return -1;  // ㄸ, ㅃ, ㅉ
+        case 0: return 1;   // ㄱ -> ㄱ
+        case 1: return 2;   // ㄲ -> ㄲ
+        case 2: return 4;   // ㄴ -> ㄴ
+        case 3: return 7;   // ㄷ -> ㄷ
+        case 5: return 8;   // ㄹ -> ㄹ
+        case 6: return 16;  // ㅁ -> ㅁ
+        case 7: return 17;  // ㅂ -> ㅂ
+        case 9: return 19;  // ㅅ -> ㅅ
+        case 10: return 20; // ㅆ -> ㅆ
+        case 11: return 21; // ㅇ -> ㅇ
+        case 12: return 22; // ㅈ -> ㅈ
+        case 14: return 23; // ㅊ -> ㅊ
+        case 15: return 24; // ㅋ -> ㅋ
+        case 16: return 25; // ㅌ -> ㅌ
+        case 17: return 26; // ㅍ -> ㅍ
+        case 18: return 27; // ㅎ -> ㅎ
+        default: return -1; // ㄸ, ㅃ, ㅉ
     }
 }
 
@@ -55,22 +55,22 @@ int choseongToSingleJongseong(int choseongIndex)
 int singleJongseongToChoseong(int jongseongIndex)
 {
     switch (jongseongIndex) {
-        case 1: return 0;    // ㄱ -> ㄱ
-        case 2: return 1;    // ㄲ -> ㄲ
-        case 4: return 2;    // ㄴ -> ㄴ
-        case 7: return 3;    // ㄷ -> ㄷ
-        case 8: return 5;    // ㄹ -> ㄹ
-        case 16: return 6;   // ㅁ -> ㅁ
-        case 17: return 7;   // ㅂ -> ㅂ
-        case 19: return 9;   // ㅅ -> ㅅ
-        case 20: return 10;  // ㅆ -> ㅆ
-        case 21: return 11;  // ㅇ -> ㅇ
-        case 22: return 12;  // ㅈ -> ㅈ
-        case 23: return 14;  // ㅊ -> ㅊ
-        case 24: return 15;  // ㅋ -> ㅋ
-        case 25: return 16;  // ㅌ -> ㅌ
-        case 26: return 17;  // ㅍ -> ㅍ
-        case 27: return 18;  // ㅎ -> ㅎ
+        case 1: return 0;   // ㄱ -> ㄱ
+        case 2: return 1;   // ㄲ -> ㄲ
+        case 4: return 2;   // ㄴ -> ㄴ
+        case 7: return 3;   // ㄷ -> ㄷ
+        case 8: return 5;   // ㄹ -> ㄹ
+        case 16: return 6;  // ㅁ -> ㅁ
+        case 17: return 7;  // ㅂ -> ㅂ
+        case 19: return 9;  // ㅅ -> ㅅ
+        case 20: return 10; // ㅆ -> ㅆ
+        case 21: return 11; // ㅇ -> ㅇ
+        case 22: return 12; // ㅈ -> ㅈ
+        case 23: return 14; // ㅊ -> ㅊ
+        case 24: return 15; // ㅋ -> ㅋ
+        case 25: return 16; // ㅌ -> ㅌ
+        case 26: return 17; // ㅍ -> ㅍ
+        case 27: return 18; // ㅎ -> ㅎ
         default: return -1;
     }
 }
@@ -80,23 +80,23 @@ int singleJongseongToChoseong(int jongseongIndex)
 int combineJongseong(int baseJongseongIndex, int addedChoseongIndex)
 {
     switch (baseJongseongIndex) {
-        case 1: return addedChoseongIndex == 9 ? 3 : -1;    // ㄱ+ㅅ -> ㄳ
-        case 4:                                              // ㄴ+...
-            if (addedChoseongIndex == 12) return 5;          // ㄴ+ㅈ -> ㄵ
-            if (addedChoseongIndex == 18) return 6;          // ㄴ+ㅎ -> ㄶ
+        case 1: return addedChoseongIndex == 9 ? 3 : -1; // ㄱ+ㅅ -> ㄳ
+        case 4:                                          // ㄴ+...
+            if (addedChoseongIndex == 12) return 5;      // ㄴ+ㅈ -> ㄵ
+            if (addedChoseongIndex == 18) return 6;      // ㄴ+ㅎ -> ㄶ
             return -1;
-        case 8:                                              // ㄹ+...
+        case 8: // ㄹ+...
             switch (addedChoseongIndex) {
-                case 0: return 9;    // ㄹ+ㄱ -> ㄺ
-                case 6: return 10;   // ㄹ+ㅁ -> ㄻ
-                case 7: return 11;   // ㄹ+ㅂ -> ㄼ
-                case 9: return 12;   // ㄹ+ㅅ -> ㄽ
-                case 16: return 13;  // ㄹ+ㅌ -> ㄾ
-                case 17: return 14;  // ㄹ+ㅍ -> ㄿ
-                case 18: return 15;  // ㄹ+ㅎ -> ㅀ
+                case 0: return 9;   // ㄹ+ㄱ -> ㄺ
+                case 6: return 10;  // ㄹ+ㅁ -> ㄻ
+                case 7: return 11;  // ㄹ+ㅂ -> ㄼ
+                case 9: return 12;  // ㄹ+ㅅ -> ㄽ
+                case 16: return 13; // ㄹ+ㅌ -> ㄾ
+                case 17: return 14; // ㄹ+ㅍ -> ㄿ
+                case 18: return 15; // ㄹ+ㅎ -> ㅀ
                 default: return -1;
             }
-        case 17: return addedChoseongIndex == 9 ? 18 : -1;  // ㅂ+ㅅ -> ㅄ
+        case 17: return addedChoseongIndex == 9 ? 18 : -1; // ㅂ+ㅅ -> ㅄ
         default: return -1;
     }
 }
@@ -104,22 +104,26 @@ int combineJongseong(int baseJongseongIndex, int addedChoseongIndex)
 // Splits a compound jongseong back into the part that stays as this
 // syllable's final and the consonant that gets pulled into the next
 // syllable's initial. Returns {-1, -1} if `jongseongIndex` isn't compound.
-struct JongseongSplit { int remainingJongseong; int pulledChoseong; };
+struct JongseongSplit
+{
+    int remainingJongseong;
+    int pulledChoseong;
+};
 
 JongseongSplit decomposeCompoundJongseong(int jongseongIndex)
 {
     switch (jongseongIndex) {
-        case 3: return {1, 9};    // ㄳ -> ㄱ + ㅅ
-        case 5: return {4, 12};   // ㄵ -> ㄴ + ㅈ
-        case 6: return {4, 18};   // ㄶ -> ㄴ + ㅎ
-        case 9: return {8, 0};    // ㄺ -> ㄹ + ㄱ
-        case 10: return {8, 6};   // ㄻ -> ㄹ + ㅁ
-        case 11: return {8, 7};   // ㄼ -> ㄹ + ㅂ
-        case 12: return {8, 9};   // ㄽ -> ㄹ + ㅅ
-        case 13: return {8, 16};  // ㄾ -> ㄹ + ㅌ
-        case 14: return {8, 17};  // ㄿ -> ㄹ + ㅍ
-        case 15: return {8, 18};  // ㅀ -> ㄹ + ㅎ
-        case 18: return {17, 9};  // ㅄ -> ㅂ + ㅅ
+        case 3: return {1, 9};   // ㄳ -> ㄱ + ㅅ
+        case 5: return {4, 12};  // ㄵ -> ㄴ + ㅈ
+        case 6: return {4, 18};  // ㄶ -> ㄴ + ㅎ
+        case 9: return {8, 0};   // ㄺ -> ㄹ + ㄱ
+        case 10: return {8, 6};  // ㄻ -> ㄹ + ㅁ
+        case 11: return {8, 7};  // ㄼ -> ㄹ + ㅂ
+        case 12: return {8, 9};  // ㄽ -> ㄹ + ㅅ
+        case 13: return {8, 16}; // ㄾ -> ㄹ + ㅌ
+        case 14: return {8, 17}; // ㄿ -> ㄹ + ㅍ
+        case 15: return {8, 18}; // ㅀ -> ㄹ + ㅎ
+        case 18: return {17, 9}; // ㅄ -> ㅂ + ㅅ
         default: return {-1, -1};
     }
 }
@@ -134,21 +138,21 @@ bool isCompoundJongseong(int jongseongIndex)
 int combineJungseong(int baseJungseongIndex, int addedJungseongIndex)
 {
     switch (baseJungseongIndex) {
-        case 8:                                             // ㅗ+...
+        case 8: // ㅗ+...
             switch (addedJungseongIndex) {
-                case 0: return 9;    // ㅗ+ㅏ -> ㅘ
-                case 1: return 10;   // ㅗ+ㅐ -> ㅙ
-                case 20: return 11;  // ㅗ+ㅣ -> ㅚ
+                case 0: return 9;   // ㅗ+ㅏ -> ㅘ
+                case 1: return 10;  // ㅗ+ㅐ -> ㅙ
+                case 20: return 11; // ㅗ+ㅣ -> ㅚ
                 default: return -1;
             }
-        case 13:                                             // ㅜ+...
+        case 13: // ㅜ+...
             switch (addedJungseongIndex) {
-                case 4: return 14;   // ㅜ+ㅓ -> ㅝ
-                case 5: return 15;   // ㅜ+ㅔ -> ㅞ
-                case 20: return 16;  // ㅜ+ㅣ -> ㅟ
+                case 4: return 14;  // ㅜ+ㅓ -> ㅝ
+                case 5: return 15;  // ㅜ+ㅔ -> ㅞ
+                case 20: return 16; // ㅜ+ㅣ -> ㅟ
                 default: return -1;
             }
-        case 18: return addedJungseongIndex == 20 ? 19 : -1;  // ㅡ+ㅣ -> ㅢ
+        case 18: return addedJungseongIndex == 20 ? 19 : -1; // ㅡ+ㅣ -> ㅢ
         default: return -1;
     }
 }
@@ -158,9 +162,13 @@ int combineJungseong(int baseJungseongIndex, int addedJungseongIndex)
 int decomposeCompoundJungseong(int jungseongIndex)
 {
     switch (jungseongIndex) {
-        case 9: case 10: case 11: return 8;   // ㅘ/ㅙ/ㅚ -> ㅗ
-        case 14: case 15: case 16: return 13; // ㅝ/ㅞ/ㅟ -> ㅜ
-        case 19: return 18;                   // ㅢ -> ㅡ
+        case 9:
+        case 10:
+        case 11: return 8; // ㅘ/ㅙ/ㅚ -> ㅗ
+        case 14:
+        case 15:
+        case 16: return 13; // ㅝ/ㅞ/ㅟ -> ㅜ
+        case 19: return 18; // ㅢ -> ㅡ
         default: return -1;
     }
 }

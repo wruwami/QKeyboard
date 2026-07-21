@@ -15,12 +15,9 @@ namespace {
 bool actionFromString(const QString &type, KeyAction *outAction)
 {
     static const QHash<QString, KeyAction> kActions = {
-        {QStringLiteral("char"), KeyAction::Character},
-        {QStringLiteral("backspace"), KeyAction::Backspace},
-        {QStringLiteral("enter"), KeyAction::Enter},
-        {QStringLiteral("space"), KeyAction::Space},
-        {QStringLiteral("shift"), KeyAction::Shift},
-        {QStringLiteral("switch"), KeyAction::Switch},
+        {QStringLiteral("char"), KeyAction::Character}, {QStringLiteral("backspace"), KeyAction::Backspace},
+        {QStringLiteral("enter"), KeyAction::Enter},    {QStringLiteral("space"), KeyAction::Space},
+        {QStringLiteral("shift"), KeyAction::Shift},    {QStringLiteral("switch"), KeyAction::Switch},
     };
     const auto it = kActions.constFind(type);
     if (it == kActions.constEnd()) return false;

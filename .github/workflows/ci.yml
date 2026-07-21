@@ -6,6 +6,39 @@ on:
   pull_request:
 
 jobs:
+  lint:
+    name: clang-format + cppcheck
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install clang-format and cppcheck
+        run: sudo apt-get update && sudo apt-get install -y clang-format cppcheck
+
+      # Formatting is config-driven (.clang-format) rather than a fixed
+      # tool version's defaults, so this stays stable across clang-format
+      # releases. Scans the same source set cppcheck below does.
+      - name: clang-format --dry-run
+        run: |
+          files=$(find src include tests examples -name '*.cpp' -o -name '*.h')
+          clang-format --dry-run --Werror $files
+
+      # --enable=warning,style,performance,portability without
+      # unusedFunction/missingIncludeSystem (see .cppcheck-suppressions for
+      # why); -I include so cppcheck can resolve this project's own headers
+      # even without a Qt install on PATH.
+      - name: cppcheck
+        run: |
+          cppcheck --std=c++17 --language=c++ \
+            --enable=warning,style,performance,portability \
+            --inline-suppr \
+            --suppressions-list=.cppcheck-suppressions \
+            --error-exitcode=1 \
+            -I include \
+            src include tests examples
+
   build-and-test:
     name: ${{ matrix.os }} / Qt ${{ matrix.qt-version }}
     # GitHub-hosted windows-latest runners are on the shared Actions quota,

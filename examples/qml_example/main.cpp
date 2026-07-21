@@ -19,8 +19,7 @@ int main(int argc, char *argv[])
     engine.addImportPath(QStringLiteral(QKW_QML_IMPORT_PATH));
     engine.load(QUrl::fromLocalFile(QStringLiteral(QKW_EXAMPLE_MAIN_QML)));
 
-    if (engine.rootObjects().isEmpty())
-        return -1;
+    if (engine.rootObjects().isEmpty()) return -1;
 
     return app.exec();
 }
