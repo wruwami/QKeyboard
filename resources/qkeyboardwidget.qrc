@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/qkeyboardwidget/icons">
+        <file alias="backspace.svg">../assets/icons/backspace.svg</file>
+        <file alias="enter.svg">../assets/icons/enter.svg</file>
+        <file alias="shift.svg">../assets/icons/shift.svg</file>
+        <file alias="globe.svg">../assets/icons/globe.svg</file>
+    </qresource>
+    <qresource prefix="/layouts">
+        <file alias="en.json">../layouts/en.json</file>
+        <file alias="ko.json">../layouts/ko.json</file>
+    </qresource>
+</RCC>
