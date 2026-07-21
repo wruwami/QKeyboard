@@ -28,18 +28,21 @@ Item {
             model: root.controller ? root.controller.rows : []
 
             delegate: RowLayout {
-                property var modelData
+                // Capture modelData into an explicitly named property so the
+                // inner Repeater's delegate can reference it without ambiguity.
+                // Declaring `property var modelData` would *shadow* the
+                // auto-injected QML role and produce undefined; use a distinct
+                // name instead.
+                property var rowData: modelData
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 spacing: root.theme.keySpacing
 
                 Repeater {
-                    model: parent.modelData
+                    model: rowData
 
                     delegate: KeyboardKey {
-                        property var modelData
-
                         keyData: modelData
                         theme: root.theme
                         Layout.preferredWidth: 40 * (modelData.span || 1) + (root.theme.keySpacing * ((modelData.span || 1) - 1))

@@ -12,10 +12,19 @@ Rectangle {
 
     signal activated()
 
+    // Shift (4) and Switch (5) keys use the accent colour so the user can tell
+    // at a glance that pressing them changes the keyboard page rather than
+    // typing a character. action is serialised as an int by toVariantMap()
+    // matching the KeyAction enum: Character=0 Backspace=1 Enter=2 Space=3
+    // Shift=4 Switch=5.
+    readonly property bool isAccent: keyData && (keyData.action === 4 || keyData.action === 5)
+
     radius: theme ? theme.cornerRadius : 6
     color: mouseArea.pressed
            ? (theme ? theme.keyPressedColor : "#636366")
-           : (theme ? theme.keyColor : "#3a3a3c")
+           : isAccent
+             ? (theme ? theme.accentKeyColor : "#ff9500")
+             : (theme ? theme.keyColor : "#3a3a3c")
 
     Behavior on color { ColorAnimation { duration: 80 } }
 
@@ -29,11 +38,16 @@ Rectangle {
     }
 
     Text {
+        // Show label text only when there is no icon. When both are present
+        // the icon takes precedence (matches KeyButton behaviour in QWidget).
         visible: !(keyData && keyData.icon)
         anchors.centerIn: parent
         text: keyData ? keyData.text : ""
         color: theme ? theme.textColor : "white"
-        font: theme ? theme.font : parent.font
+        // Avoid binding to parent.font: Rectangle has no font property and
+        // the binding would produce a QML warning. Fall back to the Text
+        // element's own default font when no theme is set.
+        font: theme ? theme.font : font
         elide: Text.ElideNone
     }
 
