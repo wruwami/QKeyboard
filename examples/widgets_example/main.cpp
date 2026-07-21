@@ -6,6 +6,8 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+#include "qkeyboardwidget/keyboard_controller.h"
+#include "qkeyboardwidget/keyboard_theme.h"
 #include "qkeyboardwidget/keyboard_widget.h"
 
 // Minimal demo: a QLineEdit driven entirely by a KeyboardWidget, with a
