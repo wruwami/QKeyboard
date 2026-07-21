@@ -25,8 +25,8 @@ on-screen keyboard projects.
 
 ## Status
 
-The core library, both views, the CMake build, and the `en`/`ko` layouts are
-implemented. Example apps and `.ts` translation files are tracked as open
+The core library, both views, the CMake build, the `en`/`ko` layouts, and
+UI-string translation are implemented. Example apps are tracked as open
 work in the repository's issues — see those before assuming this builds out
 of the box.
 
@@ -116,17 +116,29 @@ Two independent things can change per language:
 1. **Key layout** — call `controller->loadFile(...)` (C++) or set
    `controller.source` (QML) to a different `layouts/<locale>.json`.
 2. **UI string translation** (Enter/Backspace/Shift/... labels) — install a
-   `QTranslator` loaded from `i18n/qkeyboardwidget_<locale>.qm` before
-   reloading the layout, so `KeyboardController::resolveLabel()` picks up
-   the translated strings on the next `rows` rebuild.
+   `QTranslator` loaded from the compiled `qkeyboardwidget_<locale>.qm`
+   before reloading the layout, so `KeyboardController::resolveLabel()`
+   picks up the translated strings on the next `rows` rebuild. English needs
+   no translator at all: `QCoreApplication::translate()` falls back to the
+   (English) source text when no translator is installed for the active
+   locale.
 
 ```cpp
 auto *translator = new QTranslator(qApp);
+// CMAKE_INSTALL_DATADIR/qkeyboardwidget/i18n if installed system-wide, or
+// wherever your app embeds/deploys the .qm files it needs.
 translator->load(QLocale(QLocale::Korean), QStringLiteral("qkeyboardwidget"),
-                  QStringLiteral("_"), QStringLiteral(":/i18n"));
+                  QStringLiteral("_"), QStringLiteral("/usr/share/qkeyboardwidget/i18n"));
 qApp->installTranslator(translator);
 keyboard->controller()->loadFile(":/layouts/ko.json");
 ```
+
+`i18n/qkeyboardwidget_ko.ts` is the Korean translation source; `QKW_BUILD_TRANSLATIONS`
+(on by default) compiles it to `.qm` via CMake at build time and installs it.
+To add another language, add `i18n/qkeyboardwidget_<locale>.ts` (run `lupdate`
+against `src/keyboard_controller.cpp`, context `QKeyboardWidget`, to seed it
+with the current source strings), list it in `QKW_TS_FILES` in
+`CMakeLists.txt`, and translate it in Qt Linguist.
 
 ## Layout format
 
@@ -181,7 +193,7 @@ src/                       implementation
 qml/                       Qt Quick components
 layouts/                   per-locale layout JSON
 assets/icons/              key icons (SVG)
-i18n/                      Qt Linguist translation sources (in progress)
+i18n/                      Qt Linguist translation sources
 examples/                  demo apps (in progress)
 ```
 
