@@ -9,3 +9,4 @@ endfunction()
 
 qkw_add_test(tst_keyboardlayout tst_keyboardlayout.cpp)
 qkw_add_test(tst_keyboardcontroller tst_keyboardcontroller.cpp)
+qkw_add_test(tst_hangulcomposer tst_hangulcomposer.cpp)
