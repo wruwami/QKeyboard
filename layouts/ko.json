@@ -1,0 +1,135 @@
+{
+  "locale": "ko",
+  "pages": [
+    {
+      "id": "jamo",
+      "rows": [
+        [
+          {"type": "char", "text": "ㅂ"}, {"type": "char", "text": "ㅈ"}, {"type": "char", "text": "ㄷ"},
+          {"type": "char", "text": "ㄱ"}, {"type": "char", "text": "ㅅ"}, {"type": "char", "text": "ㅛ"},
+          {"type": "char", "text": "ㅕ"}, {"type": "char", "text": "ㅑ"}, {"type": "char", "text": "ㅐ"},
+          {"type": "char", "text": "ㅔ"},
+          {"type": "backspace", "span": 2, "icon": ":/qkeyboardwidget/icons/backspace.svg"}
+        ],
+        [
+          {"type": "char", "text": "ㅁ"}, {"type": "char", "text": "ㄴ"}, {"type": "char", "text": "ㅇ"},
+          {"type": "char", "text": "ㄹ"}, {"type": "char", "text": "ㅎ"}, {"type": "char", "text": "ㅗ"},
+          {"type": "char", "text": "ㅓ"}, {"type": "char", "text": "ㅏ"}, {"type": "char", "text": "ㅣ"},
+          {"type": "enter", "span": 2, "icon": ":/qkeyboardwidget/icons/enter.svg"}
+        ],
+        [
+          {"type": "shift", "target": "jamo_shift", "span": 2, "icon": ":/qkeyboardwidget/icons/shift.svg"},
+          {"type": "char", "text": "ㅋ"}, {"type": "char", "text": "ㅌ"}, {"type": "char", "text": "ㅊ"},
+          {"type": "char", "text": "ㅍ"}, {"type": "char", "text": "ㅠ"}, {"type": "char", "text": "ㅜ"},
+          {"type": "char", "text": "ㅡ"},
+          {"type": "char", "text": ","}, {"type": "char", "text": "."}
+        ],
+        [
+          {"type": "switch", "target": "numeric", "labelId": "numbers", "span": 2},
+          {"type": "char", "text": ","},
+          {"type": "space", "span": 5},
+          {"type": "char", "text": "."},
+          {"type": "char", "text": "?"},
+          {"type": "char", "text": "!"}
+        ]
+      ]
+    },
+    {
+      "id": "jamo_shift",
+      "rows": [
+        [
+          {"type": "char", "text": "ㅃ"}, {"type": "char", "text": "ㅉ"}, {"type": "char", "text": "ㄸ"},
+          {"type": "char", "text": "ㄲ"}, {"type": "char", "text": "ㅆ"}, {"type": "char", "text": "ㅛ"},
+          {"type": "char", "text": "ㅕ"}, {"type": "char", "text": "ㅑ"}, {"type": "char", "text": "ㅒ"},
+          {"type": "char", "text": "ㅖ"},
+          {"type": "backspace", "span": 2, "icon": ":/qkeyboardwidget/icons/backspace.svg"}
+        ],
+        [
+          {"type": "char", "text": "ㅁ"}, {"type": "char", "text": "ㄴ"}, {"type": "char", "text": "ㅇ"},
+          {"type": "char", "text": "ㄹ"}, {"type": "char", "text": "ㅎ"}, {"type": "char", "text": "ㅗ"},
+          {"type": "char", "text": "ㅓ"}, {"type": "char", "text": "ㅏ"}, {"type": "char", "text": "ㅣ"},
+          {"type": "enter", "span": 2, "icon": ":/qkeyboardwidget/icons/enter.svg"}
+        ],
+        [
+          {"type": "shift", "target": "jamo", "span": 2, "icon": ":/qkeyboardwidget/icons/shift.svg"},
+          {"type": "char", "text": "ㅋ"}, {"type": "char", "text": "ㅌ"}, {"type": "char", "text": "ㅊ"},
+          {"type": "char", "text": "ㅍ"}, {"type": "char", "text": "ㅠ"}, {"type": "char", "text": "ㅜ"},
+          {"type": "char", "text": "ㅡ"},
+          {"type": "char", "text": ","}, {"type": "char", "text": "."}
+        ],
+        [
+          {"type": "switch", "target": "numeric", "labelId": "numbers", "span": 2},
+          {"type": "char", "text": ","},
+          {"type": "space", "span": 5},
+          {"type": "char", "text": "."},
+          {"type": "char", "text": "?"},
+          {"type": "char", "text": "!"}
+        ]
+      ]
+    },
+    {
+      "id": "numeric",
+      "rows": [
+        [
+          {"type": "char", "text": "1"}, {"type": "char", "text": "2"}, {"type": "char", "text": "3"},
+          {"type": "char", "text": "4"}, {"type": "char", "text": "5"}, {"type": "char", "text": "6"},
+          {"type": "char", "text": "7"}, {"type": "char", "text": "8"}, {"type": "char", "text": "9"},
+          {"type": "char", "text": "0"},
+          {"type": "backspace", "span": 2, "icon": ":/qkeyboardwidget/icons/backspace.svg"}
+        ],
+        [
+          {"type": "char", "text": "-"}, {"type": "char", "text": "/"}, {"type": "char", "text": ":"},
+          {"type": "char", "text": ";"}, {"type": "char", "text": "("}, {"type": "char", "text": ")"},
+          {"type": "char", "text": "₩"}, {"type": "char", "text": "&"}, {"type": "char", "text": "@"},
+          {"type": "enter", "span": 2, "icon": ":/qkeyboardwidget/icons/enter.svg"}
+        ],
+        [
+          {"type": "switch", "target": "symbols", "labelId": "symbols", "span": 2},
+          {"type": "char", "text": "."}, {"type": "char", "text": ","}, {"type": "char", "text": "?"},
+          {"type": "char", "text": "!"}, {"type": "char", "text": "'"}, {"type": "char", "text": "+"},
+          {"type": "char", "text": "\""}
+        ],
+        [
+          {"type": "switch", "target": "jamo", "labelId": "letters", "span": 2},
+          {"type": "char", "text": ","},
+          {"type": "space", "span": 5},
+          {"type": "char", "text": "."},
+          {"type": "char", "text": "\""},
+          {"type": "char", "text": "%"}
+        ]
+      ]
+    },
+    {
+      "id": "symbols",
+      "rows": [
+        [
+          {"type": "char", "text": "["}, {"type": "char", "text": "]"}, {"type": "char", "text": "{"},
+          {"type": "char", "text": "}"}, {"type": "char", "text": "#"}, {"type": "char", "text": "%"},
+          {"type": "char", "text": "^"}, {"type": "char", "text": "*"}, {"type": "char", "text": "+"},
+          {"type": "char", "text": "="},
+          {"type": "backspace", "span": 2, "icon": ":/qkeyboardwidget/icons/backspace.svg"}
+        ],
+        [
+          {"type": "char", "text": "_"}, {"type": "char", "text": "\\"}, {"type": "char", "text": "|"},
+          {"type": "char", "text": "~"}, {"type": "char", "text": "<"}, {"type": "char", "text": ">"},
+          {"type": "char", "text": "$"}, {"type": "char", "text": "@"},
+          {"type": "enter", "span": 2, "icon": ":/qkeyboardwidget/icons/enter.svg"}
+        ],
+        [
+          {"type": "switch", "target": "numeric", "labelId": "numbers", "span": 2},
+          {"type": "char", "text": "."}, {"type": "char", "text": ","}, {"type": "char", "text": "?"},
+          {"type": "char", "text": "!"}, {"type": "char", "text": "'"}, {"type": "char", "text": "/"},
+          {"type": "char", "text": "&"}
+        ],
+        [
+          {"type": "switch", "target": "jamo", "labelId": "letters", "span": 2},
+          {"type": "char", "text": ","},
+          {"type": "space", "span": 5},
+          {"type": "char", "text": "."},
+          {"type": "char", "text": ":"},
+          {"type": "char", "text": ";"}
+        ]
+      ]
+    }
+  ]
+}

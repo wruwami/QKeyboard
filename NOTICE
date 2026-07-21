@@ -1,0 +1,12 @@
+QKeyboard
+Copyright 2026 wruwami
+
+This product is licensed under the Apache License, Version 2.0.
+
+This is an independent, clean-room reimplementation. The on-screen keyboard
+core, widget view, QML components, layout schema, theming API, and
+translations in this repository were designed and written from scratch for
+this project. No source code, build files, or bundled assets from the
+original GPLv3-licensed QKeyboardWidget project (Mihaylov93/QKeyboardWidget)
+are included; only the general product concept (a JSON-driven on-screen
+keyboard widget for Qt) was carried over.
