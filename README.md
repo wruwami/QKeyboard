@@ -1,5 +1,8 @@
 # QKeyboard
 
+[![CI](https://github.com/wruwami/QKeyboard/actions/workflows/ci.yml/badge.svg)](https://github.com/wruwami/QKeyboard/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/wruwami/QKeyboard/branch/main/graph/badge.svg)](https://codecov.io/gh/wruwami/QKeyboard)
+
 An on-screen keyboard widget for Qt, licensed under Apache-2.0. It supports
 both QWidget and QML (Qt Quick) applications from the same core, drives its
 key layout entirely from JSON (so adding a language or remapping keys never
@@ -172,6 +175,22 @@ complete examples.
 > left to the receiving text field / OS IME; this library does not
 > implement Hangul syllable composition itself (tracked as a known
 > limitation in the issues).
+
+## Testing & CI
+
+```sh
+cmake -S . -B build -DQKW_ENABLE_COVERAGE=ON
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+`.github/workflows/ci.yml` runs this same build+test on both Qt 5.15 and
+Qt 6.7 on every push/PR (the two ends of the "Qt5 through the latest Qt6"
+support range), and uploads coverage from the Qt6 leg to Codecov. To get
+the Codecov badge actually reporting data, the repo owner needs to connect
+`wruwami/QKeyboard` at [codecov.io](https://codecov.io) and add the
+resulting upload token as a `CODECOV_TOKEN` repository secret — that step
+can't be done from CI itself.
 
 ## Repository layout
 
