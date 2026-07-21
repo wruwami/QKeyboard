@@ -31,18 +31,6 @@ jobs:
           # requesting it explicitly 404s ("packages ... were not found").
           cache: true
 
-      # Qt 5.15/6.7 macOS binaries reference the legacy AGL framework in
-      # their .prl link metadata; the runner's Xcode SDKs have dropped AGL
-      # entirely (across every available Xcode version, so pinning an older
-      # one isn't an option here), breaking every link step with
-      # "ld: framework 'AGL' not found". Nothing in a modern Qt/macOS build
-      # actually calls into AGL — it's vestigial — so stripping the
-      # reference from the .prl files is safe.
-      - name: Strip legacy AGL framework reference from Qt .prl files (macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          grep -rl -- '-framework AGL' "$QT_ROOT_DIR" | xargs sed -i '' 's/-framework AGL//g' || true
-
       # lcov/gcov-based coverage only works with the GCC toolchain used on
       # ubuntu-latest; Windows (MSVC) and macOS (Clang) legs skip it and just
       # build+test.
@@ -50,11 +38,19 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && startsWith(matrix.qt-version, '6')
         run: sudo apt-get update && sudo apt-get install -y lcov
 
+      # Qt 5.15.2 never shipped a native Apple Silicon macOS build (Qt's
+      # arm64 macOS support starts at Qt6); the runner is Apple Silicon and
+      # defaults to arm64, so without forcing x86_64 here every link against
+      # Qt5's Intel-only libraries fails with
+      # "symbol(s) not found for architecture arm64". Built x86_64 binaries
+      # still run fine under Rosetta 2, which GitHub's macOS runners ship
+      # preinstalled.
       - name: Configure
         run: >
           cmake -S . -B build
           -DCMAKE_BUILD_TYPE=Debug
           -DQKW_ENABLE_COVERAGE=${{ (matrix.os == 'ubuntu-latest' && startsWith(matrix.qt-version, '6')) && 'ON' || 'OFF' }}
+          ${{ (matrix.os == 'macos-latest' && startsWith(matrix.qt-version, '5')) && '-DCMAKE_OSX_ARCHITECTURES=x86_64' || '' }}
 
       # --config Debug is a no-op on single-config generators (Unix
       # Makefiles/Ninja, used on Linux/macOS) but required on Windows' default
