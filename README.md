@@ -25,10 +25,9 @@ on-screen keyboard projects.
 
 ## Status
 
-The core library, both views, the CMake build, and the `en`/`ko` layouts are
-implemented. Example apps and `.ts` translation files are tracked as open
-work in the repository's issues — see those before assuming this builds out
-of the box.
+The core library, both views, the CMake build, the `en`/`ko` layouts, UI
+translation, and the example apps are implemented. Check the repository's
+issues for anything still open before assuming this builds out of the box.
 
 Supports Qt5 (broad 5.x) through the latest Qt6: the QML types are
 registered imperatively with `qmlRegisterType()` (see
@@ -173,6 +172,14 @@ complete examples.
 > implement Hangul syllable composition itself (tracked as a known
 > limitation in the issues).
 
+## Examples
+
+`examples/widgets_example` and `examples/qml_example` are both minimal demo
+apps: a text field driven entirely by the keyboard, a combo box that swaps
+the `en`/`ko` layout at runtime, and a small `KeyboardTheme` override. Build
+them with the rest of the project (they're on by default) and run
+`qkw_widgets_example` / `qkw_qml_example` from the build directory.
+
 ## Repository layout
 
 ```
@@ -181,8 +188,8 @@ src/                       implementation
 qml/                       Qt Quick components
 layouts/                   per-locale layout JSON
 assets/icons/              key icons (SVG)
-i18n/                      Qt Linguist translation sources (in progress)
-examples/                  demo apps (in progress)
+i18n/                      Qt Linguist translation sources
+examples/                  demo apps
 ```
 
 ## License
