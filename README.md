@@ -211,13 +211,14 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-`.github/workflows/ci.yml` runs this same build+test on both Qt 5.15 and
-Qt 6.7 on every push/PR (the two ends of the "Qt5 through the latest Qt6"
-support range), and uploads coverage from the Qt6 leg to Codecov. To get
-the Codecov badge actually reporting data, the repo owner needs to connect
-`wruwami/QKeyboard` at [codecov.io](https://codecov.io) and add the
-resulting upload token as a `CODECOV_TOKEN` repository secret — that step
-can't be done from CI itself.
+`.github/workflows/ci.yml` runs this same build+test on a full matrix of
+Linux, Windows, and macOS, each on both Qt 5.15 and Qt 6.7 (the two ends of
+the "Qt5 through the latest Qt6" support range) — six jobs on every
+push/PR. Coverage (lcov, GCC-only) is collected once, from the
+Linux+Qt6 leg, and uploaded to Codecov. To get the Codecov badge actually
+reporting data, the repo owner needs to connect `wruwami/QKeyboard` at
+[codecov.io](https://codecov.io) and add the resulting upload token as a
+`CODECOV_TOKEN` repository secret — that step can't be done from CI itself.
 
 ## Repository layout
 
