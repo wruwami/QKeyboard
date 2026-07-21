@@ -76,7 +76,12 @@ if(QKW_BUILD_TRANSLATIONS)
     # English needs no .ts/.qm: QCoreApplication::translate() falls back to
     # the (English) source text whenever no translator is installed for the
     # active locale, so "en" is the implicit default with nothing to compile.
-    qt${QT_VERSION_MAJOR}_add_translation(QKW_QM_FILES ${QKW_TS_FILES})
+    #
+    # CMake command names can't be built by string interpolation directly
+    # ("qt${QT_VERSION_MAJOR}_add_translation(...)" is a parse error, not a
+    # dynamic call) — cmake_language(CALL ...) is the actual mechanism for
+    # invoking a command whose name is only known at configure time.
+    cmake_language(CALL "qt${QT_VERSION_MAJOR}_add_translation" QKW_QM_FILES ${QKW_TS_FILES})
 
     add_custom_target(qkeyboardwidget_translations ALL DEPENDS ${QKW_QM_FILES})
     add_dependencies(qkeyboardwidget qkeyboardwidget_translations)
