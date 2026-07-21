@@ -7,11 +7,12 @@ on:
 
 jobs:
   build-and-test:
-    name: Qt ${{ matrix.qt-version }}
-    runs-on: ubuntu-latest
+    name: ${{ matrix.os }} / Qt ${{ matrix.qt-version }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         qt-version: ['5.15.2', '6.7.3']
 
     env:
@@ -30,33 +31,87 @@ jobs:
           # requesting it explicitly 404s ("packages ... were not found").
           cache: true
 
+      # lcov/gcov-based coverage only works with the GCC toolchain used on
+      # ubuntu-latest; Windows (MSVC) and macOS (Clang) legs skip it and just
+      # build+test.
       - name: Install lcov
-        if: startsWith(matrix.qt-version, '6')
+        if: matrix.os == 'ubuntu-latest' && startsWith(matrix.qt-version, '6')
         run: sudo apt-get update && sudo apt-get install -y lcov
 
+      # Legacy framework AGL was removed from macOS SDKs starting with macOS 14.
+      # Older Qt6 releases (such as 6.7.3) still reference it in their CMake/prl configs,
+      # which fails link steps on modern macOS runners. Strip it from the installed Qt.
+      - name: Patch macOS AGL framework reference in Qt
+        if: matrix.os == 'macos-latest' && startsWith(matrix.qt-version, '6')
+        run: |
+          if [ -d "$QT_ROOT_DIR" ]; then
+            echo "=== Files containing AGL before patch ==="
+            find "$QT_ROOT_DIR" -type f \( -name "*.cmake" -o -name "*.prl" -o -name "*.pc" \) -exec grep -inH "AGL" {} + || true
+
+            # Replace various ways AGL might be linked (case-insensitive where supported)
+            find "$QT_ROOT_DIR" -type f \( -name "*.cmake" -o -name "*.prl" -o -name "*.pc" \) -exec sed -i '' 's/-framework AGL//g' {} +
+            find "$QT_ROOT_DIR" -type f \( -name "*.cmake" -o -name "*.prl" -o -name "*.pc" \) -exec sed -i '' 's/-framework agl//g' {} +
+            find "$QT_ROOT_DIR" -type f \( -name "*.cmake" -o -name "*.prl" -o -name "*.pc" \) -exec sed -i '' 's/;AGL;/;/g' {} +
+            find "$QT_ROOT_DIR" -type f \( -name "*.cmake" -o -name "*.prl" -o -name "*.pc" \) -exec sed -i '' 's/;AGL//g' {} +
+            find "$QT_ROOT_DIR" -type f \( -name "*.cmake" -o -name "*.prl" -o -name "*.pc" \) -exec sed -i '' 's/AGL;//g' {} +
+
+            echo "=== Files containing AGL after patch ==="
+            find "$QT_ROOT_DIR" -type f \( -name "*.cmake" -o -name "*.prl" -o -name "*.pc" \) -exec grep -inH "AGL" {} + || true
+          fi
+
+      # Qt 5.15.2 never shipped a native Apple Silicon macOS build (Qt's
+      # arm64 macOS support starts at Qt6); the runner is Apple Silicon and
+      # defaults to arm64, so without forcing x86_64 here every link against
+      # Qt5's Intel-only libraries fails with
+      # "symbol(s) not found for architecture arm64". Built x86_64 binaries
+      # still run fine under Rosetta 2, which GitHub's macOS runners ship
+      # preinstalled.
       - name: Configure
         run: >
           cmake -S . -B build
           -DCMAKE_BUILD_TYPE=Debug
-          -DQKW_ENABLE_COVERAGE=${{ startsWith(matrix.qt-version, '6') && 'ON' || 'OFF' }}
+          -DQKW_ENABLE_COVERAGE=${{ (matrix.os == 'ubuntu-latest' && startsWith(matrix.qt-version, '6')) && 'ON' || 'OFF' }}
+          ${{ (matrix.os == 'macos-latest' && startsWith(matrix.qt-version, '5')) && '-DCMAKE_OSX_ARCHITECTURES=x86_64' || '' }}
+          ${{ (matrix.os == 'macos-latest' && startsWith(matrix.qt-version, '6')) && '-DWrapOpenGL_AGL="-framework OpenGL" -DOPENGL_agl_LIBRARY="-framework OpenGL"' || '' }}
 
+      - name: Patch generated build files to strip AGL framework on macOS
+        if: matrix.os == 'macos-latest' && startsWith(matrix.qt-version, '6')
+        run: |
+          if [ -d "build" ]; then
+            echo "=== Files containing AGL in build before patch ==="
+            find build -type f -exec grep -inH "AGL" {} + || true
+
+            find build -type f \( -name "Makefile" -o -name "*.make" -o -name "link.txt" -o -name "*.cmake" -o -name "CMakeCache.txt" \) -exec sed -i '' 's/-framework AGL//g' {} +
+            find build -type f \( -name "Makefile" -o -name "*.make" -o -name "link.txt" -o -name "*.cmake" -o -name "CMakeCache.txt" \) -exec sed -i '' 's/AGL.framework/OpenGL.framework/g' {} +
+
+            echo "=== Files containing AGL in build after patch ==="
+            find build -type f -exec grep -inH "AGL" {} + || true
+          fi
+
+      # --config Debug is a no-op on single-config generators (Unix
+      # Makefiles/Ninja, used on Linux/macOS) but required on Windows' default
+      # multi-config Visual Studio generator, where CMAKE_BUILD_TYPE is
+      # ignored.
       - name: Build
-        run: cmake --build build --parallel
+        run: cmake --build build --parallel --config Debug
 
+      # -C Debug is likewise required for ctest to find the Windows
+      # multi-config build's test binaries ("Test not available without
+      # configuration" otherwise); harmless on the single-config generators.
       - name: Test
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --test-dir build --output-on-failure -C Debug
 
-      # Coverage is only collected once (on the Qt6 leg) to avoid uploading
-      # duplicate reports to Codecov.
+      # Coverage is only collected once (the ubuntu+Qt6 leg) to avoid
+      # uploading duplicate reports to Codecov.
       - name: Collect coverage
-        if: startsWith(matrix.qt-version, '6')
+        if: matrix.os == 'ubuntu-latest' && startsWith(matrix.qt-version, '6')
         run: |
           lcov --capture --directory build --output-file coverage.info --ignore-errors inconsistent,gcov,mismatch
           lcov --remove coverage.info '/usr/*' '*/tests/*' '*/examples/*' --ignore-errors unused --output-file coverage.info
           lcov --list coverage.info
 
       - name: Upload coverage to Codecov
-        if: startsWith(matrix.qt-version, '6')
+        if: matrix.os == 'ubuntu-latest' && startsWith(matrix.qt-version, '6')
         uses: codecov/codecov-action@v4
         with:
           files: coverage.info

@@ -49,3 +49,12 @@ re-stated.
   own PRs.
 - Track work as GitHub issues; reference them in commit messages/PR bodies
   (e.g. `Closes #N`).
+
+## Versioning
+
+Semantic Versioning; current version is `0.1.0` (pre-1.0, API not yet
+stable). The version lives in exactly one place —
+`project(QKeyboardWidget VERSION X.Y.Z ...)` in the top-level
+`CMakeLists.txt` — and the rules for what bumps MAJOR/MINOR/PATCH, and the
+release checklist, are in `VERSIONING.md`. See that file before cutting a
+release or deciding whether a change is breaking.

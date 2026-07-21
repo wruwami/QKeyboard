@@ -7,6 +7,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
+# MSVC assumes the active system code page for narrow string-literal source
+# text unless told otherwise, silently mangling the non-ASCII (Hangul)
+# literals in hangul_composer.cpp/tst_hangulcomposer.cpp; force UTF-8 source
+# and execution character sets so they round-trip correctly on Windows. A
+# no-op on GCC/Clang, which already assume UTF-8 source.
+if(MSVC)
+    add_compile_options(/utf-8)
+endif()
+
 option(QKW_ENABLE_QML "Build the Qt Quick (QML) view and register QML types" ON)
 option(QKW_ENABLE_COVERAGE "Enable gcov/lcov coverage instrumentation (GCC/Clang only)" OFF)
 option(QKW_BUILD_TRANSLATIONS "Compile i18n/*.ts UI-string translations into .qm files" ON)
@@ -104,4 +113,32 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
 endif()
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/examples/CMakeLists.txt")
     add_subdirectory(examples)
+endif()
+
+# Qt's macOS build metadata still references the legacy AGL framework (both
+# in qmake-era .prl-derived flags and, for Qt6, directly as a CMake imported
+# target property); recent macOS SDKs have dropped AGL entirely, breaking
+# every link step with "ld: framework 'AGL' not found". Nothing in a modern
+# Qt/macOS build actually uses AGL — it's vestigial — so strip it from the
+# affected imported targets' link properties. Placed after both
+# add_subdirectory() calls so it also covers Qt::Test (only pulled in by
+# tests/CMakeLists.txt); imported-target properties are resolved against
+# their state at the end of configure, not at each target_link_libraries()
+# call site, so mutating them here still takes effect everywhere.
+if(APPLE)
+    function(qkw_strip_agl_framework target)
+        if(NOT TARGET ${target})
+            return()
+        endif()
+        foreach(prop IN ITEMS INTERFACE_LINK_LIBRARIES INTERFACE_LINK_OPTIONS)
+            get_target_property(_qkw_val ${target} ${prop})
+            if(_qkw_val)
+                list(FILTER _qkw_val EXCLUDE REGEX "AGL")
+                set_target_properties(${target} PROPERTIES ${prop} "${_qkw_val}")
+            endif()
+        endforeach()
+    endfunction()
+    foreach(_qkw_qt_module Core Gui Widgets Qml Quick Test)
+        qkw_strip_agl_framework(Qt${QT_VERSION_MAJOR}::${_qkw_qt_module})
+    endforeach()
 endif()
