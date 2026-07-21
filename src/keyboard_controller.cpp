@@ -1,5 +1,7 @@
 #include "qkeyboardwidget/keyboard_controller.h"
 
+#include <QCoreApplication>
+
 namespace qkw {
 
 KeyboardController::KeyboardController(QObject *parent) : QObject(parent)
@@ -149,17 +151,27 @@ QString KeyboardController::resolveLabel(const KeyDefinition &key) const
         }
     }
 
-    // Every recognized id must appear here as a literal tr() call so that
-    // `lupdate` can discover it statically; unknown ids fall back to
-    // whatever the layout JSON put in "labelId" so a new layout still works
-    // (untranslated) without needing a code change.
-    if (labelId == QLatin1String("backspace")) return tr("Backspace", "keyboard control key label");
-    if (labelId == QLatin1String("enter")) return tr("Enter", "keyboard control key label");
-    if (labelId == QLatin1String("space")) return tr("Space", "keyboard control key label");
-    if (labelId == QLatin1String("shift")) return tr("Shift", "keyboard control key label");
-    if (labelId == QLatin1String("numbers")) return tr("123", "keyboard control key label");
-    if (labelId == QLatin1String("letters")) return tr("ABC", "keyboard control key label");
-    if (labelId == QLatin1String("symbols")) return tr("#+=", "keyboard control key label");
+    // Every recognized id must appear here as a literal QCoreApplication::translate()
+    // call (fixed context "QKeyboardWidget") so that `lupdate` can discover it
+    // statically and the translation lookup at runtime doesn't depend on how a
+    // given Qt version mangles a namespaced class name into a tr() context.
+    // Unknown ids fall back to whatever the layout JSON put in "labelId" so a
+    // new layout still works (untranslated) without needing a code change.
+    static const char *kContext = "QKeyboardWidget";
+    if (labelId == QLatin1String("backspace"))
+        return QCoreApplication::translate(kContext, "Backspace", "keyboard control key label");
+    if (labelId == QLatin1String("enter"))
+        return QCoreApplication::translate(kContext, "Enter", "keyboard control key label");
+    if (labelId == QLatin1String("space"))
+        return QCoreApplication::translate(kContext, "Space", "keyboard control key label");
+    if (labelId == QLatin1String("shift"))
+        return QCoreApplication::translate(kContext, "Shift", "keyboard control key label");
+    if (labelId == QLatin1String("numbers"))
+        return QCoreApplication::translate(kContext, "123", "keyboard control key label");
+    if (labelId == QLatin1String("letters"))
+        return QCoreApplication::translate(kContext, "ABC", "keyboard control key label");
+    if (labelId == QLatin1String("symbols"))
+        return QCoreApplication::translate(kContext, "#+=", "keyboard control key label");
 
     return labelId.isEmpty() ? key.text : labelId;
 }
