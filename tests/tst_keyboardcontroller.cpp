@@ -244,11 +244,6 @@ void TestKeyboardController::rowsReflectsCurrentPage()
     KeyboardController controller;
     QVERIFY(controller.loadJson(sampleLayoutJson()));
 
-    qDebug() << "ROWS SIZE:" << controller.rows().size();
-    for (int i = 0; i < controller.rows().size(); ++i) {
-        qDebug() << "  Row" << i << "type:" << controller.rows().at(i).typeName() << "value:" << controller.rows().at(i);
-    }
-
     // Page 0 ("lower") has 1 row with 5 keys.
     QCOMPARE(controller.rows().size(), 1);
     controller.setCurrentPageIndex(1); // "upper" has 1 row with 1 key.
