@@ -5,20 +5,20 @@
 # Keep this list to genuine false positives, not real findings papered over —
 # per CLAUDE.md's engineering-discipline rules, a suppression that's no
 # longer needed should be removed, not left "just in case".
-
+#
 # cppcheck is run without a real Qt install on the PATH it can resolve
 # headers from (CI installs Qt for the build matrix, not the lint job), so
 # every Qt header include is unresolvable. This is expected and not a real
 # finding — cppcheck still analyzes the translation unit's own code using
 # the -I include/ path we do provide.
 missingIncludeSystem
-
+#
 # This is a library: most public API in include/qkeyboardwidget/*.h is
 # called by consumers (examples/, tests/, or external users) outside what
 # a single-repo cppcheck run can see, and Qt's moc/signal-slot machinery
 # calls slots/signals that never appear as a direct call in source either.
 unusedFunction
-
+#
 # Q_OBJECT/moc-generated code and Qt's signal/slot macros aren't visible to
 # cppcheck (moc output isn't part of the source tree it scans), which
 # produces noise around QObject-derived classes' constructors/signals that

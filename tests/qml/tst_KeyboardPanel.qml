@@ -27,6 +27,12 @@ TestCase {
             ] } ]
         })
         verify(controller.loadJson(json))
+        // Repeater delegates (and the Layouts computing their geometry) are
+        // created/positioned over subsequent event-loop turns rather than
+        // synchronously when `rows` changes; wait for an actual rendered
+        // frame so mouseClick() below hits real, laid-out item bounds
+        // instead of a still-zero-sized item.
+        waitForRendering(panel)
     }
 
     function findKeyboardKeys(item) {
