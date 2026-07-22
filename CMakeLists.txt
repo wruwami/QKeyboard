@@ -66,10 +66,14 @@ if(QKW_ENABLE_QML)
     target_compile_definitions(qkeyboardwidget PUBLIC QKW_ENABLE_QML)
     target_link_libraries(qkeyboardwidget PUBLIC Qt${QT_VERSION_MAJOR}::Qml Qt${QT_VERSION_MAJOR}::Quick)
 
-    # qml/KeyboardKey.qml and qml/KeyboardPanel.qml plus the hand-written
-    # qml/qmldir are shipped as plain files (not a compiled qt_add_qml_module,
-    # which is Qt6-only): host apps add this directory to the QML import
-    # path and call qkw::registerQmlTypes() before loading QML that imports
+    # qml/QKeyboardWidget/KeyboardKey.qml, qml/QKeyboardWidget/KeyboardPanel.qml,
+    # and the hand-written qml/QKeyboardWidget/qmldir are shipped as plain
+    # files (not a compiled qt_add_qml_module, which is Qt6-only): the
+    # QKeyboardWidget/ subdirectory name is required by Qt's module-import
+    # resolution ("import QKeyboardWidget 1.0" looks for
+    # <import path>/QKeyboardWidget/qmldir). Host apps add qml/ (the parent
+    # of QKeyboardWidget/) to the QML import path and call
+    # qkw::registerQmlTypes() before loading QML that imports
     # "QKeyboardWidget". See README.md.
     install(DIRECTORY qml/ DESTINATION ${CMAKE_INSTALL_DATADIR}/qkeyboardwidget/qml)
 endif()

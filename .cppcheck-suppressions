@@ -1,7 +1,6 @@
 # cppcheck suppression list for QKeyboard.
 # One suppression per line: <id>[:<file-glob>]. See:
 # https://cppcheck.sourceforge.io/manual.pdf ("Suppressions")
-#
 # Keep this list to genuine false positives, not real findings papered over —
 # per CLAUDE.md's engineering-discipline rules, a suppression that's no
 # longer needed should be removed, not left "just in case".
@@ -24,3 +23,9 @@ unusedFunction
 # produces noise around QObject-derived classes' constructors/signals that
 # don't apply to plain C++ code.
 unmatchedSuppression
+
+# Same root cause as missingIncludeSystem above (no real Qt install on
+# cppcheck's path): without Qt's headers, cppcheck can't expand Qt macros
+# like Q_PROPERTY, Q_OBJECT, signals:, and slots:, and reports each as an
+# "unknown macro" error.
+unknownMacro

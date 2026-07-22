@@ -57,24 +57,26 @@ void KeyButton::fitFontToButton()
 {
     if (text().isEmpty()) return;
 
-    QFont current = font();
     const int targetHeight = rect().height() - 8;
     const int targetWidth = rect().width() - 8;
     if (targetHeight <= 0 || targetWidth <= 0) return;
 
-    qreal pointSize = qMax(current.pointSizeF(), 6.0);
-    for (int guard = 0; guard < 64; ++guard) {
+    QFont current = font();
+    const auto fitsAt = [&](qreal pointSize) {
         current.setPointSizeF(pointSize);
         const QRect bounds = QFontMetrics(current).boundingRect(text());
-        if (bounds.height() <= targetHeight && bounds.width() <= targetWidth) {
-            if (pointSize >= 48.0) break;
-            pointSize += 0.5;
-        } else {
-            pointSize -= 0.5;
-            break;
+        return bounds.height() <= targetHeight && bounds.width() <= targetWidth;
+    };
+
+    qreal best = 6.0;
+    for (qreal candidate = 6.0; candidate <= 48.0; candidate += 0.5) {
+        if (fitsAt(candidate)) {
+            best = candidate;
+        } else if (candidate > 6.0) {
+            break; // monotonic: once it stops fitting, larger sizes won't fit either
         }
     }
-    current.setPointSizeF(qMax(pointSize, 6.0));
+    current.setPointSizeF(best);
     setFont(current);
 }
 
