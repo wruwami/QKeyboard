@@ -47,7 +47,7 @@ TestCase {
         // instead of a stale, still-overlapping-at-(0,0) position.
         tryVerify(function () {
             const keys = findKeyboardKeys(panel)
-            return keys.length === 3 && keys[1].width > 0 && keys[1].x > 0
+            return keys.length === 3 && keys[1].width > 0 && keys[1].height > 0 && keys[1].x > 0
         }, 3000, "keys did not finish laying out in time")
     }
 
@@ -65,7 +65,11 @@ TestCase {
     function test_clickForwardsRowAndColumnToController() {
         characterSpy.clear()
         const keys = findKeyboardKeys(panel)
-        mouseClick(keys[1])
+        const k = keys[1]
+        console.log("keys[1] geometry: x=" + k.x + " y=" + k.y + " width=" + k.width
+                     + " height=" + k.height + " mapped="
+                     + JSON.stringify(k.mapToItem(null, k.width / 2, k.height / 2)))
+        mouseClick(k)
         compare(characterSpy.count, 1)
         compare(characterSpy.signalArguments[0][0], "b")
     }
