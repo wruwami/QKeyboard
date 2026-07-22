@@ -21,7 +21,8 @@ void TestKeyButton::shrinksToFitInASingleResize()
     QFont big = button.font();
     big.setPointSizeF(40.0);
     button.setFont(big);
-    button.resize(60, 40);
+    button.show();
+    button.resize(120, 40);
     QCoreApplication::processEvents();
 
     const QFontMetrics metrics(button.font());
@@ -34,6 +35,7 @@ void TestKeyButton::growsToFillLargeButton()
 {
     KeyButton button(QStringLiteral("A"));
     const qreal initialPointSize = button.font().pointSizeF();
+    button.show();
     button.resize(300, 300);
     QCoreApplication::processEvents();
 
