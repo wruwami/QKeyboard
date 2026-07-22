@@ -1,0 +1,97 @@
+#include <QtTest>
+
+#include "qkeyboardwidget/key_button.h"
+#include "qkeyboardwidget/keyboard_controller.h"
+#include "qkeyboardwidget/keyboard_widget.h"
+
+using namespace qkw;
+
+namespace {
+
+QByteArray sampleLayoutJson()
+{
+    return R"({
+        "locale": "en",
+        "pages": [
+            {
+                "id": "lower",
+                "rows": [
+                    [
+                        { "type": "char", "text": "a" },
+                        { "type": "shift", "target": "upper" },
+                        { "type": "switch", "target": "numeric", "labelId": "numbers" }
+                    ]
+                ]
+            },
+            { "id": "upper", "rows": [ [ { "type": "char", "text": "A" } ] ] },
+            { "id": "numeric", "rows": [ [ { "type": "char", "text": "1" } ] ] }
+        ]
+    })";
+}
+
+} // namespace
+
+class TestKeyboardWidget : public QObject
+{
+    Q_OBJECT
+private slots:
+    void buildsOneButtonPerKeyAcrossAllPages();
+    void accentsShiftAndSwitchKeysOnly();
+    void rebuildDoesNotCrashOnReload();
+    void invalidLayoutClearsButtons();
+};
+
+void TestKeyboardWidget::buildsOneButtonPerKeyAcrossAllPages()
+{
+    KeyboardWidget widget;
+    QVERIFY(widget.controller()->loadJson(sampleLayoutJson()));
+
+    // 3 keys on "lower" + 1 on "upper" + 1 on "numeric" = 5 buttons total,
+    // since rebuildPages() builds every page up front.
+    QCOMPARE(widget.findChildren<KeyButton *>().size(), 5);
+}
+
+void TestKeyboardWidget::accentsShiftAndSwitchKeysOnly()
+{
+    KeyboardWidget widget;
+    QVERIFY(widget.controller()->loadJson(sampleLayoutJson()));
+
+    KeyButton *charButton = widget.findChild<KeyButton *>(QStringLiteral("a"));
+    KeyButton *shiftButton = widget.findChild<KeyButton *>(QStringLiteral("Shift"));
+    KeyButton *switchButton = widget.findChild<KeyButton *>(QStringLiteral("123"));
+    QVERIFY(charButton);
+    QVERIFY(shiftButton);
+    QVERIFY(switchButton);
+
+    QVERIFY(!charButton->isAccented());
+    QVERIFY(shiftButton->isAccented());
+    QVERIFY(switchButton->isAccented());
+}
+
+void TestKeyboardWidget::rebuildDoesNotCrashOnReload()
+{
+    KeyboardWidget widget;
+    QVERIFY(widget.controller()->loadJson(sampleLayoutJson()));
+    QCOMPARE(widget.findChildren<KeyButton *>().size(), 5);
+
+    // Reloading triggers rebuildPages() again while the previously built
+    // pages are still pending deleteLater(); regression test for the
+    // QStackedWidget double-delete fixed in #25.
+    QVERIFY(widget.controller()->loadJson(sampleLayoutJson()));
+    QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    QCOMPARE(widget.findChildren<KeyButton *>().size(), 5);
+}
+
+void TestKeyboardWidget::invalidLayoutClearsButtons()
+{
+    KeyboardWidget widget;
+    QVERIFY(widget.controller()->loadJson(sampleLayoutJson()));
+    QCOMPARE(widget.findChildren<KeyButton *>().size(), 5);
+
+    QVERIFY(!widget.controller()->loadJson(QByteArrayLiteral("not json")));
+    QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    QCOMPARE(widget.findChildren<KeyButton *>().size(), 0);
+}
+
+QTEST_MAIN(TestKeyboardWidget)
+#include "tst_keyboardwidget.moc"
