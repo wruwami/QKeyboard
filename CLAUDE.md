@@ -45,6 +45,7 @@ re-stated.
 
 - One branch per issue/feature (`feature/<name>` or `docs/<name>`), opened
   as a PR against `main`. Don't push directly to `main`.
+  - **AI Agents**: Follow [AI.md](file:///c:/Users/owner/workspace/QKeyboard/AI.md) for branch naming (`<ai-name>/issue-<number>-<description>`) and baseline/PR status checks before starting.
 - The repo owner reviews and merges every PR themselves — don't merge your
   own PRs.
 - Track work as GitHub issues; reference them in commit messages/PR bodies
