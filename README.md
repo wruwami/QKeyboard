@@ -3,6 +3,11 @@
 [![CI](https://github.com/wruwami/QKeyboard/actions/workflows/ci.yml/badge.svg)](https://github.com/wruwami/QKeyboard/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/wruwami/QKeyboard/branch/main/graph/badge.svg)](https://codecov.io/gh/wruwami/QKeyboard)
 
+> **Notice:** This is a temporary personal project, developed with the
+> assistance of AI. It has not yet reached a level of development,
+> testing, or review sufficient for real-world use. **Do not use this
+> project until it has matured further.**
+
 An on-screen keyboard widget for Qt, licensed under Apache-2.0. It supports
 both QWidget and QML (Qt Quick) applications from the same core, drives its
 key layout entirely from JSON (so adding a language or remapping keys never
