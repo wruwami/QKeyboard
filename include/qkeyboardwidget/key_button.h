@@ -28,6 +28,7 @@ protected:
 
 private:
     void fitFontToButton();
+    void fitIconToButton();
 
     bool _accented = false;
 };

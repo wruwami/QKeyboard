@@ -20,18 +20,30 @@ Rectangle {
     readonly property bool isAccent: keyData && (keyData.action === 4 || keyData.action === 5)
 
     radius: theme ? theme.cornerRadius : 6
+    // Instant color swap on press, matching KeyButton's stylesheet-based
+    // press feedback in the QWidget view (no animation on either side - see
+    // issue #44 point 4).
     color: mouseArea.pressed
            ? (theme ? theme.keyPressedColor : "#636366")
            : isAccent
              ? (theme ? theme.accentKeyColor : "#0a84ff")
              : (theme ? theme.keyColor : "#3a3a3c")
 
-    Behavior on color { ColorAnimation { duration: 80 } }
+    // These are root's own property-change signals, handled directly here
+    // (not via a Connections{} attached to another object), so this is
+    // ordinary Qt5/Qt6-compatible syntax throughout - keyLabel.fitFont()
+    // itself reads root.width/root.height, not keyLabel's own size, since
+    // keyLabel's size is a function of the font size fitFont() is solving
+    // for (using keyLabel's own width/height here would be circular).
+    onWidthChanged: keyLabel.fitFont()
+    onHeightChanged: keyLabel.fitFont()
 
     Image {
         visible: keyData && keyData.icon
         anchors.centerIn: parent
         source: keyData ? keyData.icon : ""
+        // Matches KeyButton::fitIconToButton()'s 40%-of-the-smaller-dimension
+        // rule in the QWidget view (issue #44 point 2).
         width: Math.min(parent.width, parent.height) * 0.4
         height: width
         fillMode: Image.PreserveAspectFit
@@ -45,27 +57,47 @@ Rectangle {
         anchors.centerIn: parent
         text: keyData ? keyData.text : ""
         color: theme ? theme.textColor : "white"
-        // font is applied imperatively to avoid a binding-loop warning.
-        // A declarative 'font: theme ? theme.font : font' self-references the
-        // property and triggers "Binding loop detected" in QML. Using an
-        // onThemeChanged handler is safe on all Qt5/Qt6 versions.
+        // Family/weight/style come from the theme (grouped-property
+        // sub-bindings, not a whole-object 'font: theme.font' assignment,
+        // so fitFont() below can independently drive font.pixelSize without
+        // the two bindings fighting each other). The fallback values don't
+        // reference this Text's own font, so no self-referencing binding
+        // loop - see the KeyboardTheme font-sync fix in #50 for why that
+        // matters here.
+        font.family: theme ? theme.font.family : Qt.application.font.family
+        font.bold: theme ? theme.font.bold : false
+        font.italic: theme ? theme.font.italic : false
         elide: Text.ElideNone
-    }
 
-    // Apply theme.font whenever the theme object itself changes. The 'changed'
-    // signal on KeyboardTheme (which fires for any property mutation) is wired
-    // via Connections below, so font updates propagate at runtime too.
-    onThemeChanged: {
-        if (theme) keyLabel.font = theme.font
-    }
+        // Mirrors KeyButton::fitFontToButton() in the QWidget view: grow/
+        // shrink pixelSize so the label fills the key, instead of using
+        // theme.font's size verbatim - QML has no built-in equivalent
+        // (issue #44 point 3). Binary search assumes fit is monotonic in
+        // pixelSize, same assumption the QWidget version makes.
+        function fitFont() {
+            if (!text) return
+            var targetW = root.width - 8
+            var targetH = root.height - 8
+            if (targetW <= 0 || targetH <= 0) return
 
-    Connections {
-        target: theme
-        // Update font whenever any theme property changes (the theme emits a
-        // single 'changed' signal for all properties).
-        // Note: 'function onChanged()' syntax requires Qt 5.15+; use the
-        // 'onChanged:' property form which works on all Qt5/Qt6 versions.
-        onChanged: { if (theme) keyLabel.font = theme.font }
+            var lo = 6
+            var hi = 96
+            var best = lo
+            while (lo <= hi) {
+                var mid = Math.floor((lo + hi) / 2)
+                font.pixelSize = mid
+                if (contentWidth <= targetW && contentHeight <= targetH) {
+                    best = mid
+                    lo = mid + 1
+                } else {
+                    hi = mid - 1
+                }
+            }
+            font.pixelSize = best
+        }
+
+        onTextChanged: fitFont()
+        Component.onCompleted: fitFont()
     }
 
     MouseArea {
