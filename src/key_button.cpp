@@ -39,9 +39,8 @@ void KeyButton::applyTheme(const KeyboardTheme &theme)
 {
     const QColor keyBg = _accented ? theme.accentKeyColor() : theme.keyColor();
     setFont(theme.font());
-    setStyleSheet(QStringLiteral(
-                      "QPushButton { background-color: %1; color: %2; border-radius: %3px; border: none; }"
-                      "QPushButton:pressed { background-color: %4; }")
+    setStyleSheet(QStringLiteral("QPushButton { background-color: %1; color: %2; border-radius: %3px; border: none; }"
+                                 "QPushButton:pressed { background-color: %4; }")
                       .arg(keyBg.name(QColor::HexArgb), theme.textColor().name(QColor::HexArgb))
                       .arg(theme.cornerRadius())
                       .arg(theme.keyPressedColor().name(QColor::HexArgb)));

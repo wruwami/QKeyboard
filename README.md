@@ -237,6 +237,26 @@ this network. Remove that step (and the job-level `PYTHONPATH` env) if the
 runner ever moves off this network or gets the corporate root CA properly
 trusted instead.
 
+A separate `lint` job runs on every push/PR too:
+
+```sh
+# formatting — must produce no diff
+find src include tests examples -name '*.cpp' -o -name '*.h' | xargs clang-format --dry-run --Werror
+
+# static analysis
+cppcheck --std=c++17 --language=c++ --enable=warning,style,performance,portability \
+  --inline-suppr --suppressions-list=.cppcheck-suppressions --error-exitcode=1 -I include \
+  src include tests examples
+```
+
+Formatting rules live in [`.clang-format`](.clang-format) (matches the
+style already used throughout the codebase — 4-space indent, brace
+placement, pointer/reference alignment); run `clang-format -i <file>`
+locally before committing. cppcheck's suppression list
+([`.cppcheck-suppressions`](.cppcheck-suppressions)) is kept to genuine
+false positives (e.g. Qt headers/moc output cppcheck can't resolve without
+a full Qt install) — see the comments in that file before adding to it.
+
 ## Repository layout
 
 ```

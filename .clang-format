@@ -1,0 +1,57 @@
+---
+# Matches the style already used throughout src/ and include/: 4-space
+# indent, braces attached to namespaces/control statements but on their own
+# line for class/struct/function bodies, pointers/references bound to the
+# variable name (PointerAlignment: Right), no extra indent inside
+# `namespace qkw { ... }`.
+Language: Cpp
+BasedOnStyle: LLVM
+
+IndentWidth: 4
+ColumnLimit: 120
+UseTab: Never
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterNamespace: false
+  AfterClass: true
+  AfterStruct: true
+  AfterUnion: true
+  AfterEnum: false
+  AfterFunction: true
+  AfterControlStatement: false
+  AfterCaseLabel: false
+  AfterExternBlock: false
+  BeforeElse: false
+  BeforeCatch: false
+  BeforeWhile: false
+  IndentBraces: false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+  SplitEmptyNamespace: true
+
+NamespaceIndentation: None
+IndentCaseLabels: true
+AllowShortCaseLabelsOnASingleLine: true
+AccessModifierOffset: -4
+
+PointerAlignment: Right
+ReferenceAlignment: Right
+DerivePointerAlignment: false
+
+BreakConstructorInitializers: AfterColon
+PackConstructorInitializers: NextLine
+
+AlignAfterOpenBracket: Align
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+BinPackArguments: true
+BinPackParameters: true
+
+SortIncludes: false
+IncludeBlocks: Preserve
+
+SpaceAfterTemplateKeyword: false
+Cpp11BracedListStyle: true

@@ -49,32 +49,32 @@ int main(int argc, char *argv[])
     auto *hangulComposer = new qkw::HangulComposer(central);
 
     QObject::connect(keyboard->controller(), &qkw::KeyboardController::characterEntered, lineEdit,
-                      [lineEdit, hangulComposer](const QString &text) {
-                          if (!hangulComposer->feed(text)) lineEdit->insert(text);
-                      });
+                     [lineEdit, hangulComposer](const QString &text) {
+                         if (!hangulComposer->feed(text)) lineEdit->insert(text);
+                     });
     QObject::connect(hangulComposer, &qkw::HangulComposer::syllableReady, lineEdit,
-                      [lineEdit](const QString &text, bool replacePrevious) {
-                          if (replacePrevious) lineEdit->backspace();
-                          lineEdit->insert(text);
-                      });
+                     [lineEdit](const QString &text, bool replacePrevious) {
+                         if (replacePrevious) lineEdit->backspace();
+                         lineEdit->insert(text);
+                     });
     QObject::connect(hangulComposer, &qkw::HangulComposer::syllableCleared, lineEdit,
-                      [lineEdit]() { lineEdit->backspace(); });
+                     [lineEdit]() { lineEdit->backspace(); });
 
     QObject::connect(keyboard->controller(), &qkw::KeyboardController::backspaceRequested, lineEdit,
-                      [lineEdit, hangulComposer]() {
-                          if (!hangulComposer->backspace()) lineEdit->backspace();
-                      });
+                     [lineEdit, hangulComposer]() {
+                         if (!hangulComposer->backspace()) lineEdit->backspace();
+                     });
     QObject::connect(keyboard->controller(), &qkw::KeyboardController::enterRequested, lineEdit,
-                      [lineEdit, hangulComposer]() {
-                          hangulComposer->commit();
-                          lineEdit->clear();
-                      });
+                     [lineEdit, hangulComposer]() {
+                         hangulComposer->commit();
+                         lineEdit->clear();
+                     });
 
     QObject::connect(localeBox, QOverload<int>::of(&QComboBox::currentIndexChanged), keyboard->controller(),
-                      [keyboard, localeBox, hangulComposer](int index) {
-                          hangulComposer->commit();
-                          keyboard->controller()->loadFile(localeBox->itemData(index).toString());
-                      });
+                     [keyboard, localeBox, hangulComposer](int index) {
+                         hangulComposer->commit();
+                         keyboard->controller()->loadFile(localeBox->itemData(index).toString());
+                     });
 
     layout->addWidget(localeBox);
     layout->addWidget(lineEdit);

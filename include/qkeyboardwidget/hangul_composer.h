@@ -68,9 +68,9 @@ private:
     QString composeCurrent() const;
     void startNewSyllable(int choseongIndex);
 
-    int _cho;   // choseong index [0,18], -1 if none
-    int _jung;  // jungseong index [0,20], -1 if none
-    int _jong;  // jongseong index [0,27], 0 = no final
+    int _cho;  // choseong index [0,18], -1 if none
+    int _jung; // jungseong index [0,20], -1 if none
+    int _jong; // jongseong index [0,27], 0 = no final
 };
 
 } // namespace qkw
