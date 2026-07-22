@@ -3,6 +3,11 @@
 [![CI](https://github.com/wruwami/QKeyboard/actions/workflows/ci.yml/badge.svg)](https://github.com/wruwami/QKeyboard/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/wruwami/QKeyboard/branch/main/graph/badge.svg)](https://codecov.io/gh/wruwami/QKeyboard)
 
+> **Notice:** This is a temporary personal project, developed with the
+> assistance of AI. Feel free to try it out, but it's still early-stage
+> and evolving quickly, so it's not really at the point of being a
+> finished "product" yet.
+
 An on-screen keyboard widget for Qt, licensed under Apache-2.0. It supports
 both QWidget and QML (Qt Quick) applications from the same core, drives its
 key layout entirely from JSON (so adding a language or remapping keys never
@@ -220,23 +225,6 @@ Linux+Qt6 leg, and uploaded to Codecov. To get the Codecov badge actually
 reporting data, the repo owner needs to connect `wruwami/QKeyboard` at
 [codecov.io](https://codecov.io) and add the resulting upload token as a
 `CODECOV_TOKEN` repository secret — that step can't be done from CI itself.
-
-The Windows leg runs on a self-hosted runner (labels `self-hosted`,
-`Windows`, `X64`) instead of GitHub-hosted `windows-latest`, since the
-shared Actions minutes quota for this repo is exhausted; Linux and macOS
-stay on GitHub-hosted runners. Switch it back to `windows-latest` in
-`build-and-test`'s `runs-on` once quota is available again.
-
-That self-hosted runner sits behind a corporate network that TLS-inspects
-outbound HTTPS with its own root certificate, which breaks Python's
-`requests`/`urllib3` (used by `aqtinstall` to download Qt) with a
-self-signed-certificate verification error. The "Disable TLS verification
-for Qt download" step works around this — scoped to the Windows leg only,
-via a `sitecustomize.py` on `PYTHONPATH` rather than a machine-wide
-change — per an explicit call by the repo owner that it's unavoidable on
-this network. Remove that step (and the job-level `PYTHONPATH` env) if the
-runner ever moves off this network or gets the corporate root CA properly
-trusted instead.
 
 A separate `lint` job runs on every push/PR too:
 
