@@ -18,6 +18,18 @@ This is an independent, clean-room implementation — see [`NOTICE`](NOTICE)
 for details on what that means and how this project relates to other
 on-screen keyboard projects.
 
+## Demo
+
+`examples/widgets_example`, actually built and run (Qt 6.4, Ubuntu 24.04,
+offscreen X server) — the combo box switches `layouts/en.json` and
+`layouts/ko.json` at runtime, and Shift/Switch keys render in the accent
+color:
+
+<p>
+  <img src="docs/screenshots/widgets_example_en.png" width="420" alt="widgets_example running the en.json QWERTY layout, with the text field showing text typed via the on-screen keys">
+  <img src="docs/screenshots/widgets_example_ko.png" width="420" alt="widgets_example running the ko.json 2-set Hangul jamo layout after switching locale in the combo box">
+</p>
+
 ## Features
 
 - **Dual UI**: `KeyboardWidget` (QWidget) and `KeyboardPanel.qml` (Qt Quick)
