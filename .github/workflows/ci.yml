@@ -140,9 +140,15 @@ jobs:
       # show()s a window). Surfaces Qt's own plugin-loading diagnostics in
       # case that's the cause. Remove once root-caused.
       - name: Test
+        shell: bash
         env:
           QT_DEBUG_PLUGINS: ${{ matrix.os == 'windows-latest' && '1' || '' }}
-        run: ctest --test-dir build --output-on-failure -C Debug
+        run: |
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            xvfb-run ctest --test-dir build --output-on-failure -C Debug
+          else
+            ctest --test-dir build --output-on-failure -C Debug
+          fi
 
       # ctest's --output-on-failure captures nothing for tst_keybutton/
       # tst_quick on windows-latest (see above) — run them directly so their

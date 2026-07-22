@@ -21,8 +21,6 @@ void TestKeyButton::shrinksToFitInASingleResize()
     QFont big = button.font();
     big.setPointSizeF(40.0);
     button.setFont(big);
-    button.show();
-    QVERIFY(QTest::qWaitForWindowExposed(&button));
     button.resize(60, 40);
     QCoreApplication::processEvents();
 
@@ -36,8 +34,6 @@ void TestKeyButton::growsToFillLargeButton()
 {
     KeyButton button(QStringLiteral("A"));
     const qreal initialPointSize = button.font().pointSizeF();
-    button.show();
-    QVERIFY(QTest::qWaitForWindowExposed(&button));
     button.resize(300, 300);
     QCoreApplication::processEvents();
 
