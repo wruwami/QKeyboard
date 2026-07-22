@@ -226,6 +226,17 @@ shared Actions minutes quota for this repo is exhausted; Linux and macOS
 stay on GitHub-hosted runners. Switch it back to `windows-latest` in
 `build-and-test`'s `runs-on` once quota is available again.
 
+That self-hosted runner sits behind a corporate network that TLS-inspects
+outbound HTTPS with its own root certificate, which breaks Python's
+`requests`/`urllib3` (used by `aqtinstall` to download Qt) with a
+self-signed-certificate verification error. The "Disable TLS verification
+for Qt download" step works around this — scoped to the Windows leg only,
+via a `sitecustomize.py` on `PYTHONPATH` rather than a machine-wide
+change — per an explicit call by the repo owner that it's unavoidable on
+this network. Remove that step (and the job-level `PYTHONPATH` env) if the
+runner ever moves off this network or gets the corporate root CA properly
+trusted instead.
+
 ## Repository layout
 
 ```
