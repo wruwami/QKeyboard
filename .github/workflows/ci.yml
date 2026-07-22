@@ -41,11 +41,7 @@ jobs:
 
   build-and-test:
     name: ${{ matrix.os }} / Qt ${{ matrix.qt-version }}
-    # GitHub-hosted windows-latest runners are on the shared Actions quota,
-    # which has been exhausted; a self-hosted Windows runner (labels:
-    # self-hosted, Windows, X64) covers that leg instead. ubuntu-latest and
-    # macos-latest stay on GitHub-hosted runners.
-    runs-on: ${{ matrix.os == 'windows-latest' && fromJSON('["self-hosted", "Windows", "X64"]') || matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -54,53 +50,10 @@ jobs:
 
     env:
       QT_QPA_PLATFORM: offscreen
-      # Points Python at the sitecustomize.py written below, so it's picked
-      # up automatically by aqtinstall's subprocess on the Windows leg only
-      # (empty elsewhere — harmless).
-      PYTHONPATH: ${{ matrix.os == 'windows-latest' && format('{0}\.ci\pysitecustomize', github.workspace) || '' }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      # The self-hosted Windows runner sits behind a corporate network that
-      # TLS-inspects outbound HTTPS with its own (non-publicly-trusted) root
-      # certificate, which breaks aqtinstall's Qt downloads with
-      # "SSLCertVerificationError: self-signed certificate in certificate
-      # chain" against download.qt.io and every fallback mirror alike —
-      # confirming it's the local network path, not any one server. Per repo
-      # owner's explicit call (unavoidable on this network), disable TLS
-      # verification for Python's requests/urllib3 (what aqt's downloader
-      # uses) via a sitecustomize.py on PYTHONPATH, scoped to this job only
-      # — it never touches the ubuntu-latest/macos-latest (GitHub-hosted,
-      # non-intercepted) legs.
-      - name: Disable TLS verification for Qt download (corporate proxy workaround)
-        if: matrix.os == 'windows-latest'
-        shell: pwsh
-        run: |
-          $dir = Join-Path $env:GITHUB_WORKSPACE ".ci\pysitecustomize"
-          New-Item -ItemType Directory -Force -Path $dir | Out-Null
-          @'
-          import ssl
-          try:
-              ssl._create_default_https_context = ssl._create_unverified_context
-          except Exception:
-              pass
-          try:
-              import urllib3
-              urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-          except Exception:
-              pass
-          try:
-              import requests
-              _orig_request = requests.Session.request
-              def _patched_request(self, method, url, **kwargs):
-                  kwargs.setdefault("verify", False)
-                  return _orig_request(self, method, url, **kwargs)
-              requests.Session.request = _patched_request
-          except Exception:
-              pass
-          '@ | Set-Content -Path (Join-Path $dir "sitecustomize.py") -Encoding utf8
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
