@@ -220,6 +220,12 @@ reporting data, the repo owner needs to connect `wruwami/QKeyboard` at
 [codecov.io](https://codecov.io) and add the resulting upload token as a
 `CODECOV_TOKEN` repository secret — that step can't be done from CI itself.
 
+The Windows leg runs on a self-hosted runner (labels `self-hosted`,
+`Windows`, `X64`) instead of GitHub-hosted `windows-latest`, since the
+shared Actions minutes quota for this repo is exhausted; Linux and macOS
+stay on GitHub-hosted runners. Switch it back to `windows-latest` in
+`build-and-test`'s `runs-on` once quota is available again.
+
 ## Repository layout
 
 ```

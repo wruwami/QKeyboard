@@ -8,7 +8,11 @@ on:
 jobs:
   build-and-test:
     name: ${{ matrix.os }} / Qt ${{ matrix.qt-version }}
-    runs-on: ${{ matrix.os }}
+    # GitHub-hosted windows-latest runners are on the shared Actions quota,
+    # which has been exhausted; a self-hosted Windows runner (labels:
+    # self-hosted, Windows, X64) covers that leg instead. ubuntu-latest and
+    # macos-latest stay on GitHub-hosted runners.
+    runs-on: ${{ matrix.os == 'windows-latest' && fromJSON('["self-hosted", "Windows", "X64"]') || matrix.os }}
     strategy:
       fail-fast: false
       matrix:
