@@ -52,11 +52,11 @@ ApplicationWindow {
     }
 
     KeyboardPanel {
+        anchors.top: inputField.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: 8
-        height: 220
         controller: controller
         theme: theme
     }
