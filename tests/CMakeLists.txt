@@ -19,6 +19,7 @@ qkw_add_test(tst_keyboardcontroller tst_keyboardcontroller.cpp)
 qkw_add_test(tst_hangulcomposer tst_hangulcomposer.cpp)
 qkw_add_test(tst_keybutton tst_keybutton.cpp)
 qkw_add_test(tst_keyboardwidget tst_keyboardwidget.cpp)
+qkw_add_test(tst_keyboardtheme tst_keyboardtheme.cpp)
 
 if(QKW_ENABLE_QML)
     find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS QuickTest)
