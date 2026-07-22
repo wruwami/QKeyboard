@@ -98,9 +98,15 @@ void TestKeyButton::shrinkingBelowMarginSkipsFontFit()
     // fitFontToButton() returns immediately once the button is smaller than
     // its fixed 8px margin in either dimension; must not crash.
     KeyButton button(QStringLiteral("a"));
-    const QFont initial = button.font();
     button.setMinimumSize(0, 0); // KeyButton's own ctor sets a 24x24 floor
     button.show();
+    QCoreApplication::processEvents();
+
+    // Capture the font *after* show()'s own initial resizeEvent (which may
+    // already have run fitFontToButton() once) rather than before it, so
+    // this only asserts that the specific shrink-below-margin resize below
+    // is what leaves the font untouched.
+    const QFont initial = button.font();
     button.resize(4, 4);
     QCoreApplication::processEvents();
     QCOMPARE(button.font(), initial);
