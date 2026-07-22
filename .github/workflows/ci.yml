@@ -178,7 +178,19 @@ jobs:
       # -C Debug is likewise required for ctest to find the Windows
       # multi-config build's test binaries ("Test not available without
       # configuration" otherwise); harmless on the single-config generators.
+      #
+      # QT_DEBUG_PLUGINS on Windows only: tst_keybutton/tst_keyboardwidget
+      # (QTEST_MAIN, needs QApplication) and tst_quick (QUICK_TEST_MAIN,
+      # needs QGuiApplication+QQmlEngine) are the first tests in this project
+      # that touch the QPA platform-plugin subsystem at all — every prior
+      # test uses QTEST_GUILESS_MAIN (QCoreApplication only). They're failing
+      # on the self-hosted Windows runner with zero captured output, which
+      # points at the offscreen platform plugin failing to load rather than
+      # a test assertion; this surfaces Qt's own plugin-loading diagnostics
+      # to confirm before changing anything. Remove once root-caused.
       - name: Test
+        env:
+          QT_DEBUG_PLUGINS: ${{ matrix.os == 'windows-latest' && '1' || '' }}
         run: ctest --test-dir build --output-on-failure -C Debug
 
       # Coverage is only collected once (the ubuntu+Qt6 leg) to avoid
