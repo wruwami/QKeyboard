@@ -4,9 +4,9 @@
 [![codecov](https://codecov.io/gh/wruwami/QKeyboard/branch/main/graph/badge.svg)](https://codecov.io/gh/wruwami/QKeyboard)
 
 > **Notice:** This is a temporary personal project, developed with the
-> assistance of AI. It's still early-stage and evolving quickly, so
-> it's not recommended for production use yet — check back as it
-> matures.
+> assistance of AI. Feel free to try it out, but it's still early-stage
+> and evolving quickly, so it's not really at the point of being a
+> finished "product" yet.
 
 An on-screen keyboard widget for Qt, licensed under Apache-2.0. It supports
 both QWidget and QML (Qt Quick) applications from the same core, drives its
