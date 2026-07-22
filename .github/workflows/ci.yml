@@ -156,10 +156,10 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "=== tst_keybutton ==="
-          & "build\tests\Debug\tst_keybutton.exe" -v2
+          & "build\tests\Debug\tst_keybutton.exe"
           Write-Host "exit code: $LASTEXITCODE"
           Write-Host "=== tst_quick ==="
-          & "build\tests\Debug\tst_quick.exe" -v2
+          & "build\tests\Debug\tst_quick.exe"
           Write-Host "exit code: $LASTEXITCODE"
 
       # Coverage is only collected once (the ubuntu+Qt6 leg) to avoid

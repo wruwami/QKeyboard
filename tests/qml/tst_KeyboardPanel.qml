@@ -68,8 +68,12 @@ TestCase {
         const k = keys[1]
         console.log("keys[1] geometry: x=" + k.x + " y=" + k.y + " width=" + k.width
                      + " height=" + k.height + " mapped="
-                     + JSON.stringify(k.mapToItem(null, k.width / 2, k.height / 2)))
+                     + JSON.stringify(k.mapToItem(null, k.width / 2, k.height / 2))
+                     + " keyData.row=" + k.keyData.row + " keyData.column=" + k.keyData.column)
+        let activatedCount = 0
+        k.activated.connect(function () { activatedCount++ })
         mouseClick(k)
+        console.log("activatedCount=" + activatedCount + " characterSpy.count=" + characterSpy.count)
         compare(characterSpy.count, 1)
         compare(characterSpy.signalArguments[0][0], "b")
     }
