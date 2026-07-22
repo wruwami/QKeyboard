@@ -45,27 +45,16 @@ Rectangle {
         anchors.centerIn: parent
         text: keyData ? keyData.text : ""
         color: theme ? theme.textColor : "white"
-        // font is applied imperatively to avoid a binding-loop warning.
-        // A declarative 'font: theme ? theme.font : font' self-references the
-        // property and triggers "Binding loop detected" in QML. Using an
-        // onThemeChanged handler is safe on all Qt5/Qt6 versions.
+        // A plain declarative binding works here because the fallback value
+        // (Qt.application.font) doesn't reference keyLabel.font itself -
+        // the earlier 'theme ? theme.font : font' version self-referenced
+        // the property being assigned, which is what actually caused the
+        // binding-loop warning (not the presence of theme.font). Reading
+        // theme.font here also means this re-evaluates automatically on
+        // KeyboardTheme::changed(), with no Connections/imperative handler
+        // needed, and no Qt6 "implicitly defined onFoo" deprecation.
+        font: theme ? theme.font : Qt.application.font
         elide: Text.ElideNone
-    }
-
-    // Apply theme.font whenever the theme object itself changes. The 'changed'
-    // signal on KeyboardTheme (which fires for any property mutation) is wired
-    // via Connections below, so font updates propagate at runtime too.
-    onThemeChanged: {
-        if (theme) keyLabel.font = theme.font
-    }
-
-    Connections {
-        target: theme
-        // Update font whenever any theme property changes (the theme emits a
-        // single 'changed' signal for all properties).
-        // Note: 'function onChanged()' syntax requires Qt 5.15+; use the
-        // 'onChanged:' property form which works on all Qt5/Qt6 versions.
-        onChanged: { if (theme) keyLabel.font = theme.font }
     }
 
     MouseArea {
