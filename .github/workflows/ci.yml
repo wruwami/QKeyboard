@@ -131,8 +131,42 @@ jobs:
       # -C Debug is likewise required for ctest to find the Windows
       # multi-config build's test binaries ("Test not available without
       # configuration" otherwise); harmless on the single-config generators.
+      #
+      # QT_DEBUG_PLUGINS on Windows only: tst_keybutton and tst_quick
+      # (QTEST_MAIN/QUICK_TEST_MAIN, need a QApplication/QGuiApplication+
+      # QQmlEngine) fail on windows-latest with zero captured stdout via
+      # ctest --output-on-failure, unlike every other test in this project
+      # (including tst_keyboardwidget, which also uses QTEST_MAIN but never
+      # show()s a window). Surfaces Qt's own plugin-loading diagnostics in
+      # case that's the cause. Remove once root-caused.
       - name: Test
-        run: ctest --test-dir build --output-on-failure -C Debug
+        shell: bash
+        env:
+          QT_DEBUG_PLUGINS: ${{ matrix.os == 'windows-latest' && '1' || '' }}
+        run: |
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            xvfb-run ctest --test-dir build --output-on-failure -C Debug
+          else
+            ctest --test-dir build --output-on-failure -C Debug
+          fi
+
+      # ctest's --output-on-failure captures nothing for tst_keybutton/
+      # tst_quick on windows-latest (see above) — run them directly so their
+      # real stdout/stderr (and, on a crash, whatever the process managed to
+      # flush) reaches the CI log instead of being swallowed by ctest's own
+      # capture. Diagnostic only: never fails the job by itself, since the
+      # ctest step above already does.
+      - name: Directly run GUI tests for diagnostics (Windows only)
+        if: always() && matrix.os == 'windows-latest'
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          Write-Host "=== tst_keybutton ==="
+          & "build\tests\Debug\tst_keybutton.exe"
+          Write-Host "exit code: $LASTEXITCODE"
+          Write-Host "=== tst_quick ==="
+          & "build\tests\Debug\tst_quick.exe"
+          Write-Host "exit code: $LASTEXITCODE"
 
       # Coverage is only collected once (the ubuntu+Qt6 leg) to avoid
       # uploading duplicate reports to Codecov.
