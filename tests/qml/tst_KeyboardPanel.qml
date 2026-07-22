@@ -18,6 +18,16 @@ TestCase {
         signalName: "characterEntered"
     }
 
+    function findKeyboardKeys(item) {
+        let result = []
+        for (let i = 0; i < item.children.length; ++i) {
+            const child = item.children[i]
+            if (typeof child.keyData !== "undefined") result.push(child)
+            result = result.concat(findKeyboardKeys(child))
+        }
+        return result
+    }
+
     function initTestCase() {
         const json = JSON.stringify({
             locale: "en",
@@ -27,22 +37,18 @@ TestCase {
             ] } ]
         })
         verify(controller.loadJson(json))
-        // Repeater delegates (and the Layouts computing their geometry) are
-        // created/positioned over subsequent event-loop turns rather than
-        // synchronously when `rows` changes; wait for an actual rendered
-        // frame so mouseClick() below hits real, laid-out item bounds
-        // instead of a still-zero-sized item.
-        waitForRendering(panel)
-    }
-
-    function findKeyboardKeys(item) {
-        let result = []
-        for (let i = 0; i < item.children.length; ++i) {
-            const child = item.children[i]
-            if (typeof child.keyData !== "undefined") result.push(child)
-            result = result.concat(findKeyboardKeys(child))
-        }
-        return result
+        // Repeater delegates aren't created synchronously when `rows`
+        // changes, and RowLayout/ColumnLayout compute width/height via
+        // bindings before their separate arrange/polish pass actually sets
+        // x/y — so a single waitForRendering() call right after loadJson()
+        // isn't guaranteed to observe the *post-layout* frame. Poll for the
+        // second key actually being positioned to the right of the first
+        // (nonzero x) so mouseClick() below hits its real on-screen bounds
+        // instead of a stale, still-overlapping-at-(0,0) position.
+        tryVerify(function () {
+            const keys = findKeyboardKeys(panel)
+            return keys.length === 3 && keys[1].width > 0 && keys[1].x > 0
+        }, 3000, "keys did not finish laying out in time")
     }
 
     function test_rendersEveryKeyOnEveryRow() {
