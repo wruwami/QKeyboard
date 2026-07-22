@@ -151,7 +151,7 @@ jobs:
       # capture. Diagnostic only: never fails the job by itself, since the
       # ctest step above already does.
       - name: Directly run GUI tests for diagnostics (Windows only)
-        if: matrix.os == 'windows-latest'
+        if: always() && matrix.os == 'windows-latest'
         continue-on-error: true
         shell: pwsh
         run: |
