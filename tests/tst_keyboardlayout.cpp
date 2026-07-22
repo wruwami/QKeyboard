@@ -1,3 +1,4 @@
+#include <QTemporaryFile>
 #include <QtTest>
 
 #include "qkeyboardwidget/keyboard_layout.h"
@@ -24,6 +25,11 @@ private slots:
     void reportsErrorOnShiftKeyMissingTarget();
     void reportsErrorOnSwitchKeyMissingLabelId();
     void reportsErrorOnPageMissingId();
+    void reportsErrorOnNonArrayRow();
+
+    // File loading
+    void fromFileReportsErrorForMissingFile();
+    void fromFileLoadsAValidFile();
 
     // Navigation
     void findsPageIndexById();
@@ -230,6 +236,44 @@ void TestKeyboardLayout::reportsErrorOnPageMissingId()
     const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
     QVERIFY(!layout.isValid());
     QVERIFY(!error.isEmpty());
+}
+
+void TestKeyboardLayout::reportsErrorOnNonArrayRow()
+{
+    // A "rows" entry that isn't itself a JSON array (each row must be one).
+    const QByteArray json = R"({
+        "locale": "en",
+        "pages": [ { "id": "lower", "rows": [ "not-a-row" ] } ]
+    })";
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+    QVERIFY(!layout.isValid());
+    QVERIFY(!error.isEmpty());
+}
+
+// ---------------------------------------------------------------------------
+// File loading
+// ---------------------------------------------------------------------------
+
+void TestKeyboardLayout::fromFileReportsErrorForMissingFile()
+{
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromFile(QStringLiteral("/nonexistent/path.json"), &error);
+    QVERIFY(!layout.isValid());
+    QVERIFY(!error.isEmpty());
+}
+
+void TestKeyboardLayout::fromFileLoadsAValidFile()
+{
+    QTemporaryFile file;
+    QVERIFY(file.open());
+    file.write(R"({"locale":"en","pages":[{"id":"p","rows":[]}]})");
+    file.close();
+
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromFile(file.fileName(), &error);
+    QVERIFY2(layout.isValid(), qPrintable(error));
+    QCOMPARE(layout.locale(), QStringLiteral("en"));
 }
 
 // ---------------------------------------------------------------------------

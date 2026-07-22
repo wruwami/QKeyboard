@@ -55,6 +55,7 @@ private slots:
 
     // Page switching
     void shiftKeySwitchesPage();
+    void switchKeySwitchesPage();
     void setCurrentPageIndexDirectly();
     void setCurrentPageIndexOutOfRangeIsIgnored();
     void setPageByIdWorks();
@@ -185,6 +186,28 @@ void TestKeyboardController::shiftKeySwitchesPage()
     QCOMPARE(spy.count(), 1);
     QCOMPARE(controller.currentPageIndex(), 1);
     QCOMPARE(controller.currentPageId(), QStringLiteral("upper"));
+}
+
+void TestKeyboardController::switchKeySwitchesPage()
+{
+    const QByteArray json = R"({
+        "locale": "en",
+        "pages": [
+            { "id": "lower", "rows": [
+                [ { "type": "switch", "target": "numeric", "labelId": "numbers" } ]
+            ] },
+            { "id": "numeric", "rows": [ [ { "type": "char", "text": "1" } ] ] }
+        ]
+    })";
+
+    KeyboardController controller;
+    QVERIFY(controller.loadJson(json));
+
+    QSignalSpy spy(&controller, &KeyboardController::currentPageChanged);
+    controller.activateKeyAt(0, 0); // the switch key, target "numeric"
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(controller.currentPageIndex(), 1);
+    QCOMPARE(controller.currentPageId(), QStringLiteral("numeric"));
 }
 
 void TestKeyboardController::setCurrentPageIndexDirectly()
