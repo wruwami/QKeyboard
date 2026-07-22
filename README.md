@@ -111,8 +111,9 @@ Item {
 ```
 
 Requires linking `Qml`/`Quick` (`QKW_ENABLE_QML`, on by default in
-`CMakeLists.txt`). `qml/KeyboardKey.qml` and `qml/KeyboardPanel.qml` are
-shipped as plain files plus a hand-written `qml/qmldir` — not a compiled
+`CMakeLists.txt`). `qml/QKeyboardWidget/KeyboardKey.qml` and
+`qml/QKeyboardWidget/KeyboardPanel.qml` are shipped as plain files plus a
+hand-written `qml/QKeyboardWidget/qmldir` — not a compiled
 Qt6-only `qt_add_qml_module` — so the same setup works on Qt5 and Qt6.
 
 ## Switching languages at runtime

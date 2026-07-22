@@ -38,7 +38,7 @@ private slots:
     void buildsOneButtonPerKeyAcrossAllPages();
     void accentsShiftAndSwitchKeysOnly();
     void rebuildDoesNotCrashOnReload();
-    void invalidLayoutClearsButtons();
+    void invalidLayoutKeepsPreviousButtons();
 };
 
 void TestKeyboardWidget::buildsOneButtonPerKeyAcrossAllPages()
@@ -82,15 +82,20 @@ void TestKeyboardWidget::rebuildDoesNotCrashOnReload()
     QCOMPARE(widget.findChildren<KeyButton *>().size(), 5);
 }
 
-void TestKeyboardWidget::invalidLayoutClearsButtons()
+void TestKeyboardWidget::invalidLayoutKeepsPreviousButtons()
 {
     KeyboardWidget widget;
     QVERIFY(widget.controller()->loadJson(sampleLayoutJson()));
     QCOMPARE(widget.findChildren<KeyButton *>().size(), 5);
 
+    // KeyboardController::loadJson() keeps the previous valid layout in
+    // place on a parse failure (only errorString() changes) rather than
+    // blanking the keyboard, so rebuildPages() rebuilds the same 5 buttons
+    // from the still-valid old layout instead of clearing them.
     QVERIFY(!widget.controller()->loadJson(QByteArrayLiteral("not json")));
     QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
-    QCOMPARE(widget.findChildren<KeyButton *>().size(), 0);
+    QCOMPARE(widget.findChildren<KeyButton *>().size(), 5);
+    QVERIFY(!widget.controller()->errorString().isEmpty());
 }
 
 QTEST_MAIN(TestKeyboardWidget)
