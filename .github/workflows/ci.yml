@@ -132,19 +132,35 @@ jobs:
       # multi-config build's test binaries ("Test not available without
       # configuration" otherwise); harmless on the single-config generators.
       #
-      # QT_DEBUG_PLUGINS on Windows only: tst_keybutton/tst_keyboardwidget
-      # (QTEST_MAIN, needs QApplication) and tst_quick (QUICK_TEST_MAIN,
-      # needs QGuiApplication+QQmlEngine) are the first tests in this project
-      # that touch the QPA platform-plugin subsystem at all — every prior
-      # test uses QTEST_GUILESS_MAIN (QCoreApplication only). They're failing
-      # on the self-hosted Windows runner with zero captured output, which
-      # points at the offscreen platform plugin failing to load rather than
-      # a test assertion; this surfaces Qt's own plugin-loading diagnostics
-      # to confirm before changing anything. Remove once root-caused.
+      # QT_DEBUG_PLUGINS on Windows only: tst_keybutton and tst_quick
+      # (QTEST_MAIN/QUICK_TEST_MAIN, need a QApplication/QGuiApplication+
+      # QQmlEngine) fail on windows-latest with zero captured stdout via
+      # ctest --output-on-failure, unlike every other test in this project
+      # (including tst_keyboardwidget, which also uses QTEST_MAIN but never
+      # show()s a window). Surfaces Qt's own plugin-loading diagnostics in
+      # case that's the cause. Remove once root-caused.
       - name: Test
         env:
           QT_DEBUG_PLUGINS: ${{ matrix.os == 'windows-latest' && '1' || '' }}
         run: ctest --test-dir build --output-on-failure -C Debug
+
+      # ctest's --output-on-failure captures nothing for tst_keybutton/
+      # tst_quick on windows-latest (see above) — run them directly so their
+      # real stdout/stderr (and, on a crash, whatever the process managed to
+      # flush) reaches the CI log instead of being swallowed by ctest's own
+      # capture. Diagnostic only: never fails the job by itself, since the
+      # ctest step above already does.
+      - name: Directly run GUI tests for diagnostics (Windows only)
+        if: matrix.os == 'windows-latest'
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          Write-Host "=== tst_keybutton ==="
+          & "build\tests\Debug\tst_keybutton.exe" -v2
+          Write-Host "exit code: $LASTEXITCODE"
+          Write-Host "=== tst_quick ==="
+          & "build\tests\Debug\tst_quick.exe" -v2
+          Write-Host "exit code: $LASTEXITCODE"
 
       # Coverage is only collected once (the ubuntu+Qt6 leg) to avoid
       # uploading duplicate reports to Codecov.
