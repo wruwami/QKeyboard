@@ -13,6 +13,9 @@ private slots:
     void growsToFillLargeButton();
     void applyThemeUsesAccentColorWhenAccented();
     void applyThemeUsesKeyColorWhenNotAccented();
+    void isAccentedDefaultsToFalse();
+    void emptyTextSkipsFontFitOnResize();
+    void shrinkingBelowMarginSkipsFontFit();
 };
 
 void TestKeyButton::shrinksToFitInASingleResize()
@@ -66,6 +69,47 @@ void TestKeyButton::applyThemeUsesKeyColorWhenNotAccented()
     button.applyTheme(theme);
 
     QVERIFY(button.styleSheet().contains(theme.keyColor().name(QColor::HexArgb), Qt::CaseInsensitive));
+}
+
+void TestKeyButton::isAccentedDefaultsToFalse()
+{
+    KeyButton button(QStringLiteral("a"));
+    QVERIFY(!button.isAccented());
+    button.setAccented(true);
+    QVERIFY(button.isAccented());
+    button.setAccented(false);
+    QVERIFY(!button.isAccented());
+}
+
+void TestKeyButton::emptyTextSkipsFontFitOnResize()
+{
+    // fitFontToButton() returns immediately for an empty label; resizing
+    // must not crash and must leave the font untouched.
+    KeyButton button(QStringLiteral(""));
+    const QFont initial = button.font();
+    button.show();
+    button.resize(120, 40);
+    QCoreApplication::processEvents();
+    QCOMPARE(button.font(), initial);
+}
+
+void TestKeyButton::shrinkingBelowMarginSkipsFontFit()
+{
+    // fitFontToButton() returns immediately once the button is smaller than
+    // its fixed 8px margin in either dimension; must not crash.
+    KeyButton button(QStringLiteral("a"));
+    button.setMinimumSize(0, 0); // KeyButton's own ctor sets a 24x24 floor
+    button.show();
+    QCoreApplication::processEvents();
+
+    // Capture the font *after* show()'s own initial resizeEvent (which may
+    // already have run fitFontToButton() once) rather than before it, so
+    // this only asserts that the specific shrink-below-margin resize below
+    // is what leaves the font untouched.
+    const QFont initial = button.font();
+    button.resize(4, 4);
+    QCoreApplication::processEvents();
+    QCOMPARE(button.font(), initial);
 }
 
 QTEST_MAIN(TestKeyButton)
