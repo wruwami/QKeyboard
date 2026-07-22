@@ -125,7 +125,7 @@ KeyboardLayout KeyboardLayout::fromJson(const QByteArray &json, QString *errorMe
         return KeyboardLayout();
     }
 
-    QVector<KeyboardPage> pages;
+    QVector<KeyboardPage> parsedPages;
     QString localError;
     for (const QJsonValue &pageValue : pagesArray) {
         KeyboardPage page;
@@ -133,9 +133,9 @@ KeyboardLayout KeyboardLayout::fromJson(const QByteArray &json, QString *errorMe
             if (errorMessage) *errorMessage = localError;
             return KeyboardLayout();
         }
-        pages.append(page);
+        parsedPages.append(page);
     }
-    layout._pages = pages;
+    layout._pages = parsedPages;
 
     return layout;
 }
