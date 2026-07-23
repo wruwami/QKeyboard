@@ -1,5 +1,6 @@
 #include <QTemporaryFile>
 #include <QtTest>
+#include <QBuffer>
 
 #include "qkeyboardwidget/keyboard_layout.h"
 
@@ -41,6 +42,12 @@ private slots:
 
     // Default-constructed layout
     void defaultConstructedLayoutIsInvalid();
+
+    // New tests for issue #82
+    void parsesLayoutFromDevice();
+    void parsesLayoutFromFile();
+    void reportsErrorOnRowNotJsonArray();
+    void reportsErrorOnKeyNotJsonObject();
 };
 
 // ---------------------------------------------------------------------------
@@ -375,6 +382,64 @@ void TestKeyboardLayout::defaultConstructedLayoutIsInvalid()
     QVERIFY(layout.locale().isEmpty());
     QVERIFY(layout.pages().isEmpty());
     QCOMPARE(layout.indexOfPage(QStringLiteral("any")), -1);
+}
+
+void TestKeyboardLayout::parsesLayoutFromDevice()
+{
+    const QByteArray json = R"({
+        "locale": "en",
+        "pages": [
+            { "id": "p", "rows": [ [ { "type": "char", "text": "a" } ] ] }
+        ]
+    })";
+    QBuffer buffer;
+    buffer.setData(json);
+    buffer.open(QIODevice::ReadOnly);
+
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromDevice(buffer, &error);
+    QVERIFY2(layout.isValid(), qPrintable(error));
+    QCOMPARE(layout.locale(), QStringLiteral("en"));
+}
+
+void TestKeyboardLayout::parsesLayoutFromFile()
+{
+    Q_INIT_RESOURCE(qkeyboardwidget);
+
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromFile(QStringLiteral(":/layouts/en.json"), &error);
+    QVERIFY2(layout.isValid(), qPrintable(error));
+    QCOMPARE(layout.locale(), QStringLiteral("en"));
+}
+
+void TestKeyboardLayout::reportsErrorOnRowNotJsonArray()
+{
+    const QByteArray json = R"({
+        "locale": "en",
+        "pages": [
+            { "id": "p", "rows": [ {} ] }
+        ]
+    })";
+
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+    QVERIFY(!layout.isValid());
+    QVERIFY(error.contains(QStringLiteral("JSON array")));
+}
+
+void TestKeyboardLayout::reportsErrorOnKeyNotJsonObject()
+{
+    const QByteArray json = R"({
+        "locale": "en",
+        "pages": [
+            { "id": "p", "rows": [ [ 42 ] ] }
+        ]
+    })";
+
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+    QVERIFY(!layout.isValid());
+    QVERIFY(error.contains(QStringLiteral("JSON object")));
 }
 
 QTEST_GUILESS_MAIN(TestKeyboardLayout)
