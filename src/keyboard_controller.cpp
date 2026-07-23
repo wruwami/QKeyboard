@@ -1,6 +1,7 @@
 #include "qkeyboardwidget/keyboard_controller.h"
 
 #include <QCoreApplication>
+#include <QDebug>
 
 // Q_INIT_RESOURCE() expands to an `extern` declaration of the rcc-generated
 // (un-namespaced) initializer function and must therefore be invoked from
@@ -28,7 +29,19 @@ namespace qkw {
 KeyboardController::KeyboardController(QObject *parent) : QObject(parent)
 {
     qkwInitBundledResources();
-    setLocale(Locale::English);
+    // Only fails if the bundled resource itself is missing/corrupted (a
+    // broken build/deployment, not a normal runtime condition, and not
+    // reproducible without actually shipping a broken qkeyboardwidget.qrc)
+    // - isValid() and errorString() still correctly reflect that failure
+    // afterward (same "leaves observable state behind" contract
+    // loadFile()/loadJson() always have), but nothing could have connected
+    // to loadFailed() yet this early, so warn too rather than leave it
+    // purely silent.
+    // LCOV_EXCL_START
+    if (!setLocale(Locale::English)) {
+        qWarning("KeyboardController: failed to load its default locale: %s", qPrintable(_errorString));
+    }
+    // LCOV_EXCL_STOP
 }
 
 bool KeyboardController::setLocale(Locale locale)
@@ -37,7 +50,14 @@ bool KeyboardController::setLocale(Locale locale)
         case Locale::English: return loadFile(QStringLiteral(":/layouts/en.json"));
         case Locale::Korean: return loadFile(QStringLiteral(":/layouts/ko.json"));
     }
-    Q_UNREACHABLE();
+    // Every Locale enumerator has a case above, so this is genuinely
+    // unreachable through the public API (the parameter type itself rules
+    // out any other value) - only exists to satisfy -Wreturn-type, which
+    // GCC still raises here despite the switch being exhaustive over every
+    // enumerator. LCOV_EXCL_LINE: excluded from coverage for the same
+    // reason, matching how this codebase already treats other genuinely
+    // unreachable defensive lines (e.g. resolveLabel()'s "default: break;").
+    Q_UNREACHABLE(); // LCOV_EXCL_LINE
 }
 
 bool KeyboardController::loadFile(const QString &filePath)
