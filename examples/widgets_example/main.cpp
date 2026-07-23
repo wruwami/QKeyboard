@@ -48,21 +48,56 @@ int main(int argc, char *argv[])
     // in unconditionally is safe regardless of which locale is active.
     auto *hangulComposer = new qkw::HangulComposer(central);
 
+    // HangulComposer::replacePrevious assumes the cursor is still sitting
+    // right after the last character it emitted. `editingComposedText`
+    // flags the insert()/backspace() calls this file makes on the
+    // composer's behalf, so the cursorPositionChanged handler below can
+    // tell those apart from a cursor move the composer doesn't know about
+    // (a click or arrow-key press) and commit() the pending syllable before
+    // it can be corrupted (#46). Captured by reference: main()'s frame, and
+    // therefore this variable, outlives app.exec() and every connection
+    // made against it.
+    bool editingComposedText = false;
+
     QObject::connect(keyboard->controller(), &qkw::KeyboardController::characterEntered, lineEdit,
                      [lineEdit, hangulComposer](const QString &text) {
                          if (!hangulComposer->feed(text)) lineEdit->insert(text);
                      });
     QObject::connect(hangulComposer, &qkw::HangulComposer::syllableReady, lineEdit,
-                     [lineEdit](const QString &text, bool replacePrevious) {
+                     [lineEdit, &editingComposedText](const QString &text, bool replacePrevious) {
+                         editingComposedText = true;
                          if (replacePrevious) lineEdit->backspace();
                          lineEdit->insert(text);
+                         editingComposedText = false;
                      });
     QObject::connect(hangulComposer, &qkw::HangulComposer::syllableCleared, lineEdit,
-                     [lineEdit]() { lineEdit->backspace(); });
+                     [lineEdit, &editingComposedText]() {
+                         editingComposedText = true;
+                         lineEdit->backspace();
+                         editingComposedText = false;
+                     });
+
+    // Any cursor move this file didn't itself cause (a click elsewhere in
+    // the field, arrow keys, etc.) invalidates the composer's assumption
+    // that it's still positioned right after the last emitted syllable, so
+    // flush the in-progress composition rather than let a later feed()
+    // corrupt unrelated text.
+    QObject::connect(lineEdit, &QLineEdit::cursorPositionChanged, hangulComposer,
+                     [hangulComposer, &editingComposedText](int, int) {
+                         if (!editingComposedText) hangulComposer->commit();
+                     });
+    // QLineEdit has no dedicated focus-out signal; QApplication::focusChanged
+    // covers it (and any other way focus can leave the field).
+    QObject::connect(qApp, &QApplication::focusChanged, hangulComposer,
+                     [lineEdit, hangulComposer](QWidget *old, QWidget *) {
+                         if (old == lineEdit) hangulComposer->commit();
+                     });
 
     QObject::connect(keyboard->controller(), &qkw::KeyboardController::backspaceRequested, lineEdit,
-                     [lineEdit, hangulComposer]() {
+                     [lineEdit, hangulComposer, &editingComposedText]() {
+                         editingComposedText = true;
                          if (!hangulComposer->backspace()) lineEdit->backspace();
+                         editingComposedText = false;
                      });
     QObject::connect(keyboard->controller(), &qkw::KeyboardController::enterRequested, lineEdit,
                      [lineEdit, hangulComposer]() {
