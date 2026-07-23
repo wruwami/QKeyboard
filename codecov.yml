@@ -1,0 +1,13 @@
+# Limits Codecov's view of the repo to the library itself. CI's lcov step
+# already strips tests/** and examples/** from the coverage.info it uploads
+# (see .github/workflows/ci.yml's "Collect coverage" step), which keeps the
+# overall project percentage accurate — but Codecov's separate per-PR patch
+# coverage check has no data at all for files stripped that way, and treats
+# "no data" as "0% covered" rather than "not applicable", flagging every
+# changed line in examples/**/main.cpp (or any tests/** change) as an
+# uncovered miss. This ignore list tells Codecov itself to exclude those
+# paths from every check, patch coverage included, instead of just from the
+# uploaded report.
+ignore:
+  - "tests/**"
+  - "examples/**"
