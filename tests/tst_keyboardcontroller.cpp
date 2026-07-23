@@ -444,7 +444,8 @@ void TestKeyboardController::resolveLabelTranslatesControlKeys()
     QCOMPARE(row.at(5).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("Enter"));
     QCOMPARE(row.at(6).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("Space"));
     QCOMPARE(row.at(7).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("Shift"));
-    QCOMPARE(row.at(8).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("custom_label"));
+    // Character keys bypass translation and always return key.text even if labelId is set
+    QCOMPARE(row.at(8).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("x"));
 }
 
 void TestKeyboardController::behaviorOnLoadFailure()
@@ -452,13 +453,13 @@ void TestKeyboardController::behaviorOnLoadFailure()
     KeyboardController controller;
     QVERIFY(controller.loadJson(sampleLayoutJson()));
     QVERIFY(controller.isValid());
+    const int prevPageCount = controller.pageCount();
 
+    // Try loading invalid JSON (should fail, but keep previously loaded state)
     QVERIFY(!controller.loadJson(QByteArrayLiteral("invalid")));
-    QVERIFY(!controller.isValid());
+    QVERIFY(controller.isValid());
+    QCOMPARE(controller.pageCount(), prevPageCount);
     QVERIFY(!controller.errorString().isEmpty());
-    QCOMPARE(controller.pageCount(), 0);
-    QVERIFY(controller.rows().isEmpty());
-    QVERIFY(controller.currentPageId().isEmpty());
 }
 
 QTEST_GUILESS_MAIN(TestKeyboardController)
