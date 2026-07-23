@@ -6,7 +6,7 @@
         <file alias="globe.svg">../assets/icons/globe.svg</file>
     </qresource>
     <qresource prefix="/layouts">
-        <file alias="en.json">../layouts/en.json</file>
-        <file alias="ko.json">../layouts/ko.json</file>
+        <file alias="en.json">layouts/en.json</file>
+        <file alias="ko.json">layouts/ko.json</file>
     </qresource>
 </RCC>

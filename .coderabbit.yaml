@@ -17,7 +17,7 @@ reviews:
     - "!**/*.md"
     - "!assets/**"
     - "!docs/**"
-    - "!i18n/**/*.ts"
+    - "!resources/i18n/**/*.ts"
   path_instructions:
     - path: "src/**/*.{h,cpp}"
       instructions: >

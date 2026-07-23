@@ -85,7 +85,7 @@ TestCase {
     function test_iconWithRealResourcePathLoadsSuccessfully() {
         // Regression test for #78: a bare Qt-resource-style icon path (the
         // same format KeyDefinition::toVariantMap()/the real layout JSON
-        // emits, e.g. layouts/en.json's shift key) failed to load via
+        // emits, e.g. resources/layouts/en.json's shift key) failed to load via
         // Image.source, which needs an explicit "qrc:" URL scheme rather
         // than the bare ":" prefix QIcon (used by the QWidget view) accepts
         // directly. Using the real compiled-in resource path here, not a
