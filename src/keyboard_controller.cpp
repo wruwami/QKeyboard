@@ -16,9 +16,7 @@ bool KeyboardController::loadFile(const QString &filePath)
     QString error;
     KeyboardLayout layout = KeyboardLayout::fromFile(path, &error);
     if (!layout.isValid()) {
-        _layout = KeyboardLayout();
         _errorString = error;
-        _currentPageIndex = 0;
         emit layoutChanged();
         emit loadFailed(error);
         return false;
@@ -39,9 +37,7 @@ bool KeyboardController::loadJson(const QByteArray &json)
     QString error;
     KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
     if (!layout.isValid()) {
-        _layout = KeyboardLayout();
         _errorString = error;
-        _currentPageIndex = 0;
         emit layoutChanged();
         emit loadFailed(error);
         return false;

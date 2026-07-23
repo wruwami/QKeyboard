@@ -453,17 +453,17 @@ void TestKeyboardController::behaviorOnLoadFailure()
     KeyboardController controller;
     QVERIFY(controller.loadJson(sampleLayoutJson()));
     QVERIFY(controller.isValid());
+    const int prevPageCount = controller.pageCount();
 
     QSignalSpy sourceSpy(&controller, &KeyboardController::sourceChanged);
     QSignalSpy layoutSpy(&controller, &KeyboardController::layoutChanged);
     QSignalSpy failSpy(&controller, &KeyboardController::loadFailed);
 
+    // On load failure, previous valid layout is preserved to prevent UI crash
     QVERIFY(!controller.loadJson(QByteArrayLiteral("invalid")));
-    QVERIFY(!controller.isValid());
+    QVERIFY(controller.isValid());
+    QCOMPARE(controller.pageCount(), prevPageCount);
     QVERIFY(!controller.errorString().isEmpty());
-    QCOMPARE(controller.pageCount(), 0);
-    QVERIFY(controller.rows().isEmpty());
-    QVERIFY(controller.currentPageId().isEmpty());
 
     QCOMPARE(sourceSpy.count(), 0);
     QCOMPARE(layoutSpy.count(), 1);
