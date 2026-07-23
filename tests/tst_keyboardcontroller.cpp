@@ -482,22 +482,22 @@ void TestKeyboardController::activateKeyAtEmitsAllActionSignals()
     QSignalSpy pageSpy(&controller, &KeyboardController::currentPageChanged);
 
     // Row 0 on page 0 ("lower"):
-    // Col 0: "a" (Char), Col 1: Backspace, Col 2: Enter, Col 3: Space, Col 4: Shift -> "upper"
+    // Col 0: "a" (Char), Col 1: Shift -> "upper", Col 2: Backspace, Col 3: Enter, Col 4: Space
     controller.activateKeyAt(0, 0); // char 'a'
     QCOMPARE(charSpy.count(), 1);
     QCOMPARE(charSpy.at(0).at(0).toString(), QStringLiteral("a"));
 
-    controller.activateKeyAt(0, 1); // backspace
+    controller.activateKeyAt(0, 2); // backspace
     QCOMPARE(bsSpy.count(), 1);
 
-    controller.activateKeyAt(0, 2); // enter
+    controller.activateKeyAt(0, 3); // enter
     QCOMPARE(enterSpy.count(), 1);
 
-    controller.activateKeyAt(0, 3); // space
+    controller.activateKeyAt(0, 4); // space
     QCOMPARE(charSpy.count(), 2);
     QCOMPARE(charSpy.at(1).at(0).toString(), QStringLiteral(" "));
 
-    controller.activateKeyAt(0, 4); // shift (switches to "upper")
+    controller.activateKeyAt(0, 1); // shift (switches to "upper")
     QCOMPARE(pageSpy.count(), 1);
     QCOMPARE(controller.currentPageId(), QStringLiteral("upper"));
 }

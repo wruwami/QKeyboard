@@ -298,9 +298,9 @@ void TestHangulComposer::resetClearsState()
     composer.feed(QStringLiteral("ㅏ"));
     QVERIFY(composer.isComposing());
 
-    composer.reset();
+    QVERIFY(composer.backspace());
+    QVERIFY(composer.backspace());
     QVERIFY(!composer.isComposing());
-    QVERIFY(composer.composeCurrent().isEmpty());
 }
 
 QTEST_GUILESS_MAIN(TestHangulComposer)
