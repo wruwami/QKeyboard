@@ -45,12 +45,25 @@ void KeyButton::applyTheme(const KeyboardTheme &theme)
                       .arg(theme.cornerRadius())
                       .arg(theme.keyPressedColor().name(QColor::HexArgb)));
     fitFontToButton();
+    fitIconToButton();
 }
 
 void KeyButton::resizeEvent(QResizeEvent *event)
 {
     QPushButton::resizeEvent(event);
     fitFontToButton();
+    fitIconToButton();
+}
+
+void KeyButton::fitIconToButton()
+{
+    if (icon().isNull()) return;
+
+    // Matches KeyboardKey.qml's icon sizing rule (40% of the smaller
+    // dimension) so the two views render icons at comparable relative
+    // sizes for the same button geometry.
+    const int side = static_cast<int>(qMin(width(), height()) * 0.4);
+    setIconSize(QSize(side, side));
 }
 
 void KeyButton::fitFontToButton()

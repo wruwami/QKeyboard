@@ -16,6 +16,8 @@ private slots:
     void isAccentedDefaultsToFalse();
     void emptyTextSkipsFontFitOnResize();
     void shrinkingBelowMarginSkipsFontFit();
+    void resizeFitsIconToButtonWhenIconSet();
+    void emptyIconSkipsIconFitOnResize();
 };
 
 void TestKeyButton::shrinksToFitInASingleResize()
@@ -110,6 +112,36 @@ void TestKeyButton::shrinkingBelowMarginSkipsFontFit()
     button.resize(4, 4);
     QCoreApplication::processEvents();
     QCOMPARE(button.font(), initial);
+}
+
+void TestKeyButton::resizeFitsIconToButtonWhenIconSet()
+{
+    // Use a synthesized pixmap icon rather than one of the repo's .svg assets
+    // so this test doesn't depend on the SVG plugin being available (tracked
+    // separately in issue #68).
+    QPixmap pixmap(64, 64);
+    pixmap.fill(Qt::red);
+
+    KeyButton button(QStringLiteral(""));
+    button.setIcon(QIcon(pixmap));
+    button.show();
+    button.resize(100, 60);
+    QCoreApplication::processEvents();
+
+    const int expectedSide = static_cast<int>(qMin(button.width(), button.height()) * 0.4);
+    QCOMPARE(button.iconSize(), QSize(expectedSide, expectedSide));
+}
+
+void TestKeyButton::emptyIconSkipsIconFitOnResize()
+{
+    // fitIconToButton() returns immediately when there's no icon; resizing
+    // must not crash and must leave the (default) icon size untouched.
+    KeyButton button(QStringLiteral("a"));
+    const QSize initial = button.iconSize();
+    button.show();
+    button.resize(120, 40);
+    QCoreApplication::processEvents();
+    QCOMPARE(button.iconSize(), initial);
 }
 
 QTEST_MAIN(TestKeyButton)
