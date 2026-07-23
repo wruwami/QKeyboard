@@ -28,6 +28,8 @@ private slots:
     void nonCombinableDoubleJamoStartsNewSyllable();
     void nonCombinableVowelsStartsNewSyllable();
     void multiStepBackspaceDecomposition();
+    void compoundVowelDecomposesOnBackspace();
+    void resetClearsState();
 };
 
 // "가": ㄱ (cho 0) + ㅏ (jung 0) -> U+AC00.
@@ -270,6 +272,35 @@ void TestHangulComposer::multiStepBackspaceDecomposition()
     QVERIFY(composer.backspace());
     QCOMPARE(clearSpy.count(), 1);
     QVERIFY(!composer.isComposing());
+}
+
+void TestHangulComposer::compoundVowelDecomposesOnBackspace()
+{
+    HangulComposer composer;
+    composer.feed(QStringLiteral("ㄱ"));
+    composer.feed(QStringLiteral("ㅗ"));
+    composer.feed(QStringLiteral("ㅏ")); // "과"
+
+    QSignalSpy spy(&composer, &HangulComposer::syllableReady);
+    QVERIFY(composer.backspace()); // "고" (ㅗ)
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.at(0).at(0).toString(), QStringLiteral("고"));
+
+    QVERIFY(composer.backspace()); // "ㄱ"
+    QCOMPARE(spy.count(), 2);
+    QCOMPARE(spy.at(1).at(0).toString(), QStringLiteral("ㄱ"));
+}
+
+void TestHangulComposer::resetClearsState()
+{
+    HangulComposer composer;
+    composer.feed(QStringLiteral("ㄱ"));
+    composer.feed(QStringLiteral("ㅏ"));
+    QVERIFY(composer.isComposing());
+
+    composer.reset();
+    QVERIFY(!composer.isComposing());
+    QVERIFY(composer.composeCurrent().isEmpty());
 }
 
 QTEST_GUILESS_MAIN(TestHangulComposer)

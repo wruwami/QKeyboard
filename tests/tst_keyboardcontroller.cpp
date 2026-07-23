@@ -75,6 +75,7 @@ private slots:
     // New tests for issue #82
     void resolveLabelTranslatesControlKeys();
     void behaviorOnLoadFailure();
+    void activateKeyAtEmitsAllActionSignals();
 };
 
 // ---------------------------------------------------------------------------
@@ -468,6 +469,37 @@ void TestKeyboardController::behaviorOnLoadFailure()
     QCOMPARE(sourceSpy.count(), 0);
     QCOMPARE(layoutSpy.count(), 1);
     QCOMPARE(failSpy.count(), 1);
+}
+
+void TestKeyboardController::activateKeyAtEmitsAllActionSignals()
+{
+    KeyboardController controller;
+    QVERIFY(controller.loadJson(sampleLayoutJson()));
+
+    QSignalSpy charSpy(&controller, &KeyboardController::characterEntered);
+    QSignalSpy bsSpy(&controller, &KeyboardController::backspaceRequested);
+    QSignalSpy enterSpy(&controller, &KeyboardController::enterRequested);
+    QSignalSpy pageSpy(&controller, &KeyboardController::currentPageChanged);
+
+    // Row 0 on page 0 ("lower"):
+    // Col 0: "a" (Char), Col 1: Backspace, Col 2: Enter, Col 3: Space, Col 4: Shift -> "upper"
+    controller.activateKeyAt(0, 0); // char 'a'
+    QCOMPARE(charSpy.count(), 1);
+    QCOMPARE(charSpy.at(0).at(0).toString(), QStringLiteral("a"));
+
+    controller.activateKeyAt(0, 1); // backspace
+    QCOMPARE(bsSpy.count(), 1);
+
+    controller.activateKeyAt(0, 2); // enter
+    QCOMPARE(enterSpy.count(), 1);
+
+    controller.activateKeyAt(0, 3); // space
+    QCOMPARE(charSpy.count(), 2);
+    QCOMPARE(charSpy.at(1).at(0).toString(), QStringLiteral(" "));
+
+    controller.activateKeyAt(0, 4); // shift (switches to "upper")
+    QCOMPARE(pageSpy.count(), 1);
+    QCOMPARE(controller.currentPageId(), QStringLiteral("upper"));
 }
 
 QTEST_GUILESS_MAIN(TestKeyboardController)
