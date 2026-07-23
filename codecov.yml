@@ -11,3 +11,6 @@
 ignore:
   - "tests/**"
   - "examples/**"
+  - "**/Qt/**"
+  - "**/usr/include/**"
+  - "**/build/**"

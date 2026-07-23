@@ -9,6 +9,8 @@ jobs:
   lint:
     name: clang-format + cppcheck
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
 
     steps:
       - name: Checkout
@@ -35,9 +37,22 @@ jobs:
             --enable=warning,style,performance,portability \
             --inline-suppr \
             --suppressions-list=.cppcheck-suppressions \
-            --error-exitcode=1 \
+            --xml --xml-version=2 \
             -I include \
-            src include tests examples
+            src include tests examples 2> cppcheck.xml
+
+      - name: Install cppcheck-sarif
+        run: |
+          python3 -m pip install cppcheck-sarif
+
+      - name: Convert Cppcheck XML to SARIF
+        run: |
+          cppcheck-sarif cppcheck.xml > cppcheck.sarif
+
+      - name: Upload SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: cppcheck.sarif
 
   build-and-test:
     name: ${{ matrix.os }} / Qt ${{ matrix.qt-version }}
@@ -181,6 +196,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && startsWith(matrix.qt-version, '6')
         uses: codecov/codecov-action@v4
         with:
-          files: coverage.info
+          files: ./coverage.info
           token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: false
+          disable_search: true
+          fail_ci_if_error: true
