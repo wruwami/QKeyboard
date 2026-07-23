@@ -20,6 +20,14 @@ private slots:
     void backspaceClearsLoneChoseong();
     void backspaceOnIdleComposerReturnsFalse();
     void invalidJongseongCandidateStartsNewSyllable();
+
+    // New tests for issue #82
+    void feedRejectsInvalidLength();
+    void vowelOnlyTypedInitially();
+    void nonJamoInputCommitsAndResets();
+    void nonCombinableDoubleJamoStartsNewSyllable();
+    void nonCombinableVowelsStartsNewSyllable();
+    void multiStepBackspaceDecomposition();
 };
 
 // "가": ㄱ (cho 0) + ㅏ (jung 0) -> U+AC00.
@@ -167,6 +175,101 @@ void TestHangulComposer::invalidJongseongCandidateStartsNewSyllable()
     QVERIFY(composer.feed(QStringLiteral("ㅃ")));
     QCOMPARE(spy.at(0).at(0).toString(), QStringLiteral("ㅃ"));
     QCOMPARE(spy.at(0).at(1).toBool(), false);
+}
+
+void TestHangulComposer::feedRejectsInvalidLength()
+{
+    HangulComposer composer;
+    composer.feed(QStringLiteral("ㄱ"));
+    QVERIFY(composer.isComposing());
+
+    QVERIFY(!composer.feed(QStringLiteral("ㄱㅏ")));
+    QVERIFY(!composer.isComposing());
+}
+
+void TestHangulComposer::vowelOnlyTypedInitially()
+{
+    HangulComposer composer;
+    QSignalSpy spy(&composer, &HangulComposer::syllableReady);
+
+    QVERIFY(composer.feed(QStringLiteral("ㅏ")));
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.at(0).at(0).toString(), QStringLiteral("ㅏ"));
+    QCOMPARE(spy.at(0).at(1).toBool(), false);
+    QVERIFY(!composer.isComposing());
+}
+
+void TestHangulComposer::nonJamoInputCommitsAndResets()
+{
+    HangulComposer composer;
+    composer.feed(QStringLiteral("ㄱ"));
+    composer.feed(QStringLiteral("ㅏ"));
+    QVERIFY(composer.isComposing());
+
+    QVERIFY(!composer.feed(QStringLiteral("가")));
+    QVERIFY(!composer.isComposing());
+}
+
+void TestHangulComposer::nonCombinableDoubleJamoStartsNewSyllable()
+{
+    HangulComposer composer;
+    composer.feed(QStringLiteral("ㄱ"));
+    composer.feed(QStringLiteral("ㅏ"));
+    composer.feed(QStringLiteral("ㄴ"));
+
+    QSignalSpy spy(&composer, &HangulComposer::syllableReady);
+    QVERIFY(composer.feed(QStringLiteral("ㄴ")));
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.at(0).at(0).toString(), QStringLiteral("ㄴ"));
+    QCOMPARE(spy.at(0).at(1).toBool(), false);
+    QVERIFY(composer.isComposing());
+
+    QVERIFY(composer.feed(QStringLiteral("ㅏ")));
+    QCOMPARE(spy.count(), 2);
+    QCOMPARE(spy.at(1).at(0).toString(), QStringLiteral("나"));
+    QCOMPARE(spy.at(1).at(1).toBool(), true);
+}
+
+void TestHangulComposer::nonCombinableVowelsStartsNewSyllable()
+{
+    HangulComposer composer;
+    composer.feed(QStringLiteral("ㄱ"));
+    composer.feed(QStringLiteral("ㅏ"));
+
+    QSignalSpy spy(&composer, &HangulComposer::syllableReady);
+    QVERIFY(composer.feed(QStringLiteral("ㅓ")));
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.at(0).at(0).toString(), QStringLiteral("ㅓ"));
+    QCOMPARE(spy.at(0).at(1).toBool(), false);
+    QVERIFY(!composer.isComposing());
+}
+
+void TestHangulComposer::multiStepBackspaceDecomposition()
+{
+    HangulComposer composer;
+    composer.feed(QStringLiteral("ㄱ"));
+    composer.feed(QStringLiteral("ㅏ"));
+    composer.feed(QStringLiteral("ㅂ"));
+    composer.feed(QStringLiteral("ㅅ"));
+
+    QSignalSpy spy(&composer, &HangulComposer::syllableReady);
+    QSignalSpy clearSpy(&composer, &HangulComposer::syllableCleared);
+
+    QVERIFY(composer.backspace());
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.at(0).at(0).toString(), QString(QChar(0xAC11)));
+
+    QVERIFY(composer.backspace());
+    QCOMPARE(spy.count(), 2);
+    QCOMPARE(spy.at(1).at(0).toString(), QString(QChar(0xAC00)));
+
+    QVERIFY(composer.backspace());
+    QCOMPARE(spy.count(), 3);
+    QCOMPARE(spy.at(2).at(0).toString(), QStringLiteral("ㄱ"));
+
+    QVERIFY(composer.backspace());
+    QCOMPARE(clearSpy.count(), 1);
+    QVERIFY(!composer.isComposing());
 }
 
 QTEST_GUILESS_MAIN(TestHangulComposer)
