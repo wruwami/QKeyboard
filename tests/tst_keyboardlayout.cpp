@@ -1,6 +1,7 @@
 #include <QTemporaryFile>
 #include <QtTest>
 #include <QBuffer>
+#include <QStringList>
 
 #include "qkeyboardwidget/keyboard_layout.h"
 
@@ -53,6 +54,15 @@ private slots:
     void reportsErrorOnMissingOrEmptyLocale();
     void reportsErrorOnNonArrayPages();
     void validatesSchemaAndLoadsAllProjectLayouts();
+    void reportsErrorOnNonStringLocale();
+    void reportsErrorOnPagesAsNonArrayJsonValue_data();
+    void reportsErrorOnPagesAsNonArrayJsonValue();
+    void acceptsWhitespaceOnlyLocaleAsPresentButNonEmpty();
+    void localeErrorTakesPrecedenceOverPagesError();
+    void schemaTopLevelRequiresLocaleAndPagesAndForbidsExtras();
+    void schemaKeyDefinitionEnumMatchesSupportedKeyTypes();
+    void schemaConditionalRequirementsForShiftAndSwitchKeys();
+    void qrcResourceRegistersSchemaFileAlongsideLayouts();
 };
 
 // ---------------------------------------------------------------------------
@@ -496,6 +506,182 @@ void TestKeyboardLayout::validatesSchemaAndLoadsAllProjectLayouts()
     const KeyboardLayout koLayout = KeyboardLayout::fromFile(QStringLiteral(":/layouts/ko.json"), &error);
     QVERIFY2(koLayout.isValid(), qPrintable(error));
     QCOMPARE(koLayout.locale(), QStringLiteral("ko"));
+}
+
+void TestKeyboardLayout::reportsErrorOnNonStringLocale()
+{
+    // "locale" present but not a JSON string (e.g. a number) must be
+    // rejected the same way a missing/empty locale is.
+    const QByteArray json = R"({ "locale": 42, "pages": [ { "id": "p", "rows": [] } ] })";
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+    QVERIFY(!layout.isValid());
+    QVERIFY(error.contains(QStringLiteral("locale")));
+}
+
+void TestKeyboardLayout::reportsErrorOnPagesAsNonArrayJsonValue_data()
+{
+    QTest::addColumn<QByteArray>("json");
+
+    QTest::newRow("pages is an object") << QByteArray(
+        R"({ "locale": "en", "pages": { "id": "p" } })");
+    QTest::newRow("pages is null") << QByteArray(
+        R"({ "locale": "en", "pages": null })");
+    QTest::newRow("pages is a number") << QByteArray(
+        R"({ "locale": "en", "pages": 7 })");
+    QTest::newRow("pages is a bool") << QByteArray(
+        R"({ "locale": "en", "pages": true })");
+}
+
+void TestKeyboardLayout::reportsErrorOnPagesAsNonArrayJsonValue()
+{
+    QFETCH(QByteArray, json);
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+    QVERIFY(!layout.isValid());
+    QVERIFY(error.contains(QStringLiteral("pages")));
+}
+
+void TestKeyboardLayout::acceptsWhitespaceOnlyLocaleAsPresentButNonEmpty()
+{
+    // The locale guard only rejects an empty string; a whitespace-only
+    // value is a non-empty QString and therefore currently passes. This
+    // pins down that boundary so a future change to the emptiness check
+    // (e.g. trimming) is a deliberate, visible behavior change.
+    const QByteArray json = R"({ "locale": "   ", "pages": [ { "id": "p", "rows": [] } ] })";
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+    QVERIFY2(layout.isValid(), qPrintable(error));
+    QCOMPARE(layout.locale(), QStringLiteral("   "));
+}
+
+void TestKeyboardLayout::localeErrorTakesPrecedenceOverPagesError()
+{
+    // When both 'locale' and 'pages' are missing, the locale check runs
+    // first, so the reported error must be about 'locale', not 'pages'.
+    const QByteArray json = R"({})";
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+    QVERIFY(!layout.isValid());
+    QVERIFY(error.contains(QStringLiteral("locale")));
+}
+
+void TestKeyboardLayout::schemaTopLevelRequiresLocaleAndPagesAndForbidsExtras()
+{
+    Q_INIT_RESOURCE(qkeyboardwidget);
+
+    QFile schemaFile(QStringLiteral(":/layouts/schema/keyboard-layout.schema.json"));
+    QVERIFY(schemaFile.open(QIODevice::ReadOnly));
+    QJsonParseError parseError{};
+    const QJsonDocument doc = QJsonDocument::fromJson(schemaFile.readAll(), &parseError);
+    QCOMPARE(parseError.error, QJsonParseError::NoError);
+    const QJsonObject root = doc.object();
+
+    QCOMPARE(root.value(QStringLiteral("type")).toString(), QStringLiteral("object"));
+    QCOMPARE(root.value(QStringLiteral("additionalProperties")).toBool(true), false);
+
+    const QJsonArray requiredArray = root.value(QStringLiteral("required")).toArray();
+    QVERIFY(requiredArray.contains(QJsonValue(QStringLiteral("locale"))));
+    QVERIFY(requiredArray.contains(QJsonValue(QStringLiteral("pages"))));
+    QCOMPARE(requiredArray.size(), 2);
+
+    const QJsonObject properties = root.value(QStringLiteral("properties")).toObject();
+    const QJsonObject localeSchema = properties.value(QStringLiteral("locale")).toObject();
+    QCOMPARE(localeSchema.value(QStringLiteral("type")).toString(), QStringLiteral("string"));
+    QCOMPARE(localeSchema.value(QStringLiteral("minLength")).toInt(), 1);
+
+    const QJsonObject pagesSchema = properties.value(QStringLiteral("pages")).toObject();
+    QCOMPARE(pagesSchema.value(QStringLiteral("type")).toString(), QStringLiteral("array"));
+    QCOMPARE(pagesSchema.value(QStringLiteral("minItems")).toInt(), 1);
+}
+
+void TestKeyboardLayout::schemaKeyDefinitionEnumMatchesSupportedKeyTypes()
+{
+    Q_INIT_RESOURCE(qkeyboardwidget);
+
+    QFile schemaFile(QStringLiteral(":/layouts/schema/keyboard-layout.schema.json"));
+    QVERIFY(schemaFile.open(QIODevice::ReadOnly));
+    const QJsonDocument doc = QJsonDocument::fromJson(schemaFile.readAll());
+    const QJsonObject definitions = doc.object().value(QStringLiteral("definitions")).toObject();
+    const QJsonObject keyDefinition = definitions.value(QStringLiteral("keyDefinition")).toObject();
+    const QJsonObject typeSchema = keyDefinition.value(QStringLiteral("properties")).toObject().value(QStringLiteral("type")).toObject();
+
+    QCOMPARE(typeSchema.value(QStringLiteral("type")).toString(), QStringLiteral("string"));
+
+    const QJsonArray enumArray = typeSchema.value(QStringLiteral("enum")).toArray();
+    QStringList enumValues;
+    for (const QJsonValue &value : enumArray) enumValues << value.toString();
+
+    // Must exactly match the key types accepted by KeyboardLayout::fromJson's
+    // internal actionFromString() table (src/keyboard_layout.cpp).
+    const QStringList expected = {
+        QStringLiteral("char"),      QStringLiteral("backspace"), QStringLiteral("enter"),
+        QStringLiteral("space"),     QStringLiteral("shift"),     QStringLiteral("switch"),
+    };
+    QCOMPARE(enumValues.size(), expected.size());
+    for (const QString &type : expected) QVERIFY(enumValues.contains(type));
+}
+
+void TestKeyboardLayout::schemaConditionalRequirementsForShiftAndSwitchKeys()
+{
+    Q_INIT_RESOURCE(qkeyboardwidget);
+
+    QFile schemaFile(QStringLiteral(":/layouts/schema/keyboard-layout.schema.json"));
+    QVERIFY(schemaFile.open(QIODevice::ReadOnly));
+    const QJsonDocument doc = QJsonDocument::fromJson(schemaFile.readAll());
+    const QJsonObject keyDefinition =
+        doc.object().value(QStringLiteral("definitions")).toObject().value(QStringLiteral("keyDefinition")).toObject();
+
+    const QJsonArray allOf = keyDefinition.value(QStringLiteral("allOf")).toArray();
+    QCOMPARE(allOf.size(), 3);
+
+    bool foundCharRule = false;
+    bool foundShiftSwitchTargetRule = false;
+    bool foundSwitchLabelIdRule = false;
+
+    for (const QJsonValue &clauseValue : allOf) {
+        const QJsonObject clause = clauseValue.toObject();
+        const QJsonObject ifTypeObj =
+            clause.value(QStringLiteral("if")).toObject().value(QStringLiteral("properties")).toObject().value(QStringLiteral("type")).toObject();
+        const QJsonArray thenRequired = clause.value(QStringLiteral("then")).toObject().value(QStringLiteral("required")).toArray();
+
+        if (ifTypeObj.value(QStringLiteral("const")).toString() == QStringLiteral("char")) {
+            QVERIFY(thenRequired.contains(QJsonValue(QStringLiteral("text"))));
+            foundCharRule = true;
+        }
+        if (ifTypeObj.contains(QStringLiteral("enum"))) {
+            const QJsonArray typesEnum = ifTypeObj.value(QStringLiteral("enum")).toArray();
+            QStringList types;
+            for (const QJsonValue &t : typesEnum) types << t.toString();
+            if (types.contains(QStringLiteral("shift")) && types.contains(QStringLiteral("switch"))) {
+                QVERIFY(thenRequired.contains(QJsonValue(QStringLiteral("target"))));
+                foundShiftSwitchTargetRule = true;
+            }
+        }
+        if (ifTypeObj.value(QStringLiteral("const")).toString() == QStringLiteral("switch")) {
+            QVERIFY(thenRequired.contains(QJsonValue(QStringLiteral("labelId"))));
+            foundSwitchLabelIdRule = true;
+        }
+    }
+
+    QVERIFY(foundCharRule);
+    QVERIFY(foundShiftSwitchTargetRule);
+    QVERIFY(foundSwitchLabelIdRule);
+}
+
+void TestKeyboardLayout::qrcResourceRegistersSchemaFileAlongsideLayouts()
+{
+    Q_INIT_RESOURCE(qkeyboardwidget);
+
+    // The qrc change adds the schema file under the existing /layouts
+    // prefix without disturbing the existing en.json / ko.json entries.
+    QVERIFY(QFile::exists(QStringLiteral(":/layouts/en.json")));
+    QVERIFY(QFile::exists(QStringLiteral(":/layouts/ko.json")));
+    QVERIFY(QFile::exists(QStringLiteral(":/layouts/schema/keyboard-layout.schema.json")));
+
+    QFile schemaFile(QStringLiteral(":/layouts/schema/keyboard-layout.schema.json"));
+    QVERIFY(schemaFile.open(QIODevice::ReadOnly));
+    QVERIFY(schemaFile.size() > 0);
 }
 
 QTEST_GUILESS_MAIN(TestKeyboardLayout)
