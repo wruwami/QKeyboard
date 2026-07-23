@@ -2,10 +2,42 @@
 
 #include <QCoreApplication>
 
+// Q_INIT_RESOURCE() expands to an `extern` declaration of the rcc-generated
+// (un-namespaced) initializer function and must therefore be invoked from
+// outside any C++ namespace - calling it from within `namespace qkw` would
+// instead declare and look up qkw::qInitResources_qkeyboardwidget(), which
+// doesn't exist, and fail to link. This wrapper is the one place that calls
+// it; KeyboardController's constructor below just calls this ordinary
+// function, which has no such restriction.
+//
+// Needed because qkeyboardwidget's layouts/icons are compiled into this
+// static library's own resources/qkeyboardwidget.qrc: the linker only pulls
+// the generated resource-initializer object file into a consumer's binary
+// if something actually references it, so without this, a statically-linked
+// KeyboardController's own default-locale auto-load below would silently
+// fail to find ":/layouts/en.json" in any app that never happened to
+// initialize the resource itself (as every example/test previously had to
+// do explicitly).
+static void qkwInitBundledResources()
+{
+    Q_INIT_RESOURCE(qkeyboardwidget);
+}
+
 namespace qkw {
 
 KeyboardController::KeyboardController(QObject *parent) : QObject(parent)
 {
+    qkwInitBundledResources();
+    setLocale(Locale::English);
+}
+
+bool KeyboardController::setLocale(Locale locale)
+{
+    switch (locale) {
+        case Locale::English: return loadFile(QStringLiteral(":/layouts/en.json"));
+        case Locale::Korean: return loadFile(QStringLiteral(":/layouts/ko.json"));
+    }
+    Q_UNREACHABLE();
 }
 
 bool KeyboardController::loadFile(const QString &filePath)

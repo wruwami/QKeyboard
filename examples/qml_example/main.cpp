@@ -6,11 +6,6 @@
 
 int main(int argc, char *argv[])
 {
-    // See the note in main.cpp on qkeyboardwidget/keyboard_widget.h's
-    // widgets counterpart: layouts/icons are compiled into the static
-    // library's own resources and need this to actually be linked in.
-    Q_INIT_RESOURCE(qkeyboardwidget);
-
     QGuiApplication app(argc, argv);
 
     qkw::registerQmlTypes();

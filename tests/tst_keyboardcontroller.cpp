@@ -41,6 +41,10 @@ class TestKeyboardController : public QObject
     Q_OBJECT
 
 private slots:
+    // Default locale
+    void constructedWithEnglishLocaleByDefault();
+    void setLocaleSwitchesToKorean();
+
     // Loading
     void loadsValidJson();
     void invalidJsonReportsError();
@@ -70,13 +74,42 @@ private slots:
 
     // Boundary / safety
     void activateKeyAtOutOfRangeIsIgnored();
-    void activateKeyAtOnInvalidControllerIsIgnored();
 
     // New tests for issue #82
     void resolveLabelTranslatesControlKeys();
     void behaviorOnLoadFailure();
     void activateKeyAtEmitsAllActionSignals();
 };
+
+// ---------------------------------------------------------------------------
+// Default locale
+// ---------------------------------------------------------------------------
+
+void TestKeyboardController::constructedWithEnglishLocaleByDefault()
+{
+    // No loadFile()/loadJson()/setLocale() call: a freshly constructed
+    // controller is already usable, with Locale::English's bundled layout
+    // loaded (the whole point of having a default is not needing to set one
+    // explicitly for the common case).
+    KeyboardController controller;
+    QVERIFY(controller.isValid());
+    QCOMPARE(controller.locale(), QStringLiteral("en"));
+    QCOMPARE(controller.source(), QStringLiteral(":/layouts/en.json"));
+    QVERIFY(controller.pageCount() > 0);
+    QVERIFY(!controller.rows().isEmpty());
+}
+
+void TestKeyboardController::setLocaleSwitchesToKorean()
+{
+    KeyboardController controller;
+    QSignalSpy layoutSpy(&controller, &KeyboardController::layoutChanged);
+
+    QVERIFY(controller.setLocale(KeyboardController::Locale::Korean));
+    QVERIFY(controller.isValid());
+    QCOMPARE(controller.locale(), QStringLiteral("ko"));
+    QCOMPARE(controller.source(), QStringLiteral(":/layouts/ko.json"));
+    QCOMPARE(layoutSpy.count(), 1);
+}
 
 // ---------------------------------------------------------------------------
 // Loading
@@ -97,7 +130,10 @@ void TestKeyboardController::invalidJsonReportsError()
 {
     KeyboardController controller;
     QVERIFY(!controller.loadJson(QByteArrayLiteral("not json")));
-    QVERIFY(!controller.isValid());
+    // Leaves the default-constructed controller's prior (valid) layout in
+    // place - see invalidJsonEmitsLoadFailedNotSourceChanged() below for the
+    // full "leaves prior state" contract.
+    QVERIFY(controller.isValid());
     QVERIFY(!controller.errorString().isEmpty());
 }
 
@@ -145,20 +181,20 @@ void TestKeyboardController::reloadingJsonResetsToFirstPage()
 
 void TestKeyboardController::setSourceTriggersLoad()
 {
-    Q_INIT_RESOURCE(qkeyboardwidget);
-
     KeyboardController controller;
-    // source property starts empty and setting it to the same value is a no-op.
-    QVERIFY(controller.source().isEmpty());
+    // A default-constructed controller already has Locale::English's
+    // resource path as its source.
+    QCOMPARE(controller.source(), QStringLiteral(":/layouts/en.json"));
 
     QSignalSpy layoutSpy(&controller, &KeyboardController::layoutChanged);
-    // Setting a valid path should load it and emit layoutChanged.
-    controller.setSource(QStringLiteral(":/layouts/en.json"));
+    // Setting a different valid path should load it and emit layoutChanged.
+    controller.setSource(QStringLiteral(":/layouts/ko.json"));
     QVERIFY(controller.isValid());
+    QCOMPARE(controller.source(), QStringLiteral(":/layouts/ko.json"));
     QCOMPARE(layoutSpy.count(), 1);
 
     // Setting the same path again must be a no-op (no redundant signals).
-    controller.setSource(QStringLiteral(":/layouts/en.json"));
+    controller.setSource(QStringLiteral(":/layouts/ko.json"));
     QCOMPARE(layoutSpy.count(), 1);
 }
 
@@ -166,13 +202,10 @@ void TestKeyboardController::setSourceWithBadPathEmitsLoadFailedNotSourceChanged
 {
     // Issue #47: setSource() is the Q_PROPERTY WRITE function, so it can
     // only be called from QML/setProperty() as a fire-and-forget void — a
-    // failed write must still be observable somehow, via loadFailed(). Set
-    // a valid source first so the failure below has real prior state
+    // failed write must still be observable somehow, via loadFailed(). A
+    // default-constructed controller already has real prior state
     // (source()/valid()) to (not) clobber.
-    Q_INIT_RESOURCE(qkeyboardwidget);
-
     KeyboardController controller;
-    controller.setSource(QStringLiteral(":/layouts/en.json"));
     QVERIFY(controller.isValid());
 
     QSignalSpy failedSpy(&controller, &KeyboardController::loadFailed);
@@ -395,15 +428,6 @@ void TestKeyboardController::activateKeyAtOutOfRangeIsIgnored()
 
     QCOMPARE(charSpy.count(), 0);
     QCOMPARE(bsSpy.count(), 0);
-}
-
-void TestKeyboardController::activateKeyAtOnInvalidControllerIsIgnored()
-{
-    KeyboardController controller; // no layout loaded
-
-    QSignalSpy charSpy(&controller, &KeyboardController::characterEntered);
-    controller.activateKeyAt(0, 0);
-    QCOMPARE(charSpy.count(), 0);
 }
 
 void TestKeyboardController::resolveLabelTranslatesControlKeys()

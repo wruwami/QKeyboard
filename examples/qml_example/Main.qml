@@ -11,7 +11,8 @@ ApplicationWindow {
 
     KeyboardController {
         id: controller
-        source: "qrc:/layouts/en.json"
+        // Already shows English by default; the combo box below switches it
+        // via setLocale() rather than a "qrc:/layouts/..." source string.
 
         onCharacterEntered: (text) => inputField.insert(inputField.cursorPosition, text)
         onBackspaceRequested: {
@@ -36,10 +37,10 @@ ApplicationWindow {
         anchors.margins: 8
         textRole: "text"
         model: [
-            { text: "English", source: "qrc:/layouts/en.json" },
-            { text: "한국어", source: "qrc:/layouts/ko.json" }
+            { text: "English", locale: KeyboardController.English },
+            { text: "한국어", locale: KeyboardController.Korean }
         ]
-        onActivated: (index) => { controller.source = model[index].source }
+        onActivated: (index) => { controller.setLocale(model[index].locale) }
     }
 
     TextField {

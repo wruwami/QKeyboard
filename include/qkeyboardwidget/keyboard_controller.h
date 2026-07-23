@@ -31,11 +31,28 @@ class QKW_EXPORT KeyboardController : public QObject
     Q_PROPERTY(QVariantList rows READ rows NOTIFY currentPageChanged)
 
 public:
+    // One value per layout bundled into the library's own resources
+    // (layouts/<name>.json in the source tree, compiled in via
+    // resources/qkeyboardwidget.qrc). setLocale() maps each value to its
+    // resource path, so a host app that only wants a stock layout never has
+    // to spell out a ":/layouts/..." path itself. loadFile()/loadJson()
+    // remain the way to use a layout that isn't one of these - adding a
+    // *new* locale to the JSON side (layouts/<locale>.json) still needs no
+    // code change, same as before; it only needs an enum value here (plus a
+    // qrc entry) to also be reachable via setLocale().
+    enum class Locale { English, Korean };
+    Q_ENUM(Locale)
+
     explicit KeyboardController(QObject *parent = nullptr);
 
     // Loads a layout from a local path or a Qt resource ("qrc:/..." or ":/...").
     Q_INVOKABLE bool loadFile(const QString &filePath);
     Q_INVOKABLE bool loadJson(const QByteArray &json);
+
+    // Loads one of the layouts bundled with the library. A freshly
+    // constructed KeyboardController already has Locale::English loaded, so
+    // this only needs to be called to pick a different bundled locale.
+    Q_INVOKABLE bool setLocale(Locale locale);
 
     bool isValid() const;
     QString errorString() const;
