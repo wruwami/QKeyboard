@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/wruwami/QKeyboard/actions/workflows/ci.yml/badge.svg)](https://github.com/wruwami/QKeyboard/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/wruwami/QKeyboard/branch/main/graph/badge.svg)](https://codecov.io/gh/wruwami/QKeyboard)
-[![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/wruwami/QKeyboard?utm_source=oss&utm_medium=github&utm_campaign=wruwami%2FQKeyboard&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)](https://coderabbit.ai)
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/wruwami/QKeyboard?utm_source=oss&utm_medium=github&utm_campaign=wruwami%2FQKeyboard&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
 > **Notice:** This is a temporary personal project, developed with the
 > assistance of AI. Feel free to try it out, but it's still early-stage
