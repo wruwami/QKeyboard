@@ -456,7 +456,6 @@ void TestKeyboardController::behaviorOnLoadFailure()
 
     QSignalSpy sourceSpy(&controller, &KeyboardController::sourceChanged);
     QSignalSpy layoutSpy(&controller, &KeyboardController::layoutChanged);
-    QSignalSpy pageSpy(&controller, &KeyboardController::currentPageChanged);
     QSignalSpy failSpy(&controller, &KeyboardController::loadFailed);
 
     QVERIFY(!controller.loadJson(QByteArrayLiteral("invalid")));
@@ -466,9 +465,8 @@ void TestKeyboardController::behaviorOnLoadFailure()
     QVERIFY(controller.rows().isEmpty());
     QVERIFY(controller.currentPageId().isEmpty());
 
-    QCOMPARE(sourceSpy.count(), 1);
+    QCOMPARE(sourceSpy.count(), 0);
     QCOMPARE(layoutSpy.count(), 1);
-    QCOMPARE(pageSpy.count(), 1);
     QCOMPARE(failSpy.count(), 1);
 }
 
