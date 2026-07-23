@@ -453,13 +453,23 @@ void TestKeyboardController::behaviorOnLoadFailure()
     KeyboardController controller;
     QVERIFY(controller.loadJson(sampleLayoutJson()));
     QVERIFY(controller.isValid());
-    const int prevPageCount = controller.pageCount();
 
-    // Try loading invalid JSON (should fail, but keep previously loaded state)
+    QSignalSpy sourceSpy(&controller, &KeyboardController::sourceChanged);
+    QSignalSpy layoutSpy(&controller, &KeyboardController::layoutChanged);
+    QSignalSpy pageSpy(&controller, &KeyboardController::currentPageChanged);
+    QSignalSpy failSpy(&controller, &KeyboardController::loadFailed);
+
     QVERIFY(!controller.loadJson(QByteArrayLiteral("invalid")));
-    QVERIFY(controller.isValid());
-    QCOMPARE(controller.pageCount(), prevPageCount);
+    QVERIFY(!controller.isValid());
     QVERIFY(!controller.errorString().isEmpty());
+    QCOMPARE(controller.pageCount(), 0);
+    QVERIFY(controller.rows().isEmpty());
+    QVERIFY(controller.currentPageId().isEmpty());
+
+    QCOMPARE(sourceSpy.count(), 1);
+    QCOMPARE(layoutSpy.count(), 1);
+    QCOMPARE(pageSpy.count(), 1);
+    QCOMPARE(failSpy.count(), 1);
 }
 
 QTEST_GUILESS_MAIN(TestKeyboardController)
