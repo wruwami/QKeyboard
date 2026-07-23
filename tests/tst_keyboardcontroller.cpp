@@ -71,6 +71,10 @@ private slots:
     // Boundary / safety
     void activateKeyAtOutOfRangeIsIgnored();
     void activateKeyAtOnInvalidControllerIsIgnored();
+
+    // New tests for issue #82
+    void resolveLabelTranslatesControlKeys();
+    void behaviorOnLoadFailure();
 };
 
 // ---------------------------------------------------------------------------
@@ -399,6 +403,62 @@ void TestKeyboardController::activateKeyAtOnInvalidControllerIsIgnored()
     QSignalSpy charSpy(&controller, &KeyboardController::characterEntered);
     controller.activateKeyAt(0, 0);
     QCOMPARE(charSpy.count(), 0);
+}
+
+void TestKeyboardController::resolveLabelTranslatesControlKeys()
+{
+    const QByteArray json = R"({
+        "locale": "en",
+        "pages": [
+            {
+                "id": "p",
+                "rows": [
+                    [
+                        { "type": "char", "text": "a" },
+                        { "type": "switch", "target": "p", "labelId": "numbers" },
+                        { "type": "switch", "target": "p", "labelId": "letters" },
+                        { "type": "switch", "target": "p", "labelId": "symbols" },
+                        { "type": "backspace" },
+                        { "type": "enter" },
+                        { "type": "space" },
+                        { "type": "shift", "target": "p" },
+                        { "type": "char", "text": "x", "labelId": "custom_label" }
+                    ]
+                ]
+            }
+        ]
+    })";
+
+    KeyboardController controller;
+    QVERIFY(controller.loadJson(json));
+    QCOMPARE(controller.currentPageIndex(), 0);
+
+    const QVariantList row = controller.rows().first().toList();
+    QCOMPARE(row.size(), 9);
+
+    QCOMPARE(row.at(0).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("a"));
+    QCOMPARE(row.at(1).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("123"));
+    QCOMPARE(row.at(2).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("ABC"));
+    QCOMPARE(row.at(3).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("#+="));
+    QCOMPARE(row.at(4).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("Backspace"));
+    QCOMPARE(row.at(5).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("Enter"));
+    QCOMPARE(row.at(6).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("Space"));
+    QCOMPARE(row.at(7).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("Shift"));
+    QCOMPARE(row.at(8).toMap().value(QStringLiteral("text")).toString(), QStringLiteral("custom_label"));
+}
+
+void TestKeyboardController::behaviorOnLoadFailure()
+{
+    KeyboardController controller;
+    QVERIFY(controller.loadJson(sampleLayoutJson()));
+    QVERIFY(controller.isValid());
+
+    QVERIFY(!controller.loadJson(QByteArrayLiteral("invalid")));
+    QVERIFY(!controller.isValid());
+    QVERIFY(!controller.errorString().isEmpty());
+    QCOMPARE(controller.pageCount(), 0);
+    QVERIFY(controller.rows().isEmpty());
+    QVERIFY(controller.currentPageId().isEmpty());
 }
 
 QTEST_GUILESS_MAIN(TestKeyboardController)
