@@ -44,8 +44,10 @@ private slots:
     // Loading
     void loadsValidJson();
     void invalidJsonReportsError();
+    void invalidJsonEmitsLoadFailedNotSourceChanged();
     void reloadingJsonResetsToFirstPage();
     void setSourceTriggersLoad();
+    void setSourceWithBadPathEmitsLoadFailedNotSourceChanged();
 
     // Signal emissions
     void emitsCharacterEnteredForCharKey();
@@ -94,6 +96,35 @@ void TestKeyboardController::invalidJsonReportsError()
     QVERIFY(!controller.errorString().isEmpty());
 }
 
+void TestKeyboardController::invalidJsonEmitsLoadFailedNotSourceChanged()
+{
+    // Issue #47: a failed load must be observable via a dedicated signal
+    // rather than leaving callers to guess from sourceChanged() never
+    // firing — sourceChanged() only fires on a *successful* load. Load a
+    // valid layout first so the failure below has real prior state to
+    // (not) clobber, matching the documented "leaves prior state in place"
+    // contract.
+    KeyboardController controller;
+    QVERIFY(controller.loadJson(sampleLayoutJson()));
+
+    QSignalSpy failedSpy(&controller, &KeyboardController::loadFailed);
+    QSignalSpy sourceSpy(&controller, &KeyboardController::sourceChanged);
+    QSignalSpy layoutSpy(&controller, &KeyboardController::layoutChanged);
+
+    QVERIFY(!controller.loadJson(QByteArrayLiteral("not json")));
+
+    QCOMPARE(failedSpy.count(), 1);
+    QCOMPARE(failedSpy.takeFirst().at(0).toString(), controller.errorString());
+    QVERIFY(!controller.errorString().isEmpty());
+    QCOMPARE(layoutSpy.count(), 1);
+    QCOMPARE(sourceSpy.count(), 0);
+
+    // The previously-loaded layout must still be intact.
+    QVERIFY(controller.isValid());
+    QCOMPARE(controller.pageCount(), 2);
+    QCOMPARE(controller.currentPageId(), QStringLiteral("lower"));
+}
+
 void TestKeyboardController::reloadingJsonResetsToFirstPage()
 {
     KeyboardController controller;
@@ -124,6 +155,36 @@ void TestKeyboardController::setSourceTriggersLoad()
     // Setting the same path again must be a no-op (no redundant signals).
     controller.setSource(QStringLiteral(":/layouts/en.json"));
     QCOMPARE(layoutSpy.count(), 1);
+}
+
+void TestKeyboardController::setSourceWithBadPathEmitsLoadFailedNotSourceChanged()
+{
+    // Issue #47: setSource() is the Q_PROPERTY WRITE function, so it can
+    // only be called from QML/setProperty() as a fire-and-forget void — a
+    // failed write must still be observable somehow, via loadFailed(). Set
+    // a valid source first so the failure below has real prior state
+    // (source()/valid()) to (not) clobber.
+    Q_INIT_RESOURCE(qkeyboardwidget);
+
+    KeyboardController controller;
+    controller.setSource(QStringLiteral(":/layouts/en.json"));
+    QVERIFY(controller.isValid());
+
+    QSignalSpy failedSpy(&controller, &KeyboardController::loadFailed);
+    QSignalSpy sourceSpy(&controller, &KeyboardController::sourceChanged);
+    QSignalSpy layoutSpy(&controller, &KeyboardController::layoutChanged);
+
+    controller.setSource(QStringLiteral("/nonexistent/path.json"));
+
+    QCOMPARE(failedSpy.count(), 1);
+    QCOMPARE(failedSpy.takeFirst().at(0).toString(), controller.errorString());
+    QVERIFY(!controller.errorString().isEmpty());
+    QCOMPARE(layoutSpy.count(), 1);
+    QCOMPARE(sourceSpy.count(), 0);
+
+    // The previously-loaded layout and source must still be intact.
+    QVERIFY(controller.isValid());
+    QCOMPARE(controller.source(), QStringLiteral(":/layouts/en.json"));
 }
 
 // ---------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QJsonValue>
+#include <QSet>
 
 namespace qkw {
 
@@ -58,6 +59,10 @@ bool parseKey(const QJsonValue &value, KeyDefinition *outKey, QString *errorMess
     }
     if (action == KeyAction::Switch && key.labelId.isEmpty()) {
         *errorMessage = QStringLiteral("a 'switch' key requires a non-empty 'labelId'");
+        return false;
+    }
+    if (key.span < 1) {
+        *errorMessage = QStringLiteral("'span' must be a positive integer, got %1").arg(key.span);
         return false;
     }
 
@@ -135,6 +140,30 @@ KeyboardLayout KeyboardLayout::fromJson(const QByteArray &json, QString *errorMe
         }
         parsedPages.append(page);
     }
+
+    // parseKey() already rejects a missing/empty 'target' on shift/switch
+    // keys, but not one that doesn't match any page actually declared in
+    // this layout — a typo there parsed successfully and just became a
+    // permanently inert key at runtime (KeyboardController::setPageById()
+    // silently no-ops on an unknown id) with no error surfaced anywhere.
+    QSet<QString> pageIds;
+    for (const KeyboardPage &page : parsedPages)
+        pageIds.insert(page.id);
+    for (const KeyboardPage &page : parsedPages) {
+        for (const QVector<KeyDefinition> &row : page.rows) {
+            for (const KeyDefinition &key : row) {
+                if (key.target.isEmpty()) continue;
+                if (!pageIds.contains(key.target)) {
+                    if (errorMessage) {
+                        *errorMessage =
+                            QStringLiteral("page '%1' has a key targeting unknown page '%2'").arg(page.id, key.target);
+                    }
+                    return KeyboardLayout();
+                }
+            }
+        }
+    }
+
     layout._pages = parsedPages;
 
     return layout;

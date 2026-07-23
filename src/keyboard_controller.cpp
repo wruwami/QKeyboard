@@ -18,6 +18,7 @@ bool KeyboardController::loadFile(const QString &filePath)
     if (!layout.isValid()) {
         _errorString = error;
         emit layoutChanged();
+        emit loadFailed(error);
         return false;
     }
 
@@ -38,6 +39,7 @@ bool KeyboardController::loadJson(const QByteArray &json)
     if (!layout.isValid()) {
         _errorString = error;
         emit layoutChanged();
+        emit loadFailed(error);
         return false;
     }
 
