@@ -41,10 +41,16 @@ jobs:
             --enable=warning,style,performance,portability \
             --inline-suppr \
             --suppressions-list=.cppcheck-suppressions \
-            --output-format=sarif \
+            --xml --xml-version=2 \
             -I include \
-            src include tests examples | tee cppcheck.sarif
+            src include tests examples 2> cppcheck.xml
             
+      - name: Convert Cppcheck XML to SARIF
+        uses: Flast/cppcheck-sarif@v2
+        with:
+          input: cppcheck.xml
+          output: cppcheck.sarif
+
       - name: Upload SARIF to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
