@@ -41,6 +41,10 @@ public:
     QString locale() const;
 
     QString source() const;
+    // Fire-and-forget: writing an invalid path/JSON leaves source()/valid()
+    // at their prior values and does NOT emit sourceChanged() (nothing was
+    // actually sourced from the failed input). Listen for loadFailed()
+    // instead of sourceChanged() to observe a failed write.
     void setSource(const QString &filePath);
 
     int currentPageIndex() const;
@@ -66,6 +70,12 @@ signals:
     void sourceChanged();
     void layoutChanged();
     void currentPageChanged();
+    // Emitted whenever loadFile()/loadJson()/setSource() fails to parse its
+    // input, with the same text errorString() then reports. layoutChanged()
+    // also fires on this path (valid()/errorString() are always observable
+    // through it), but this is the signal to listen for specifically when a
+    // *write* — including a QML "source: ..." binding — failed.
+    void loadFailed(const QString &error);
 
     void characterEntered(const QString &text);
     void backspaceRequested();
