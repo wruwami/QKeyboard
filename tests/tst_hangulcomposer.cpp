@@ -411,6 +411,7 @@ void TestHangulComposer::testsAllCompoundVowelsAndDecomposition()
         QString expectedComposed;
         QString expectedDecomposed;
     } tests[] = {
+        {QStringLiteral("ㄱ"), QStringLiteral("ㅗ"), QStringLiteral("ㅏ"), QStringLiteral("과"), QStringLiteral("고")},
         {QStringLiteral("ㄷ"), QStringLiteral("ㅗ"), QStringLiteral("ㅐ"), QStringLiteral("돼"), QStringLiteral("도")},
         {QStringLiteral("ㅇ"), QStringLiteral("ㅗ"), QStringLiteral("ㅣ"), QStringLiteral("외"), QStringLiteral("오")},
         {QStringLiteral("ㅇ"), QStringLiteral("ㅜ"), QStringLiteral("ㅓ"), QStringLiteral("워"), QStringLiteral("우")},
@@ -425,10 +426,14 @@ void TestHangulComposer::testsAllCompoundVowelsAndDecomposition()
         composer.feed(t.v1);
         QSignalSpy spy(&composer, &HangulComposer::syllableReady);
         QVERIFY(composer.feed(t.v2));
+        QCOMPARE(spy.count(), 1);
         QCOMPARE(spy.at(0).at(0).toString(), t.expectedComposed);
+        QCOMPARE(spy.at(0).at(1).toBool(), true);
 
         QVERIFY(composer.backspace());
+        QCOMPARE(spy.count(), 2);
         QCOMPARE(spy.at(1).at(0).toString(), t.expectedDecomposed);
+        QCOMPARE(spy.at(1).at(1).toBool(), true);
     }
 }
 
@@ -486,10 +491,14 @@ void TestHangulComposer::testsAllCompoundJongseongAndDecomposition()
         composer.feed(t.j1);
         QSignalSpy spy(&composer, &HangulComposer::syllableReady);
         QVERIFY(composer.feed(t.j2));
+        QCOMPARE(spy.count(), 1);
         QCOMPARE(spy.at(0).at(0).toString(), t.expectedComposed);
+        QCOMPARE(spy.at(0).at(1).toBool(), true);
 
         QVERIFY(composer.backspace());
+        QCOMPARE(spy.count(), 2);
         QCOMPARE(spy.at(1).at(0).toString(), t.expectedDecomposed);
+        QCOMPARE(spy.at(1).at(1).toBool(), true);
     }
 }
 
