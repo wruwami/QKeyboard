@@ -3,6 +3,8 @@
 #include <QObject>
 #include <QString>
 
+#include "qkeyboardwidget/qkw_export.h"
+
 namespace qkw {
 
 // Composes individual Hangul jamo (as emitted one-at-a-time by a 2-beolsik
@@ -21,7 +23,7 @@ namespace qkw {
 // Not registered for QML: composition is a text-editing concern that belongs
 // wherever the host owns the text field, which for the QML view is host QML
 // code, not this library's KeyboardPanel.
-class HangulComposer : public QObject
+class QKW_EXPORT HangulComposer : public QObject
 {
     Q_OBJECT
 

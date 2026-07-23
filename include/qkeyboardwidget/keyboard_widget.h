@@ -3,6 +3,8 @@
 #include <QWidget>
 #include <QVector>
 
+#include "qkeyboardwidget/qkw_export.h"
+
 class QStackedWidget;
 class QGridLayout;
 
@@ -16,7 +18,7 @@ class KeyButton;
 // KeyButton) per KeyboardLayout page and swaps the visible one when the
 // controller's current page changes; nothing here parses JSON or knows
 // typing semantics, that all lives in KeyboardController.
-class KeyboardWidget : public QWidget
+class QKW_EXPORT KeyboardWidget : public QWidget
 {
     Q_OBJECT
 

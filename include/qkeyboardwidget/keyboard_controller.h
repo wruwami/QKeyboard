@@ -4,6 +4,7 @@
 #include <QVariantList>
 
 #include "qkeyboardwidget/keyboard_layout.h"
+#include "qkeyboardwidget/qkw_export.h"
 
 namespace qkw {
 
@@ -17,7 +18,7 @@ namespace qkw {
 // Registered for QML with qmlRegisterType() (see qml_registration.h) rather
 // than the QML_ELEMENT macro, since QML_ELEMENT requires Qt 5.15+/Qt6 and
 // this library targets Qt5 through the latest Qt6.
-class KeyboardController : public QObject
+class QKW_EXPORT KeyboardController : public QObject
 {
     Q_OBJECT
 

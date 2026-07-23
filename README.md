@@ -236,6 +236,11 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
+By default `qkeyboardwidget` builds as a static library. Pass the standard
+CMake `-DBUILD_SHARED_LIBS=ON` to build it as a shared library instead; the
+library exports symbols correctly either way (a `qkw_export.h` header is
+generated and installed alongside the rest of `include/qkeyboardwidget`).
+
 `.github/workflows/ci.yml` runs this same build+test on a full matrix of
 Linux, Windows, and macOS, each on both Qt 5.15 and Qt 6.7 (the two ends of
 the "Qt5 through the latest Qt6" support range) — six jobs on every
