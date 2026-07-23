@@ -21,14 +21,20 @@ on-screen keyboard projects.
 
 ## Demo
 
-`examples/widgets_example`, actually built and run (Qt 6.4, Ubuntu 24.04,
-offscreen X server) — the combo box switches `layouts/en.json` and
-`layouts/ko.json` at runtime, and Shift/Switch keys render in the accent
-color:
+`examples/widgets_example` (QWidget) and `examples/qml_example` (Qt Quick),
+both actually built and run (Qt 6.4, Ubuntu 24.04, offscreen X server) — the
+combo box switches `layouts/en.json` and `layouts/ko.json` at runtime, and
+Shift/Switch keys render in the accent color. Both views render the same
+`KeyboardController`/`KeyboardTheme` core, which is why they look identical
+key-for-key:
 
 <p>
-  <img src="docs/screenshots/widgets_example_en.png" width="420" alt="widgets_example running the en.json QWERTY layout, with the text field showing text typed via the on-screen keys">
-  <img src="docs/screenshots/widgets_example_ko.png" width="420" alt="widgets_example running the ko.json 2-set Hangul jamo layout after switching locale in the combo box">
+  <img src="docs/screenshots/widgets_example_en.png" width="420" alt="widgets_example (QWidget) running the en.json QWERTY layout, with the text field showing text typed via the on-screen keys">
+  <img src="docs/screenshots/widgets_example_ko.png" width="420" alt="widgets_example (QWidget) running the ko.json 2-set Hangul jamo layout after switching locale in the combo box">
+</p>
+<p>
+  <img src="docs/screenshots/qml_example_en.png" width="420" alt="qml_example (Qt Quick) running the en.json QWERTY layout, with the text field showing text typed via the on-screen keys">
+  <img src="docs/screenshots/qml_example_ko.png" width="420" alt="qml_example (Qt Quick) running the ko.json 2-set Hangul jamo layout after switching locale in the combo box">
 </p>
 
 ## Features
