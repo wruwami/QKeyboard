@@ -523,14 +523,10 @@ void TestKeyboardLayout::reportsErrorOnPagesAsNonArrayJsonValue_data()
 {
     QTest::addColumn<QByteArray>("json");
 
-    QTest::newRow("pages is an object") << QByteArray(
-        R"({ "locale": "en", "pages": { "id": "p" } })");
-    QTest::newRow("pages is null") << QByteArray(
-        R"({ "locale": "en", "pages": null })");
-    QTest::newRow("pages is a number") << QByteArray(
-        R"({ "locale": "en", "pages": 7 })");
-    QTest::newRow("pages is a bool") << QByteArray(
-        R"({ "locale": "en", "pages": true })");
+    QTest::newRow("pages is an object") << QByteArray(R"({ "locale": "en", "pages": { "id": "p" } })");
+    QTest::newRow("pages is null") << QByteArray(R"({ "locale": "en", "pages": null })");
+    QTest::newRow("pages is a number") << QByteArray(R"({ "locale": "en", "pages": 7 })");
+    QTest::newRow("pages is a bool") << QByteArray(R"({ "locale": "en", "pages": true })");
 }
 
 void TestKeyboardLayout::reportsErrorOnPagesAsNonArrayJsonValue()
@@ -604,22 +600,25 @@ void TestKeyboardLayout::schemaKeyDefinitionEnumMatchesSupportedKeyTypes()
     const QJsonDocument doc = QJsonDocument::fromJson(schemaFile.readAll());
     const QJsonObject definitions = doc.object().value(QStringLiteral("definitions")).toObject();
     const QJsonObject keyDefinition = definitions.value(QStringLiteral("keyDefinition")).toObject();
-    const QJsonObject typeSchema = keyDefinition.value(QStringLiteral("properties")).toObject().value(QStringLiteral("type")).toObject();
+    const QJsonObject typeSchema =
+        keyDefinition.value(QStringLiteral("properties")).toObject().value(QStringLiteral("type")).toObject();
 
     QCOMPARE(typeSchema.value(QStringLiteral("type")).toString(), QStringLiteral("string"));
 
     const QJsonArray enumArray = typeSchema.value(QStringLiteral("enum")).toArray();
     QStringList enumValues;
-    for (const QJsonValue &value : enumArray) enumValues << value.toString();
+    for (const QJsonValue &value : enumArray)
+        enumValues << value.toString();
 
     // Must exactly match the key types accepted by KeyboardLayout::fromJson's
     // internal actionFromString() table (src/keyboard_layout.cpp).
     const QStringList expected = {
-        QStringLiteral("char"),      QStringLiteral("backspace"), QStringLiteral("enter"),
-        QStringLiteral("space"),     QStringLiteral("shift"),     QStringLiteral("switch"),
+        QStringLiteral("char"),  QStringLiteral("backspace"), QStringLiteral("enter"),
+        QStringLiteral("space"), QStringLiteral("shift"),     QStringLiteral("switch"),
     };
     QCOMPARE(enumValues.size(), expected.size());
-    for (const QString &type : expected) QVERIFY(enumValues.contains(type));
+    for (const QString &type : expected)
+        QVERIFY(enumValues.contains(type));
 }
 
 void TestKeyboardLayout::schemaConditionalRequirementsForShiftAndSwitchKeys()
@@ -641,9 +640,14 @@ void TestKeyboardLayout::schemaConditionalRequirementsForShiftAndSwitchKeys()
 
     for (const QJsonValue &clauseValue : allOf) {
         const QJsonObject clause = clauseValue.toObject();
-        const QJsonObject ifTypeObj =
-            clause.value(QStringLiteral("if")).toObject().value(QStringLiteral("properties")).toObject().value(QStringLiteral("type")).toObject();
-        const QJsonArray thenRequired = clause.value(QStringLiteral("then")).toObject().value(QStringLiteral("required")).toArray();
+        const QJsonObject ifTypeObj = clause.value(QStringLiteral("if"))
+                                          .toObject()
+                                          .value(QStringLiteral("properties"))
+                                          .toObject()
+                                          .value(QStringLiteral("type"))
+                                          .toObject();
+        const QJsonArray thenRequired =
+            clause.value(QStringLiteral("then")).toObject().value(QStringLiteral("required")).toArray();
 
         if (ifTypeObj.value(QStringLiteral("const")).toString() == QStringLiteral("char")) {
             QVERIFY(thenRequired.contains(QJsonValue(QStringLiteral("text"))));
@@ -652,7 +656,8 @@ void TestKeyboardLayout::schemaConditionalRequirementsForShiftAndSwitchKeys()
         if (ifTypeObj.contains(QStringLiteral("enum"))) {
             const QJsonArray typesEnum = ifTypeObj.value(QStringLiteral("enum")).toArray();
             QStringList types;
-            for (const QJsonValue &t : typesEnum) types << t.toString();
+            for (const QJsonValue &t : typesEnum)
+                types << t.toString();
             if (types.contains(QStringLiteral("shift")) && types.contains(QStringLiteral("switch"))) {
                 QVERIFY(thenRequired.contains(QJsonValue(QStringLiteral("target"))));
                 foundShiftSwitchTargetRule = true;
