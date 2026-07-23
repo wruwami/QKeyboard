@@ -44,8 +44,10 @@ private slots:
     // Loading
     void loadsValidJson();
     void invalidJsonReportsError();
+    void invalidJsonEmitsLoadFailedNotSourceChanged();
     void reloadingJsonResetsToFirstPage();
     void setSourceTriggersLoad();
+    void setSourceWithBadPathEmitsLoadFailedNotSourceChanged();
 
     // Signal emissions
     void emitsCharacterEnteredForCharKey();
@@ -94,6 +96,23 @@ void TestKeyboardController::invalidJsonReportsError()
     QVERIFY(!controller.errorString().isEmpty());
 }
 
+void TestKeyboardController::invalidJsonEmitsLoadFailedNotSourceChanged()
+{
+    // Issue #47: a failed load must be observable via a dedicated signal
+    // rather than leaving callers to guess from sourceChanged() never
+    // firing — sourceChanged() only fires on a *successful* load.
+    KeyboardController controller;
+    QSignalSpy failedSpy(&controller, &KeyboardController::loadFailed);
+    QSignalSpy sourceSpy(&controller, &KeyboardController::sourceChanged);
+
+    QVERIFY(!controller.loadJson(QByteArrayLiteral("not json")));
+
+    QCOMPARE(failedSpy.count(), 1);
+    QCOMPARE(failedSpy.takeFirst().at(0).toString(), controller.errorString());
+    QVERIFY(!controller.errorString().isEmpty());
+    QCOMPARE(sourceSpy.count(), 0);
+}
+
 void TestKeyboardController::reloadingJsonResetsToFirstPage()
 {
     KeyboardController controller;
@@ -124,6 +143,24 @@ void TestKeyboardController::setSourceTriggersLoad()
     // Setting the same path again must be a no-op (no redundant signals).
     controller.setSource(QStringLiteral(":/layouts/en.json"));
     QCOMPARE(layoutSpy.count(), 1);
+}
+
+void TestKeyboardController::setSourceWithBadPathEmitsLoadFailedNotSourceChanged()
+{
+    // Issue #47: setSource() is the Q_PROPERTY WRITE function, so it can
+    // only be called from QML/setProperty() as a fire-and-forget void — a
+    // failed write must still be observable somehow, via loadFailed().
+    KeyboardController controller;
+    QSignalSpy failedSpy(&controller, &KeyboardController::loadFailed);
+    QSignalSpy sourceSpy(&controller, &KeyboardController::sourceChanged);
+
+    controller.setSource(QStringLiteral("/nonexistent/path.json"));
+
+    QVERIFY(!controller.isValid());
+    QCOMPARE(failedSpy.count(), 1);
+    QVERIFY(!failedSpy.takeFirst().at(0).toString().isEmpty());
+    QCOMPARE(sourceSpy.count(), 0);
+    QVERIFY(controller.source().isEmpty());
 }
 
 // ---------------------------------------------------------------------------
