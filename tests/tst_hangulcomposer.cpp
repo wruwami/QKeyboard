@@ -222,6 +222,12 @@ void TestHangulComposer::nonCombinableDoubleJamoStartsNewSyllable()
     QCOMPARE(spy.count(), 1);
     QCOMPARE(spy.at(0).at(0).toString(), QStringLiteral("ㄴ"));
     QCOMPARE(spy.at(0).at(1).toBool(), false);
+    QVERIFY(composer.isComposing());
+
+    QVERIFY(composer.feed(QStringLiteral("ㅏ")));
+    QCOMPARE(spy.count(), 2);
+    QCOMPARE(spy.at(1).at(0).toString(), QStringLiteral("나"));
+    QCOMPARE(spy.at(1).at(1).toBool(), true);
 }
 
 void TestHangulComposer::nonCombinableVowelsStartsNewSyllable()
