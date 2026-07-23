@@ -96,6 +96,17 @@ Treat them as checks to run before opening or merging a PR, not aspirations.
    without an accompanying QtTest/Qt Quick Test regression test is
    incomplete — and coverage numbers are only meaningful if they include
    the view code, not just the framework-agnostic core.
+7. **Keep `src/` coverage close to 100%.** `codecov.yml` excludes
+   `tests/**` and `examples/**`, so `src/*.cpp` is the entire measured
+   surface — treat any real gap in it as a to-do, not a rounding error.
+   When closing a gap, test the actual value shapes production code
+   produces, not a synthetic input that happens to already satisfy the
+   code under test: issue #78's QML icon-loading bug (`Image.source`
+   needing a `qrc:` URL scheme, not the bare `:` prefix
+   `KeyDefinition`/the layout JSON actually uses) would have stayed
+   invisible forever behind a hand-crafted `"qrc:/..."` test value — a
+   coverage percentage only means something if the tests exercise the
+   same paths and values production code actually sees.
 
 ## Versioning
 
