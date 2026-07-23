@@ -238,6 +238,10 @@ Linux+Qt6 leg, and uploaded to Codecov. To get the Codecov badge actually
 reporting data, the repo owner needs to connect `wruwami/QKeyboard` at
 [codecov.io](https://codecov.io) and add the resulting upload token as a
 `CODECOV_TOKEN` repository secret — that step can't be done from CI itself.
+Coverage is scoped to the library itself: [`codecov.yml`](codecov.yml)
+excludes `tests/**` and `examples/**` from every Codecov check (mirroring
+the `lcov --remove` filter in the CI step above), so example-app or
+test-file changes never get flagged for "missing" coverage.
 
 A separate `lint` job runs on every push/PR too:
 
