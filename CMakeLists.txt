@@ -47,11 +47,36 @@ set(QKW_HEADERS
     include/qkeyboardwidget/hangul_composer.h
 )
 
-add_library(qkeyboardwidget STATIC ${QKW_SOURCES} ${QKW_HEADERS} resources/qkeyboardwidget.qrc)
+# No explicit STATIC/SHARED: follows BUILD_SHARED_LIBS (CMake's own default
+# is STATIC when unset), so downstream consumers pick the link type with the
+# standard -DBUILD_SHARED_LIBS=ON/OFF rather than this project hardcoding one.
+add_library(qkeyboardwidget ${QKW_SOURCES} ${QKW_HEADERS} resources/qkeyboardwidget.qrc)
 add_library(qkw::qkeyboardwidget ALIAS qkeyboardwidget)
 
 target_include_directories(qkeyboardwidget PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
+
+# Generates qkw_export.h with QKW_EXPORT (dllexport/dllimport on Windows,
+# default-visible on Linux/macOS, where GCC/Clang's default visibility
+# already makes this a no-op). Needed for the SHARED case: without it, a
+# Windows DLL build exports no symbols at all and every consumer fails to
+# link. GenerateExportHeader also emits a static_define name we apply
+# ourselves below, since it can't see BUILD_SHARED_LIBS at generation time —
+# only the target's own STATIC/SHARED TYPE, resolved after add_library()
+# above.
+include(GenerateExportHeader)
+generate_export_header(qkeyboardwidget
+    BASE_NAME QKW
+    EXPORT_FILE_NAME "${CMAKE_CURRENT_BINARY_DIR}/include/qkeyboardwidget/qkw_export.h"
+)
+get_target_property(QKW_LIBRARY_TYPE qkeyboardwidget TYPE)
+if(QKW_LIBRARY_TYPE STREQUAL "STATIC_LIBRARY")
+    target_compile_definitions(qkeyboardwidget PUBLIC QKW_STATIC_DEFINE)
+endif()
+target_include_directories(qkeyboardwidget PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
@@ -110,6 +135,8 @@ install(TARGETS qkeyboardwidget
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 install(DIRECTORY include/qkeyboardwidget DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/qkeyboardwidget/qkw_export.h"
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/qkeyboardwidget)
 
 enable_testing()
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
