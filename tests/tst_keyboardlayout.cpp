@@ -1,11 +1,150 @@
 #include <QTemporaryFile>
 #include <QtTest>
 #include <QBuffer>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QStringList>
+#include <cmath>
 
 #include "qkeyboardwidget/keyboard_layout.h"
 
 using namespace qkw;
+
+namespace {
+
+// A real (if deliberately partial) Draft-07 validator, covering exactly the
+// keywords resources/layouts/schema/keyboard-layout.schema.json uses: type,
+// required, properties, additionalProperties, minLength, minItems, minimum,
+// enum, const, allOf/if/then, items, and $ref (resolved against the schema
+// document's own "definitions"). This exists specifically so
+// validatesSchemaAndLoadsAllProjectLayouts() below actually runs layout JSON
+// through the schema, rather than only checking that the schema itself is
+// well-formed JSON or that KeyboardLayout::fromJson()'s own hand-written
+// parser accepts a layout - those two checks don't prove the schema and the
+// parser agree, since the schema is stricter in places (e.g.
+// "additionalProperties": false) than the parser bothers to check.
+bool jsonTypeMatches(const QJsonValue &value, const QString &type)
+{
+    switch (value.type()) {
+        case QJsonValue::String: return type == QLatin1String("string");
+        case QJsonValue::Bool: return type == QLatin1String("boolean");
+        case QJsonValue::Array: return type == QLatin1String("array");
+        case QJsonValue::Object: return type == QLatin1String("object");
+        case QJsonValue::Null: return type == QLatin1String("null");
+        case QJsonValue::Double: {
+            const double d = value.toDouble();
+            if (type == QLatin1String("integer")) return std::floor(d) == d;
+            return type == QLatin1String("number");
+        }
+        default: return false;
+    }
+}
+
+QJsonObject resolveSchema(QJsonObject schema, const QJsonObject &rootSchema)
+{
+    if (!schema.contains(QStringLiteral("$ref"))) return schema;
+    const QString ref = schema.value(QStringLiteral("$ref")).toString();
+    Q_ASSERT(ref.startsWith(QLatin1String("#/")));
+    QJsonValue current = rootSchema;
+    for (const QString &part : ref.mid(2).split(QLatin1Char('/')))
+        current = current.toObject().value(part);
+    return current.toObject();
+}
+
+bool validateAgainstSchema(const QJsonValue &instance, QJsonObject schema, const QJsonObject &rootSchema,
+                           QString *error, const QString &path = QStringLiteral("$"))
+{
+    schema = resolveSchema(schema, rootSchema);
+
+    if (schema.contains(QStringLiteral("type")) &&
+        !jsonTypeMatches(instance, schema.value(QStringLiteral("type")).toString())) {
+        if (error) *error = QStringLiteral("%1: wrong JSON type").arg(path);
+        return false;
+    }
+    if (schema.contains(QStringLiteral("const")) && instance != schema.value(QStringLiteral("const"))) {
+        if (error) *error = QStringLiteral("%1: does not match const").arg(path);
+        return false;
+    }
+    if (schema.contains(QStringLiteral("enum"))) {
+        const QJsonArray allowed = schema.value(QStringLiteral("enum")).toArray();
+        if (!allowed.contains(instance)) {
+            if (error) *error = QStringLiteral("%1: value not in enum").arg(path);
+            return false;
+        }
+    }
+    if (instance.isString() && schema.contains(QStringLiteral("minLength")) &&
+        instance.toString().length() < schema.value(QStringLiteral("minLength")).toInt()) {
+        if (error) *error = QStringLiteral("%1: shorter than minLength").arg(path);
+        return false;
+    }
+    if (instance.isDouble() && schema.contains(QStringLiteral("minimum")) &&
+        instance.toDouble() < schema.value(QStringLiteral("minimum")).toDouble()) {
+        if (error) *error = QStringLiteral("%1: below minimum").arg(path);
+        return false;
+    }
+
+    if (instance.isArray()) {
+        const QJsonArray arr = instance.toArray();
+        if (schema.contains(QStringLiteral("minItems")) &&
+            arr.size() < schema.value(QStringLiteral("minItems")).toInt()) {
+            if (error) *error = QStringLiteral("%1: shorter than minItems").arg(path);
+            return false;
+        }
+        if (schema.contains(QStringLiteral("items"))) {
+            const QJsonObject itemSchema = schema.value(QStringLiteral("items")).toObject();
+            for (int i = 0; i < arr.size(); ++i) {
+                if (!validateAgainstSchema(arr.at(i), itemSchema, rootSchema, error,
+                                           QStringLiteral("%1[%2]").arg(path).arg(i)))
+                    return false;
+            }
+        }
+    }
+
+    if (instance.isObject()) {
+        const QJsonObject obj = instance.toObject();
+
+        for (const QJsonValue &req : schema.value(QStringLiteral("required")).toArray()) {
+            if (!obj.contains(req.toString())) {
+                if (error) *error = QStringLiteral("%1: missing required property '%2'").arg(path, req.toString());
+                return false;
+            }
+        }
+
+        const QJsonObject properties = schema.value(QStringLiteral("properties")).toObject();
+        const QJsonValue additional = schema.value(QStringLiteral("additionalProperties"));
+        for (auto it = obj.constBegin(); it != obj.constEnd(); ++it) {
+            if (properties.contains(it.key())) {
+                if (!validateAgainstSchema(it.value(), properties.value(it.key()).toObject(), rootSchema, error,
+                                           QStringLiteral("%1.%2").arg(path, it.key())))
+                    return false;
+            } else if (additional.isBool() && !additional.toBool()) {
+                if (error) *error = QStringLiteral("%1: unexpected additional property '%2'").arg(path, it.key());
+                return false;
+            }
+        }
+
+        for (const QJsonValue &clauseVal : schema.value(QStringLiteral("allOf")).toArray()) {
+            const QJsonObject clause = clauseVal.toObject();
+            if (clause.contains(QStringLiteral("if"))) {
+                QString ignored;
+                const bool conditionMatches = validateAgainstSchema(
+                    instance, clause.value(QStringLiteral("if")).toObject(), rootSchema, &ignored, path);
+                if (conditionMatches &&
+                    !validateAgainstSchema(instance, clause.value(QStringLiteral("then")).toObject(), rootSchema, error,
+                                           path))
+                    return false;
+            } else if (!validateAgainstSchema(instance, clause, rootSchema, error, path)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+} // namespace
 
 class TestKeyboardLayout : public QObject
 {
@@ -54,6 +193,7 @@ private slots:
     void reportsErrorOnMissingOrEmptyLocale();
     void reportsErrorOnNonArrayPages();
     void validatesSchemaAndLoadsAllProjectLayouts();
+    void rejectsLayoutWithSchemaForbiddenExtraProperty();
     void reportsErrorOnNonStringLocale();
     void reportsErrorOnPagesAsNonArrayJsonValue_data();
     void reportsErrorOnPagesAsNonArrayJsonValue();
@@ -506,6 +646,55 @@ void TestKeyboardLayout::validatesSchemaAndLoadsAllProjectLayouts()
     const KeyboardLayout koLayout = KeyboardLayout::fromFile(QStringLiteral(":/layouts/ko.json"), &error);
     QVERIFY2(koLayout.isValid(), qPrintable(error));
     QCOMPARE(koLayout.locale(), QStringLiteral("ko"));
+
+    // Actually run en.json/ko.json through the schema itself (not just
+    // through KeyboardLayout::fromJson()'s own parser, which is a separate,
+    // hand-written set of checks that doesn't necessarily agree with the
+    // schema - e.g. the parser doesn't enforce "additionalProperties":
+    // false anywhere, so a schema-invalid layout could still load cleanly).
+    for (const QString &resourcePath : {QStringLiteral(":/layouts/en.json"), QStringLiteral(":/layouts/ko.json")}) {
+        QFile layoutFile(resourcePath);
+        QVERIFY(layoutFile.open(QIODevice::ReadOnly));
+        const QJsonDocument layoutDoc = QJsonDocument::fromJson(layoutFile.readAll(), &parseError);
+        QCOMPARE(parseError.error, QJsonParseError::NoError);
+
+        QString schemaError;
+        QVERIFY2(validateAgainstSchema(layoutDoc.object(), doc.object(), doc.object(), &schemaError),
+                 qPrintable(resourcePath + QStringLiteral(": ") + schemaError));
+    }
+}
+
+void TestKeyboardLayout::rejectsLayoutWithSchemaForbiddenExtraProperty()
+{
+    // Proves the schema validator is a genuine check and not a no-op: a
+    // top-level property the schema doesn't declare is exactly the kind of
+    // regression "additionalProperties": false exists to catch. The
+    // fromJson() parser itself doesn't check this (it only looks at the
+    // fields it cares about), so this same layout would load without error
+    // through the normal parsing path - schema validation is what actually
+    // catches it.
+    Q_INIT_RESOURCE(qkeyboardwidget);
+
+    QFile schemaFile(QStringLiteral(":/layouts/schema/keyboard-layout.schema.json"));
+    QVERIFY(schemaFile.open(QIODevice::ReadOnly));
+    const QJsonDocument schemaDoc = QJsonDocument::fromJson(schemaFile.readAll());
+
+    const QByteArray json = R"({
+        "locale": "en",
+        "pages": [ { "id": "lower", "rows": [ [ { "type": "char", "text": "a" } ] ] } ],
+        "unexpectedExtraField": true
+    })";
+    const QJsonDocument instanceDoc = QJsonDocument::fromJson(json);
+
+    QString schemaError;
+    QVERIFY(!validateAgainstSchema(instanceDoc.object(), schemaDoc.object(), schemaDoc.object(), &schemaError));
+    QVERIFY(schemaError.contains(QStringLiteral("unexpectedExtraField")));
+
+    // Confirm the gap this test plan is actually closing: the hand-written
+    // parser alone does NOT reject this same input.
+    QString parseError;
+    const KeyboardLayout layout = KeyboardLayout::fromJson(json, &parseError);
+    QVERIFY2(layout.isValid(), qPrintable(parseError));
 }
 
 void TestKeyboardLayout::reportsErrorOnNonStringLocale()
