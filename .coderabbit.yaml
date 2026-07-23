@@ -1,0 +1,51 @@
+# CodeRabbit configuration for QKeyboard.
+# https://docs.coderabbit.ai/reference/configuration
+
+language: "en-US"
+
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+  path_filters:
+    - "!**/*.md"
+    - "!assets/**"
+    - "!docs/**"
+    - "!i18n/**/*.ts"
+  path_instructions:
+    - path: "src/**/*.{h,cpp}"
+      instructions: >
+        Check for adherence to the project's Effective C++ conventions:
+        const-correctness on getters/parameters, pass non-trivial types by
+        `const &`, explicit single-argument constructors, `enum class` over
+        plain `enum`, member-initializer lists, and Qt parent/child ownership
+        instead of manual new/delete. Flag any Qt6-only API (e.g.
+        `QML_ELEMENT`) that would break the Qt5 build.
+    - path: "qml/**/*.qml"
+      instructions: >
+        Verify this mirrors the equivalent QWidget behavior (geometry,
+        theming, press feedback) rather than introducing view-specific
+        logic, and that imports are versioned (e.g. `import QtQuick 2.0`)
+        rather than Qt6-only unversioned imports.
+    - path: "CMakeLists.txt"
+      instructions: >
+        Confirm Qt version detection stays broadly compatible with Qt5 and
+        Qt6 (`find_package(QT NAMES Qt6 Qt5 ...)` pattern) and that the
+        project version is only ever set in one place.
+    - path: "tests/**"
+      instructions: >
+        Confirm new behavior changes to KeyboardWidget, KeyButton, or QML
+        views ship with a matching QtTest/Qt Quick Test regression test.
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  learnings:
+    scope: "auto"
