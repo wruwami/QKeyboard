@@ -26,8 +26,11 @@ public:
     explicit KeyboardWidget(QWidget *parent = nullptr);
     ~KeyboardWidget() override;
 
-    // Both are owned by this widget and created empty; call
-    // controller()->loadFile(...) and mutate theme() to configure them.
+    // Both are owned by this widget and already usable as constructed: the
+    // controller starts with KeyboardController::Locale::English loaded and
+    // theme() has its own built-in colors/font - call
+    // controller()->setLocale(...)/loadFile(...) and mutate theme() only to
+    // customize away from those defaults.
     KeyboardController *controller() const;
     KeyboardTheme *theme() const;
 

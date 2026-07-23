@@ -16,12 +16,6 @@
 // runtime, plus a small theme override to show re-skinning.
 int main(int argc, char *argv[])
 {
-    // qkeyboardwidget's layouts/icons are compiled into its static library
-    // via resources/qkeyboardwidget.qrc; a static library's resource
-    // initializer isn't otherwise referenced by the linker, so it must be
-    // forced in explicitly here.
-    Q_INIT_RESOURCE(qkeyboardwidget);
-
     QApplication app(argc, argv);
 
     auto *window = new QMainWindow;
@@ -29,14 +23,16 @@ int main(int argc, char *argv[])
     auto *layout = new QVBoxLayout(central);
 
     auto *localeBox = new QComboBox(central);
-    localeBox->addItem(QStringLiteral("English"), QStringLiteral(":/layouts/en.json"));
-    localeBox->addItem(QStringLiteral("한국어"), QStringLiteral(":/layouts/ko.json"));
+    localeBox->addItem(QStringLiteral("English"), QVariant::fromValue(qkw::KeyboardController::Locale::English));
+    localeBox->addItem(QStringLiteral("한국어"), QVariant::fromValue(qkw::KeyboardController::Locale::Korean));
 
     auto *lineEdit = new QLineEdit(central);
     lineEdit->setPlaceholderText(QStringLiteral("Type using the keyboard below"));
 
+    // KeyboardWidget already has KeyboardController::Locale::English loaded
+    // and a default dark theme as soon as it's constructed - only need to
+    // touch the theme here because this demo wants a different look.
     auto *keyboard = new qkw::KeyboardWidget(central);
-    keyboard->controller()->loadFile(QStringLiteral(":/layouts/en.json"));
     keyboard->theme()->setKeyColor(QColor(QStringLiteral("#2b2b2e")));
     keyboard->theme()->setAccentKeyColor(QColor(QStringLiteral("#ff9500")));
     keyboard->theme()->setCornerRadius(10);
@@ -108,7 +104,8 @@ int main(int argc, char *argv[])
     QObject::connect(localeBox, QOverload<int>::of(&QComboBox::currentIndexChanged), keyboard->controller(),
                      [keyboard, localeBox, hangulComposer](int index) {
                          hangulComposer->commit();
-                         keyboard->controller()->loadFile(localeBox->itemData(index).toString());
+                         keyboard->controller()->setLocale(
+                             localeBox->itemData(index).value<qkw::KeyboardController::Locale>());
                      });
 
     layout->addWidget(localeBox);

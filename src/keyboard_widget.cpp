@@ -24,6 +24,12 @@ KeyboardWidget::KeyboardWidget(QWidget *parent) :
     connect(_controller, &KeyboardController::layoutChanged, this, &KeyboardWidget::rebuildPages);
     connect(_controller, &KeyboardController::currentPageChanged, this, &KeyboardWidget::showCurrentPage);
     connect(_theme, &KeyboardTheme::changed, this, &KeyboardWidget::applyThemeToAllKeys);
+
+    // _controller already has its default locale loaded by this point (see
+    // KeyboardController's constructor) - layoutChanged fired for that
+    // before the connect() above existed to catch it, so build the initial
+    // pages explicitly rather than relying on that signal.
+    rebuildPages();
 }
 
 KeyboardWidget::~KeyboardWidget() = default;
