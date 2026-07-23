@@ -26,6 +26,10 @@ private slots:
     void reportsErrorOnSwitchKeyMissingLabelId();
     void reportsErrorOnPageMissingId();
     void reportsErrorOnNonArrayRow();
+    void reportsErrorOnZeroSpan();
+    void reportsErrorOnNegativeSpan();
+    void reportsErrorOnShiftTargetNotAKnownPage();
+    void reportsErrorOnSwitchTargetNotAKnownPage();
 
     // File loading
     void fromFileReportsErrorForMissingFile();
@@ -249,6 +253,60 @@ void TestKeyboardLayout::reportsErrorOnNonArrayRow()
     const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
     QVERIFY(!layout.isValid());
     QVERIFY(!error.isEmpty());
+}
+
+void TestKeyboardLayout::reportsErrorOnZeroSpan()
+{
+    const QByteArray json = R"({
+        "locale": "en",
+        "pages": [ { "id": "lower", "rows": [ [ { "type": "char", "text": "a", "span": 0 } ] ] } ]
+    })";
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+    QVERIFY(!layout.isValid());
+    QVERIFY(error.contains(QStringLiteral("span")));
+}
+
+void TestKeyboardLayout::reportsErrorOnNegativeSpan()
+{
+    const QByteArray json = R"({
+        "locale": "en",
+        "pages": [ { "id": "lower", "rows": [ [ { "type": "char", "text": "a", "span": -3 } ] ] } ]
+    })";
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+    QVERIFY(!layout.isValid());
+    QVERIFY(error.contains(QStringLiteral("span")));
+}
+
+void TestKeyboardLayout::reportsErrorOnShiftTargetNotAKnownPage()
+{
+    // "target" is non-empty (so the earlier presence check passes) but
+    // doesn't match any page id actually declared in this layout.
+    const QByteArray json = R"({
+        "locale": "en",
+        "pages": [ { "id": "lower", "rows": [ [ { "type": "shift", "target": "numeriic" } ] ] } ]
+    })";
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+    QVERIFY(!layout.isValid());
+    QVERIFY(error.contains(QStringLiteral("numeriic")));
+}
+
+void TestKeyboardLayout::reportsErrorOnSwitchTargetNotAKnownPage()
+{
+    const QByteArray json = R"({
+        "locale": "en",
+        "pages": [
+            { "id": "lower", "rows": [
+                [ { "type": "switch", "target": "nonexistent", "labelId": "numbers" } ]
+            ] }
+        ]
+    })";
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+    QVERIFY(!layout.isValid());
+    QVERIFY(error.contains(QStringLiteral("nonexistent")));
 }
 
 // ---------------------------------------------------------------------------
