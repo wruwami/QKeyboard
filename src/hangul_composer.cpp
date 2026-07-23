@@ -7,7 +7,7 @@ namespace {
 // Hangul Compatibility Jamo (U+3131..U+3163), in the fixed order used by the
 // standard Unicode Hangul syllable composition formula:
 //   syllable = 0xAC00 + (choseongIndex * 21 + jungseongIndex) * 28 + jongseongIndex
-// This is the same block layouts/ko.json's "char" keys emit one at a time.
+// This is the same block resources/layouts/ko.json's "char" keys emit one at a time.
 const QString kChoseong = QStringLiteral("ㄱㄲㄴㄷㄸㄹㅁㅂ"
                                          "ㅃㅅㅆㅇㅈㅉㅊㅋ"
                                          "ㅌㅍㅎ");

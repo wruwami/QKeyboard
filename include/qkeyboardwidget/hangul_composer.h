@@ -8,7 +8,7 @@
 namespace qkw {
 
 // Composes individual Hangul jamo (as emitted one-at-a-time by a 2-beolsik
-// layout such as layouts/ko.json, via KeyboardController::characterEntered)
+// layout such as resources/layouts/ko.json, via KeyboardController::characterEntered)
 // into precomposed Hangul syllable blocks, following the standard Unicode
 // Hangul composition algorithm: syllable = 0xAC00 + (cho*21 + jung)*28 + jong.
 //
