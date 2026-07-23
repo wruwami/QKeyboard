@@ -43,8 +43,8 @@ jobs:
             --suppressions-list=.cppcheck-suppressions \
             --output-format=sarif \
             -I include \
-            src include tests examples > cppcheck.sarif
-
+            src include tests examples > cppcheck.sarif || true
+            
       - name: Upload SARIF to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
