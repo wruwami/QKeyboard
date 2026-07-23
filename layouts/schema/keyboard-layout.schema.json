@@ -1,0 +1,149 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "QKeyboard Layout Schema",
+  "description": "Schema definition for QKeyboard layout JSON files",
+  "type": "object",
+  "required": [
+    "locale",
+    "pages"
+  ],
+  "properties": {
+    "locale": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Locale code or language tag (e.g. 'en', 'ko')"
+    },
+    "pages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/keyboardPage"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "keyboardPage": {
+      "type": "object",
+      "required": [
+        "id",
+        "rows"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique identifier of the page (e.g. 'lower', 'upper', 'numeric', 'symbols', 'jamo')"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/keyDefinition"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "keyDefinition": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "char",
+            "backspace",
+            "enter",
+            "space",
+            "shift",
+            "switch"
+          ]
+        },
+        "text": {
+          "type": "string"
+        },
+        "labelId": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "span": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "char"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "text"
+            ],
+            "properties": {
+              "text": {
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "shift",
+                  "switch"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "target"
+            ],
+            "properties": {
+              "target": {
+                "minLength": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "switch"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "labelId"
+            ],
+            "properties": {
+              "labelId": {
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    }
+  }
+}

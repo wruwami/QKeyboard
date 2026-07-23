@@ -48,6 +48,11 @@ private slots:
     void parsesLayoutFromFile();
     void reportsErrorOnRowNotJsonArray();
     void reportsErrorOnKeyNotJsonObject();
+
+    // New tests for issue #92 (JSON Schema & validation)
+    void reportsErrorOnMissingOrEmptyLocale();
+    void reportsErrorOnNonArrayPages();
+    void validatesSchemaAndLoadsAllProjectLayouts();
 };
 
 // ---------------------------------------------------------------------------
@@ -440,6 +445,57 @@ void TestKeyboardLayout::reportsErrorOnKeyNotJsonObject()
     const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
     QVERIFY(!layout.isValid());
     QVERIFY(error.contains(QStringLiteral("JSON object")));
+}
+
+void TestKeyboardLayout::reportsErrorOnMissingOrEmptyLocale()
+{
+    {
+        const QByteArray json = R"({ "pages": [ { "id": "p", "rows": [] } ] })";
+        QString error;
+        const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+        QVERIFY(!layout.isValid());
+        QVERIFY(error.contains(QStringLiteral("locale")));
+    }
+    {
+        const QByteArray json = R"({ "locale": "", "pages": [ { "id": "p", "rows": [] } ] })";
+        QString error;
+        const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+        QVERIFY(!layout.isValid());
+        QVERIFY(error.contains(QStringLiteral("locale")));
+    }
+}
+
+void TestKeyboardLayout::reportsErrorOnNonArrayPages()
+{
+    const QByteArray json = R"({ "locale": "en", "pages": "not-an-array" })";
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromJson(json, &error);
+    QVERIFY(!layout.isValid());
+    QVERIFY(error.contains(QStringLiteral("pages")));
+}
+
+void TestKeyboardLayout::validatesSchemaAndLoadsAllProjectLayouts()
+{
+    Q_INIT_RESOURCE(qkeyboardwidget);
+
+    // Validate schema file resource is valid JSON document
+    QFile schemaFile(QStringLiteral(":/layouts/schema/keyboard-layout.schema.json"));
+    QVERIFY(schemaFile.open(QIODevice::ReadOnly));
+    QJsonParseError parseError{};
+    const QJsonDocument doc = QJsonDocument::fromJson(schemaFile.readAll(), &parseError);
+    QCOMPARE(parseError.error, QJsonParseError::NoError);
+    QVERIFY(doc.isObject());
+    QCOMPARE(doc.object().value(QStringLiteral("title")).toString(), QStringLiteral("QKeyboard Layout Schema"));
+
+    // Validate project layout files en.json and ko.json load cleanly
+    QString error;
+    const KeyboardLayout enLayout = KeyboardLayout::fromFile(QStringLiteral(":/layouts/en.json"), &error);
+    QVERIFY2(enLayout.isValid(), qPrintable(error));
+    QCOMPARE(enLayout.locale(), QStringLiteral("en"));
+
+    const KeyboardLayout koLayout = KeyboardLayout::fromFile(QStringLiteral(":/layouts/ko.json"), &error);
+    QVERIFY2(koLayout.isValid(), qPrintable(error));
+    QCOMPARE(koLayout.locale(), QStringLiteral("ko"));
 }
 
 QTEST_GUILESS_MAIN(TestKeyboardLayout)
