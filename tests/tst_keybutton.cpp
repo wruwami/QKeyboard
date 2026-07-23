@@ -18,6 +18,7 @@ private slots:
     void shrinkingBelowMarginSkipsFontFit();
     void resizeFitsIconToButtonWhenIconSet();
     void emptyIconSkipsIconFitOnResize();
+    void fitFontAndIconToVariousButtonGeometries();
 };
 
 void TestKeyButton::shrinksToFitInASingleResize()
@@ -142,6 +143,23 @@ void TestKeyButton::emptyIconSkipsIconFitOnResize()
     button.resize(120, 40);
     QCoreApplication::processEvents();
     QCOMPARE(button.iconSize(), initial);
+}
+
+void TestKeyButton::fitFontAndIconToVariousButtonGeometries()
+{
+    KeyButton button(QStringLiteral("VeryLongButtonText"));
+    button.show();
+
+    // Verify fitting under extremely small geometry (e.g. 2x2) without crashing
+    button.setMinimumSize(0, 0);
+    button.resize(2, 2);
+    QCoreApplication::processEvents();
+    QVERIFY(button.font().pointSizeF() >= 6.0);
+
+    // Verify fitting under large geometry (e.g. 500x500)
+    button.resize(500, 500);
+    QCoreApplication::processEvents();
+    QVERIFY(button.font().pointSizeF() <= 48.0);
 }
 
 QTEST_MAIN(TestKeyButton)
