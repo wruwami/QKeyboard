@@ -403,7 +403,8 @@ void TestHangulComposer::testsAllCompoundVowelsAndDecomposition()
     // ㅜ+ㅔ -> ㅞ ("웨" -> "우")
     // ㅜ+ㅣ -> ㅟ ("위" -> "우")
     // ㅡ+ㅣ -> ㅢ ("의" -> "으")
-    struct CompoundVowelTest {
+    struct CompoundVowelTest
+    {
         QString initialCho;
         QString v1;
         QString v2;
@@ -445,7 +446,8 @@ void TestHangulComposer::testsAllCompoundJongseongAndDecomposition()
     // ㄹ+ㅍ -> ㄿ ("읊" -> "을")
     // ㄹ+ㅎ -> ㅀ ("잃" -> "일")
     // ㅂ+ㅅ -> ㅄ ("값" -> "갑")
-    struct CompoundJongseongTest {
+    struct CompoundJongseongTest
+    {
         QString cho;
         QString jung;
         QString j1;
@@ -453,17 +455,28 @@ void TestHangulComposer::testsAllCompoundJongseongAndDecomposition()
         QString expectedComposed;
         QString expectedDecomposed;
     } tests[] = {
-        {QStringLiteral("ㅁ"), QStringLiteral("ㅗ"), QStringLiteral("ㄱ"), QStringLiteral("ㅅ"), QStringLiteral("몫"), QStringLiteral("목")},
-        {QStringLiteral("ㅇ"), QStringLiteral("ㅏ"), QStringLiteral("ㄴ"), QStringLiteral("ㅈ"), QStringLiteral("앉"), QStringLiteral("안")},
-        {QStringLiteral("ㅇ"), QStringLiteral("ㅏ"), QStringLiteral("ㄴ"), QStringLiteral("ㅎ"), QStringLiteral("않"), QStringLiteral("안")},
-        {QStringLiteral("ㄷ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㄱ"), QStringLiteral("닭"), QStringLiteral("달")},
-        {QStringLiteral("ㅅ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㅁ"), QStringLiteral("삶"), QStringLiteral("살")},
-        {QStringLiteral("ㅂ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㅂ"), QStringLiteral("밟"), QStringLiteral("발")},
-        {QStringLiteral("ㄷ"), QStringLiteral("ㅗ"), QStringLiteral("ㄹ"), QStringLiteral("ㅅ"), QStringLiteral("돐"), QStringLiteral("돌")},
-        {QStringLiteral("ㅎ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㅌ"), QStringLiteral("핥"), QStringLiteral("할")},
-        {QStringLiteral("ㅇ"), QStringLiteral("ㅡ"), QStringLiteral("ㄹ"), QStringLiteral("ㅍ"), QStringLiteral("읊"), QStringLiteral("을")},
-        {QStringLiteral("ㅇ"), QStringLiteral("ㅣ"), QStringLiteral("ㄹ"), QStringLiteral("ㅎ"), QStringLiteral("잃"), QStringLiteral("일")},
-        {QStringLiteral("ㄱ"), QStringLiteral("ㅏ"), QStringLiteral("ㅂ"), QStringLiteral("ㅅ"), QStringLiteral("값"), QStringLiteral("갑")},
+        {QStringLiteral("ㅁ"), QStringLiteral("ㅗ"), QStringLiteral("ㄱ"), QStringLiteral("ㅅ"), QStringLiteral("몫"),
+         QStringLiteral("목")},
+        {QStringLiteral("ㅇ"), QStringLiteral("ㅏ"), QStringLiteral("ㄴ"), QStringLiteral("ㅈ"), QStringLiteral("앉"),
+         QStringLiteral("안")},
+        {QStringLiteral("ㅇ"), QStringLiteral("ㅏ"), QStringLiteral("ㄴ"), QStringLiteral("ㅎ"), QStringLiteral("않"),
+         QStringLiteral("안")},
+        {QStringLiteral("ㄷ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㄱ"), QStringLiteral("닭"),
+         QStringLiteral("달")},
+        {QStringLiteral("ㅅ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㅁ"), QStringLiteral("삶"),
+         QStringLiteral("살")},
+        {QStringLiteral("ㅂ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㅂ"), QStringLiteral("밟"),
+         QStringLiteral("발")},
+        {QStringLiteral("ㄷ"), QStringLiteral("ㅗ"), QStringLiteral("ㄹ"), QStringLiteral("ㅅ"), QStringLiteral("돐"),
+         QStringLiteral("돌")},
+        {QStringLiteral("ㅎ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㅌ"), QStringLiteral("핥"),
+         QStringLiteral("할")},
+        {QStringLiteral("ㅇ"), QStringLiteral("ㅡ"), QStringLiteral("ㄹ"), QStringLiteral("ㅍ"), QStringLiteral("읊"),
+         QStringLiteral("을")},
+        {QStringLiteral("ㅇ"), QStringLiteral("ㅣ"), QStringLiteral("ㄹ"), QStringLiteral("ㅎ"), QStringLiteral("잃"),
+         QStringLiteral("일")},
+        {QStringLiteral("ㄱ"), QStringLiteral("ㅏ"), QStringLiteral("ㅂ"), QStringLiteral("ㅅ"), QStringLiteral("값"),
+         QStringLiteral("갑")},
     };
 
     for (const auto &t : tests) {
@@ -495,7 +508,8 @@ void TestHangulComposer::testsAllSingleJongseongPullbacks()
     // ㅌ: "밭" + "ㅔ" -> "바"+"테"
     // ㅍ: "잎" + "ㅣ" -> "이"+"피"
     // ㅎ: "좋" + "ㅏ" -> "조"+"하"
-    struct SinglePullbackTest {
+    struct SinglePullbackTest
+    {
         QString cho;
         QString jung;
         QString jong;
@@ -503,18 +517,30 @@ void TestHangulComposer::testsAllSingleJongseongPullbacks()
         QString expectedEmittedReplaced;
         QString expectedEmittedNew;
     } tests[] = {
-        {QStringLiteral("ㄲ"), QStringLiteral("ㅓ"), QStringLiteral("ㄲ"), QStringLiteral("ㅣ"), QStringLiteral("꺼"), QStringLiteral("끼")},
-        {QStringLiteral("ㄷ"), QStringLiteral("ㅏ"), QStringLiteral("ㄷ"), QStringLiteral("ㅏ"), QStringLiteral("다"), QStringLiteral("다")},
-        {QStringLiteral("ㄱ"), QStringLiteral("ㅗ"), QStringLiteral("ㅁ"), QStringLiteral("ㅣ"), QStringLiteral("고"), QStringLiteral("미")},
-        {QStringLiteral("ㅇ"), QStringLiteral("ㅗ"), QStringLiteral("ㅅ"), QStringLiteral("ㅣ"), QStringLiteral("오"), QStringLiteral("시")},
-        {QStringLiteral("ㅇ"), QStringLiteral("ㅣ"), QStringLiteral("ㅆ"), QStringLiteral("ㅓ"), QStringLiteral("이"), QStringLiteral("써")},
-        {QStringLiteral("ㄱ"), QStringLiteral("ㅏ"), QStringLiteral("ㅇ"), QStringLiteral("ㅏ"), QStringLiteral("가"), QStringLiteral("아")},
-        {QStringLiteral("ㄴ"), QStringLiteral("ㅏ"), QStringLiteral("ㅈ"), QStringLiteral("ㅏ"), QStringLiteral("나"), QStringLiteral("자")},
-        {QStringLiteral("ㄲ"), QStringLiteral("ㅗ"), QStringLiteral("ㅊ"), QStringLiteral("ㅣ"), QStringLiteral("꼬"), QStringLiteral("치")},
-        {QStringLiteral("ㅇ"), QStringLiteral("ㅓ"), QStringLiteral("ㅋ"), QStringLiteral("ㅣ"), QStringLiteral("어"), QStringLiteral("키")},
-        {QStringLiteral("ㅂ"), QStringLiteral("ㅏ"), QStringLiteral("ㅌ"), QStringLiteral("ㅔ"), QStringLiteral("바"), QStringLiteral("테")},
-        {QStringLiteral("ㅇ"), QStringLiteral("ㅣ"), QStringLiteral("ㅍ"), QStringLiteral("ㅣ"), QStringLiteral("이"), QStringLiteral("피")},
-        {QStringLiteral("ㅈ"), QStringLiteral("ㅗ"), QStringLiteral("ㅎ"), QStringLiteral("ㅏ"), QStringLiteral("조"), QStringLiteral("하")},
+        {QStringLiteral("ㄲ"), QStringLiteral("ㅓ"), QStringLiteral("ㄲ"), QStringLiteral("ㅣ"), QStringLiteral("꺼"),
+         QStringLiteral("끼")},
+        {QStringLiteral("ㄷ"), QStringLiteral("ㅏ"), QStringLiteral("ㄷ"), QStringLiteral("ㅏ"), QStringLiteral("다"),
+         QStringLiteral("다")},
+        {QStringLiteral("ㄱ"), QStringLiteral("ㅗ"), QStringLiteral("ㅁ"), QStringLiteral("ㅣ"), QStringLiteral("고"),
+         QStringLiteral("미")},
+        {QStringLiteral("ㅇ"), QStringLiteral("ㅗ"), QStringLiteral("ㅅ"), QStringLiteral("ㅣ"), QStringLiteral("오"),
+         QStringLiteral("시")},
+        {QStringLiteral("ㅇ"), QStringLiteral("ㅣ"), QStringLiteral("ㅆ"), QStringLiteral("ㅓ"), QStringLiteral("이"),
+         QStringLiteral("써")},
+        {QStringLiteral("ㄱ"), QStringLiteral("ㅏ"), QStringLiteral("ㅇ"), QStringLiteral("ㅏ"), QStringLiteral("가"),
+         QStringLiteral("아")},
+        {QStringLiteral("ㄴ"), QStringLiteral("ㅏ"), QStringLiteral("ㅈ"), QStringLiteral("ㅏ"), QStringLiteral("나"),
+         QStringLiteral("자")},
+        {QStringLiteral("ㄲ"), QStringLiteral("ㅗ"), QStringLiteral("ㅊ"), QStringLiteral("ㅣ"), QStringLiteral("꼬"),
+         QStringLiteral("치")},
+        {QStringLiteral("ㅇ"), QStringLiteral("ㅓ"), QStringLiteral("ㅋ"), QStringLiteral("ㅣ"), QStringLiteral("어"),
+         QStringLiteral("키")},
+        {QStringLiteral("ㅂ"), QStringLiteral("ㅏ"), QStringLiteral("ㅌ"), QStringLiteral("ㅔ"), QStringLiteral("바"),
+         QStringLiteral("테")},
+        {QStringLiteral("ㅇ"), QStringLiteral("ㅣ"), QStringLiteral("ㅍ"), QStringLiteral("ㅣ"), QStringLiteral("이"),
+         QStringLiteral("피")},
+        {QStringLiteral("ㅈ"), QStringLiteral("ㅗ"), QStringLiteral("ㅎ"), QStringLiteral("ㅏ"), QStringLiteral("조"),
+         QStringLiteral("하")},
     };
 
     for (const auto &t : tests) {
@@ -544,7 +570,8 @@ void TestHangulComposer::testsAllCompoundJongseongPullbacks()
     // ㄾ: "핥" + "ㅏ" -> "할"+"타"
     // ㄿ: "읊" + "ㅓ" -> "을"+"퍼"
     // ㅀ: "잃" + "ㅓ" -> "일"+"허"
-    struct CompoundPullbackTest {
+    struct CompoundPullbackTest
+    {
         QString cho;
         QString jung;
         QString j1;
@@ -553,17 +580,28 @@ void TestHangulComposer::testsAllCompoundJongseongPullbacks()
         QString expectedEmittedReplaced;
         QString expectedEmittedNew;
     } tests[] = {
-        {QStringLiteral("ㅁ"), QStringLiteral("ㅗ"), QStringLiteral("ㄱ"), QStringLiteral("ㅅ"), QStringLiteral("ㅣ"), QStringLiteral("목"), QStringLiteral("시")},
-        {QStringLiteral("ㅇ"), QStringLiteral("ㅏ"), QStringLiteral("ㄴ"), QStringLiteral("ㅈ"), QStringLiteral("ㅏ"), QStringLiteral("안"), QStringLiteral("자")},
-        {QStringLiteral("ㅇ"), QStringLiteral("ㅏ"), QStringLiteral("ㄴ"), QStringLiteral("ㅎ"), QStringLiteral("ㅏ"), QStringLiteral("안"), QStringLiteral("하")},
-        {QStringLiteral("ㄷ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㄱ"), QStringLiteral("ㅣ"), QStringLiteral("달"), QStringLiteral("기")},
-        {QStringLiteral("ㅅ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㅁ"), QStringLiteral("ㅣ"), QStringLiteral("살"), QStringLiteral("미")},
-        {QStringLiteral("ㅂ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㅂ"), QStringLiteral("ㅏ"), QStringLiteral("발"), QStringLiteral("바")},
-        {QStringLiteral("ㄷ"), QStringLiteral("ㅗ"), QStringLiteral("ㄹ"), QStringLiteral("ㅅ"), QStringLiteral("ㅣ"), QStringLiteral("돌"), QStringLiteral("시")},
-        {QStringLiteral("ㅎ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㅌ"), QStringLiteral("ㅏ"), QStringLiteral("할"), QStringLiteral("타")},
-        {QStringLiteral("ㅇ"), QStringLiteral("ㅡ"), QStringLiteral("ㄹ"), QStringLiteral("ㅍ"), QStringLiteral("ㅓ"), QStringLiteral("을"), QStringLiteral("퍼")},
-        {QStringLiteral("ㅇ"), QStringLiteral("ㅣ"), QStringLiteral("ㄹ"), QStringLiteral("ㅎ"), QStringLiteral("ㅓ"), QStringLiteral("일"), QStringLiteral("허")},
-        {QStringLiteral("ㄱ"), QStringLiteral("ㅏ"), QStringLiteral("ㅂ"), QStringLiteral("ㅅ"), QStringLiteral("ㅣ"), QStringLiteral("갑"), QStringLiteral("시")},
+        {QStringLiteral("ㅁ"), QStringLiteral("ㅗ"), QStringLiteral("ㄱ"), QStringLiteral("ㅅ"), QStringLiteral("ㅣ"),
+         QStringLiteral("목"), QStringLiteral("시")},
+        {QStringLiteral("ㅇ"), QStringLiteral("ㅏ"), QStringLiteral("ㄴ"), QStringLiteral("ㅈ"), QStringLiteral("ㅏ"),
+         QStringLiteral("안"), QStringLiteral("자")},
+        {QStringLiteral("ㅇ"), QStringLiteral("ㅏ"), QStringLiteral("ㄴ"), QStringLiteral("ㅎ"), QStringLiteral("ㅏ"),
+         QStringLiteral("안"), QStringLiteral("하")},
+        {QStringLiteral("ㄷ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㄱ"), QStringLiteral("ㅣ"),
+         QStringLiteral("달"), QStringLiteral("기")},
+        {QStringLiteral("ㅅ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㅁ"), QStringLiteral("ㅣ"),
+         QStringLiteral("살"), QStringLiteral("미")},
+        {QStringLiteral("ㅂ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㅂ"), QStringLiteral("ㅏ"),
+         QStringLiteral("발"), QStringLiteral("바")},
+        {QStringLiteral("ㄷ"), QStringLiteral("ㅗ"), QStringLiteral("ㄹ"), QStringLiteral("ㅅ"), QStringLiteral("ㅣ"),
+         QStringLiteral("돌"), QStringLiteral("시")},
+        {QStringLiteral("ㅎ"), QStringLiteral("ㅏ"), QStringLiteral("ㄹ"), QStringLiteral("ㅌ"), QStringLiteral("ㅏ"),
+         QStringLiteral("할"), QStringLiteral("타")},
+        {QStringLiteral("ㅇ"), QStringLiteral("ㅡ"), QStringLiteral("ㄹ"), QStringLiteral("ㅍ"), QStringLiteral("ㅓ"),
+         QStringLiteral("을"), QStringLiteral("퍼")},
+        {QStringLiteral("ㅇ"), QStringLiteral("ㅣ"), QStringLiteral("ㄹ"), QStringLiteral("ㅎ"), QStringLiteral("ㅓ"),
+         QStringLiteral("일"), QStringLiteral("허")},
+        {QStringLiteral("ㄱ"), QStringLiteral("ㅏ"), QStringLiteral("ㅂ"), QStringLiteral("ㅅ"), QStringLiteral("ㅣ"),
+         QStringLiteral("갑"), QStringLiteral("시")},
     };
 
     for (const auto &t : tests) {
