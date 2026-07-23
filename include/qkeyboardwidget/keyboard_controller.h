@@ -32,14 +32,14 @@ class QKW_EXPORT KeyboardController : public QObject
 
 public:
     // One value per layout bundled into the library's own resources
-    // (layouts/<name>.json in the source tree, compiled in via
+    // (resources/layouts/<name>.json in the source tree, compiled in via
     // resources/qkeyboardwidget.qrc). setLocale() maps each value to its
     // resource path, so a host app that only wants a stock layout never has
     // to spell out a ":/layouts/..." path itself. loadFile()/loadJson()
     // remain the way to use a layout that isn't one of these - adding a
-    // *new* locale to the JSON side (layouts/<locale>.json) still needs no
-    // code change, same as before; it only needs an enum value here (plus a
-    // qrc entry) to also be reachable via setLocale().
+    // *new* locale to the JSON side (resources/layouts/<locale>.json) still
+    // needs no code change, same as before; it only needs an enum value
+    // here (plus a qrc entry) to also be reachable via setLocale().
     enum class Locale { English, Korean };
     Q_ENUM(Locale)
 

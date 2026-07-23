@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     keyboard->theme()->setAccentKeyColor(QColor(QStringLiteral("#ff9500")));
     keyboard->theme()->setCornerRadius(10);
 
-    // HangulComposer turns the individual jamo that layouts/ko.json emits
+    // HangulComposer turns the individual jamo that resources/layouts/ko.json emits
     // one keystroke at a time into precomposed syllable blocks (see #9).
     // It's a no-op pass-through for any other layout: feed() only consumes
     // Hangul jamo and otherwise just flushes and returns false, so wiring it

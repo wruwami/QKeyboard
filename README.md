@@ -23,7 +23,7 @@ on-screen keyboard projects.
 
 `examples/widgets_example` (QWidget) and `examples/qml_example` (Qt Quick),
 both actually built and run (Qt 6.4, Ubuntu 24.04, offscreen X server) — the
-combo box switches `layouts/en.json` and `layouts/ko.json` at runtime, and
+combo box switches `resources/layouts/en.json` and `resources/layouts/ko.json` at runtime, and
 Shift/Switch keys render in the accent color. Both views render the same
 `KeyboardController`/`KeyboardTheme` core, which is why they look identical
 key-for-key:
@@ -46,11 +46,11 @@ key-for-key:
 - **Theming**: colors, font, corner radius, and spacing are `Q_PROPERTY`s on
   a single `KeyboardTheme` object; change one at runtime and every key
   re-renders.
-- **i18n**: per-locale key layouts (`layouts/en.json`, `layouts/ko.json`,
-  ...) plus Qt Linguist translation of control-key labels (Enter, Backspace,
-  Shift, ...).
+- **i18n**: per-locale key layouts (`resources/layouts/en.json`,
+  `resources/layouts/ko.json`, ...) plus Qt Linguist translation of
+  control-key labels (Enter, Backspace, Shift, ...).
 - **Hangul composition**: `qkw::HangulComposer` is an opt-in helper that
-  turns the jamo `layouts/ko.json` emits one at a time into precomposed
+  turns the jamo `resources/layouts/ko.json` emits one at a time into precomposed
   Hangul syllable blocks; see the note under [Layout format](#layout-format).
 
 ## Status
@@ -172,13 +172,14 @@ qApp->installTranslator(translator);
 keyboard->controller()->setLocale(qkw::KeyboardController::Locale::Korean);
 ```
 
-`i18n/qkeyboardwidget_ko.ts` is the Korean translation source; `QKW_BUILD_TRANSLATIONS`
-(on by default) compiles it to `.qm` via CMake at build time and installs it.
-To add another language's JSON layout, add `layouts/<locale>.json` — no code
-change needed to use it via `loadFile()`/`source`. To also make it reachable
-through `setLocale()`, additionally add a `KeyboardController::Locale` enum
-value and a case in `setLocale()`'s mapping (`src/keyboard_controller.cpp`).
-For UI string translation, add `i18n/qkeyboardwidget_<locale>.ts` (run
+`resources/i18n/qkeyboardwidget_ko.ts` is the Korean translation source;
+`QKW_BUILD_TRANSLATIONS` (on by default) compiles it to `.qm` via CMake at
+build time and installs it. To add another language's JSON layout, add
+`resources/layouts/<locale>.json` — no code change needed to use it via
+`loadFile()`/`source`. To also make it reachable through `setLocale()`,
+additionally add a `KeyboardController::Locale` enum value and a case in
+`setLocale()`'s mapping (`src/keyboard_controller.cpp`). For UI string
+translation, add `resources/i18n/qkeyboardwidget_<locale>.ts` (run
 `lupdate` against `src/keyboard_controller.cpp`, context `QKeyboardWidget`,
 to seed it with the current source strings), list it in `QKW_TS_FILES` in
 `CMakeLists.txt`, and translate it in Qt Linguist.
@@ -218,11 +219,11 @@ to seed it with the current source strings), list it in `QKW_TS_FILES` in
 | `target` | Page `id` to jump to, for `shift`/`switch` keys. |
 | `span` | Grid column span (default 1). |
 
-Adding a new language is just adding a new `layouts/<locale>.json` file —
-no code changes required. See `layouts/en.json` and `layouts/ko.json` for
-complete examples.
+Adding a new language is just adding a new `resources/layouts/<locale>.json`
+file — no code changes required. See `resources/layouts/en.json` and
+`resources/layouts/ko.json` for complete examples.
 
-> **Note on `layouts/ko.json`**: it emits individual Hangul jamo characters
+> **Note on `resources/layouts/ko.json`**: it emits individual Hangul jamo characters
 > (ㅂ, ㅏ, ...) one at a time, same as pressing each key on a physical
 > 2-beolsik keyboard. Composing them into syllable blocks (e.g. ㄱ+ㅏ+ㄴ →
 > 간) is an opt-in step: feed `KeyboardController::characterEntered` /
@@ -292,9 +293,10 @@ a full Qt install) — see the comments in that file before adding to it.
 include/qkeyboardwidget/   public headers (namespace qkw)
 src/                       implementation
 qml/                       Qt Quick components
-layouts/                   per-locale layout JSON
+resources/                 resources/qkeyboardwidget.qrc + everything it embeds
+resources/layouts/         per-locale layout JSON
+resources/i18n/            Qt Linguist translation sources
 assets/icons/              key icons (SVG)
-i18n/                      Qt Linguist translation sources
 examples/                  demo apps
 ```
 
