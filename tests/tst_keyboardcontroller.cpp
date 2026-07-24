@@ -1,5 +1,6 @@
 #include <QtTest>
 #include <QSignalSpy>
+#include <QTemporaryFile>
 
 #include "qkeyboard/keyboard_controller.h"
 
@@ -52,6 +53,7 @@ private slots:
     void reloadingJsonResetsToFirstPage();
     void setSourceTriggersLoad();
     void setSourceWithBadPathEmitsLoadFailedNotSourceChanged();
+    void loadFileSwitchesBetweenBundledAndExternalCustomLayout();
 
     // Signal emissions
     void emitsCharacterEnteredForCharKey();
@@ -223,6 +225,47 @@ void TestKeyboardController::setSourceWithBadPathEmitsLoadFailedNotSourceChanged
     // The previously-loaded layout and source must still be intact.
     QVERIFY(controller.isValid());
     QCOMPARE(controller.source(), QStringLiteral(":/layouts/en.json"));
+}
+
+void TestKeyboardController::loadFileSwitchesBetweenBundledAndExternalCustomLayout()
+{
+    // Issue #94: loadFile()/setSource() must work identically for a bundled
+    // qrc layout and a real filesystem path, so a host app can override the
+    // stock layouts with its own custom JSON at runtime, then switch back.
+    QTemporaryFile customFile;
+    QVERIFY(customFile.open());
+    customFile.write(R"({
+        "locale": "custom",
+        "pages": [
+            { "id": "lower", "rows": [ [ { "type": "char", "text": "z" } ] ] }
+        ]
+    })");
+    customFile.close();
+
+    KeyboardController controller;
+    QCOMPARE(controller.locale(), QStringLiteral("en"));
+    QCOMPARE(controller.source(), QStringLiteral(":/layouts/en.json"));
+
+    // Bundled -> external filesystem override.
+    QVERIFY(controller.loadFile(customFile.fileName()));
+    QVERIFY(controller.isValid());
+    QCOMPARE(controller.locale(), QStringLiteral("custom"));
+    QCOMPARE(controller.source(), customFile.fileName());
+    QCOMPARE(controller.pageCount(), 1);
+    QCOMPARE(controller.rows().first().toList().first().toMap().value(QStringLiteral("text")).toString(),
+             QStringLiteral("z"));
+
+    // External override -> back to a different bundled resource.
+    QVERIFY(controller.setLocale(KeyboardController::Locale::Korean));
+    QVERIFY(controller.isValid());
+    QCOMPARE(controller.locale(), QStringLiteral("ko"));
+    QCOMPARE(controller.source(), QStringLiteral(":/layouts/ko.json"));
+
+    // Bundled -> external override again, to confirm the switch isn't
+    // one-directional.
+    QVERIFY(controller.loadFile(customFile.fileName()));
+    QCOMPARE(controller.locale(), QStringLiteral("custom"));
+    QCOMPARE(controller.source(), customFile.fileName());
 }
 
 // ---------------------------------------------------------------------------
