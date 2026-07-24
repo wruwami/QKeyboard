@@ -17,9 +17,17 @@ endfunction()
 qkw_add_test(tst_keyboardlayout tst_keyboardlayout.cpp)
 qkw_add_test(tst_keyboardcontroller tst_keyboardcontroller.cpp)
 qkw_add_test(tst_hangulcomposer tst_hangulcomposer.cpp)
+qkw_add_test(tst_kanacomposer tst_kanacomposer.cpp)
+qkw_add_test(tst_abstractcomposer tst_abstractcomposer.cpp)
 qkw_add_test(tst_keybutton tst_keybutton.cpp)
 qkw_add_test(tst_keyboardwidget tst_keyboardwidget.cpp)
 qkw_add_test(tst_keyboardtheme tst_keyboardtheme.cpp)
+
+qkw_add_test(tst_translations tst_translations.cpp)
+# Reads resources/i18n/*.ts directly from the source tree (they are plain
+# Qt Linguist source files, not embedded in the .qrc/compiled to .qm at
+# test-run time), the same way tst_quick.cpp locates its QML sources below.
+target_compile_definitions(tst_translations PRIVATE QKW_I18N_DIR="${CMAKE_SOURCE_DIR}/resources/i18n")
 
 if(QKW_ENABLE_QML)
     find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS QuickTest)

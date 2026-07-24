@@ -175,7 +175,7 @@ int decomposeCompoundJungseong(int jungseongIndex)
 
 } // namespace
 
-HangulComposer::HangulComposer(QObject *parent) : QObject(parent), _cho(-1), _jung(-1), _jong(0)
+HangulComposer::HangulComposer(QObject *parent) : AbstractComposer(parent), _cho(-1), _jung(-1), _jong(0)
 {
 }
 
@@ -324,6 +324,15 @@ void HangulComposer::commit()
     _cho = -1;
     _jung = -1;
     _jong = 0;
+}
+
+void HangulComposer::reset()
+{
+    const bool wasComposing = isComposing();
+    commit();
+    if (wasComposing) {
+        emit syllableCleared();
+    }
 }
 
 bool HangulComposer::isComposing() const

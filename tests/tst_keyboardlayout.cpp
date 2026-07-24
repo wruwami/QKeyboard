@@ -203,6 +203,11 @@ private slots:
     void schemaKeyDefinitionEnumMatchesSupportedKeyTypes();
     void schemaConditionalRequirementsForShiftAndSwitchKeys();
     void qrcResourceRegistersSchemaFileAlongsideLayouts();
+
+    // New tests for the newly-added locale layouts (de/es/fr/ru/ja).
+    void newLocaleLayoutHasExpectedLocaleAndPageIds_data();
+    void newLocaleLayoutHasExpectedLocaleAndPageIds();
+    void qrcResourceRegistersNewLocaleLayoutFiles();
 };
 
 // ---------------------------------------------------------------------------
@@ -637,22 +642,26 @@ void TestKeyboardLayout::validatesSchemaAndLoadsAllProjectLayouts()
     QVERIFY(doc.isObject());
     QCOMPARE(doc.object().value(QStringLiteral("title")).toString(), QStringLiteral("QKeyboard Layout Schema"));
 
-    // Validate project layout files en.json and ko.json load cleanly
+    // Validate project layout files load cleanly
+    const QList<QPair<QString, QString>> layoutSpecs = {
+        {QStringLiteral(":/layouts/en.json"), QStringLiteral("en")},
+        {QStringLiteral(":/layouts/ko.json"), QStringLiteral("ko")},
+        {QStringLiteral(":/layouts/es.json"), QStringLiteral("es")},
+        {QStringLiteral(":/layouts/de.json"), QStringLiteral("de")},
+        {QStringLiteral(":/layouts/fr.json"), QStringLiteral("fr")},
+        {QStringLiteral(":/layouts/ru.json"), QStringLiteral("ru")},
+        {QStringLiteral(":/layouts/ja_romaji.json"), QStringLiteral("ja_romaji")},
+        {QStringLiteral(":/layouts/ja_kana.json"), QStringLiteral("ja_kana")},
+    };
+
     QString error;
-    const KeyboardLayout enLayout = KeyboardLayout::fromFile(QStringLiteral(":/layouts/en.json"), &error);
-    QVERIFY2(enLayout.isValid(), qPrintable(error));
-    QCOMPARE(enLayout.locale(), QStringLiteral("en"));
+    for (const auto &spec : layoutSpecs) {
+        const QString &resourcePath = spec.first;
+        const QString &expectedLocale = spec.second;
+        const KeyboardLayout layout = KeyboardLayout::fromFile(resourcePath, &error);
+        QVERIFY2(layout.isValid(), qPrintable(resourcePath + QStringLiteral(": ") + error));
+        QCOMPARE(layout.locale(), expectedLocale);
 
-    const KeyboardLayout koLayout = KeyboardLayout::fromFile(QStringLiteral(":/layouts/ko.json"), &error);
-    QVERIFY2(koLayout.isValid(), qPrintable(error));
-    QCOMPARE(koLayout.locale(), QStringLiteral("ko"));
-
-    // Actually run en.json/ko.json through the schema itself (not just
-    // through KeyboardLayout::fromJson()'s own parser, which is a separate,
-    // hand-written set of checks that doesn't necessarily agree with the
-    // schema - e.g. the parser doesn't enforce "additionalProperties":
-    // false anywhere, so a schema-invalid layout could still load cleanly).
-    for (const QString &resourcePath : {QStringLiteral(":/layouts/en.json"), QStringLiteral(":/layouts/ko.json")}) {
         QFile layoutFile(resourcePath);
         QVERIFY(layoutFile.open(QIODevice::ReadOnly));
         const QJsonDocument layoutDoc = QJsonDocument::fromJson(layoutFile.readAll(), &parseError);
@@ -876,6 +885,69 @@ void TestKeyboardLayout::qrcResourceRegistersSchemaFileAlongsideLayouts()
     QFile schemaFile(QStringLiteral(":/layouts/schema/keyboard-layout.schema.json"));
     QVERIFY(schemaFile.open(QIODevice::ReadOnly));
     QVERIFY(schemaFile.size() > 0);
+}
+
+void TestKeyboardLayout::newLocaleLayoutHasExpectedLocaleAndPageIds_data()
+{
+    QTest::addColumn<QString>("resourcePath");
+    QTest::addColumn<QString>("expectedLocale");
+    QTest::addColumn<QStringList>("expectedPageIds");
+
+    QTest::newRow("de") << QStringLiteral(":/layouts/de.json") << QStringLiteral("de")
+                        << (QStringList{QStringLiteral("lower"), QStringLiteral("upper"), QStringLiteral("symbols")});
+    QTest::newRow("es") << QStringLiteral(":/layouts/es.json") << QStringLiteral("es")
+                        << (QStringList{QStringLiteral("lower"), QStringLiteral("upper"), QStringLiteral("symbols")});
+    QTest::newRow("fr") << QStringLiteral(":/layouts/fr.json") << QStringLiteral("fr")
+                        << (QStringList{QStringLiteral("lower"), QStringLiteral("upper"), QStringLiteral("symbols")});
+    QTest::newRow("ru") << QStringLiteral(":/layouts/ru.json") << QStringLiteral("ru")
+                        << (QStringList{QStringLiteral("lower"), QStringLiteral("upper"), QStringLiteral("symbols")});
+    QTest::newRow("ja_romaji") << QStringLiteral(":/layouts/ja_romaji.json") << QStringLiteral("ja_romaji")
+                               << (QStringList{QStringLiteral("lower"), QStringLiteral("upper"),
+                                               QStringLiteral("symbols")});
+    QTest::newRow("ja_kana") << QStringLiteral(":/layouts/ja_kana.json") << QStringLiteral("ja_kana")
+                             << (QStringList{QStringLiteral("lower"), QStringLiteral("symbols")});
+}
+
+void TestKeyboardLayout::newLocaleLayoutHasExpectedLocaleAndPageIds()
+{
+    Q_INIT_RESOURCE(qkeyboardwidget);
+
+    QFETCH(QString, resourcePath);
+    QFETCH(QString, expectedLocale);
+    QFETCH(QStringList, expectedPageIds);
+
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromFile(resourcePath, &error);
+    QVERIFY2(layout.isValid(), qPrintable(resourcePath + QStringLiteral(": ") + error));
+    QCOMPARE(layout.locale(), expectedLocale);
+
+    QCOMPARE(layout.pages().size(), expectedPageIds.size());
+    for (const QString &pageId : expectedPageIds)
+        QVERIFY2(layout.indexOfPage(pageId) != -1,
+                 qPrintable(QStringLiteral("%1: missing expected page '%2'").arg(resourcePath, pageId)));
+}
+
+void TestKeyboardLayout::qrcResourceRegistersNewLocaleLayoutFiles()
+{
+    Q_INIT_RESOURCE(qkeyboardwidget);
+
+    // Every new-locale layout file this PR adds to resources/qkeyboardwidget.qrc
+    // under the existing /layouts prefix must actually resolve as a Qt
+    // resource, alongside the pre-existing en.json/ko.json entries.
+    const QStringList newLayoutFiles = {
+        QStringLiteral(":/layouts/de.json"),        QStringLiteral(":/layouts/es.json"),
+        QStringLiteral(":/layouts/fr.json"),        QStringLiteral(":/layouts/ru.json"),
+        QStringLiteral(":/layouts/ja_romaji.json"), QStringLiteral(":/layouts/ja_kana.json"),
+    };
+    for (const QString &resourcePath : newLayoutFiles) {
+        QVERIFY2(QFile::exists(resourcePath), qPrintable(resourcePath));
+        QFile file(resourcePath);
+        QVERIFY(file.open(QIODevice::ReadOnly));
+        QVERIFY(file.size() > 0);
+    }
+
+    QVERIFY(QFile::exists(QStringLiteral(":/layouts/en.json")));
+    QVERIFY(QFile::exists(QStringLiteral(":/layouts/ko.json")));
 }
 
 QTEST_GUILESS_MAIN(TestKeyboardLayout)
