@@ -901,10 +901,10 @@ void TestKeyboardLayout::newLocaleLayoutHasExpectedLocaleAndPageIds_data()
                         << (QStringList{QStringLiteral("lower"), QStringLiteral("upper"), QStringLiteral("symbols")});
     QTest::newRow("ru") << QStringLiteral(":/layouts/ru.json") << QStringLiteral("ru")
                         << (QStringList{QStringLiteral("lower"), QStringLiteral("upper"), QStringLiteral("symbols")});
-    QTest::newRow("ja_romaji") << QStringLiteral(":/layouts/ja_romaji.json") << QStringLiteral("ja")
+    QTest::newRow("ja_romaji") << QStringLiteral(":/layouts/ja_romaji.json") << QStringLiteral("ja_romaji")
                                << (QStringList{QStringLiteral("lower"), QStringLiteral("upper"),
                                                QStringLiteral("symbols")});
-    QTest::newRow("ja_kana") << QStringLiteral(":/layouts/ja_kana.json") << QStringLiteral("ja")
+    QTest::newRow("ja_kana") << QStringLiteral(":/layouts/ja_kana.json") << QStringLiteral("ja_kana")
                              << (QStringList{QStringLiteral("lower"), QStringLiteral("symbols")});
 }
 

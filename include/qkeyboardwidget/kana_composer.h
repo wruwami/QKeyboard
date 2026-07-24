@@ -23,7 +23,18 @@ public:
     bool isComposing() const override;
 
 private:
+    // Which modifier (if any) produced _currentKana's current value, tracked
+    // explicitly rather than inferred by reverse-searching the modifier maps
+    // for a match: smallKanaMap() is bidirectional (large<->small, so "小"
+    // can toggle either way), so a value like plain "あ" is *also* the
+    // target of a small-kana reverse entry ("ぁ" -> "あ") purely by
+    // coincidence - reverse-lookup alone can't tell "reached via toggle"
+    // apart from "typed directly and happens to have a small-kana
+    // counterpart". backspace() needs to know which actually happened.
+    enum class LastModifier { None, Dakuten, Handakuten, SmallKana };
+
     QString _currentKana;
+    LastModifier _lastModifier = LastModifier::None;
 };
 
 } // namespace qkw

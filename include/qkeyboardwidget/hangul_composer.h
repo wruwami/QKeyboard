@@ -38,18 +38,19 @@ public:
     void commit();
     bool isComposing() const override;
 
-signals:
-    // A composed character is ready. `replacePrevious` is true when this
-    // updates the syllable currently being composed (the host should remove
-    // the one character it previously inserted for this composition, then
-    // insert `text`); false when it starts a brand-new character (the host
-    // should just insert `text`).
-    void syllableReady(const QString &text, bool replacePrevious);
-
-    // The in-progress composition was fully backspaced away with nothing
-    // left; the host should remove the one character it had displayed for
-    // it (there is no replacement text).
-    void syllableCleared();
+    // syllableReady(text, replacePrevious)/syllableCleared() are inherited
+    // from AbstractComposer, not redeclared here: Qt signals aren't virtual,
+    // so a same-name/same-signature redeclaration in a subclass doesn't
+    // override the base signal, it *shadows* it with a second, distinct
+    // signal - emit syllableReady(...) inside this class's own methods would
+    // then fire HangulComposer::syllableReady while code holding an
+    // AbstractComposer* (e.g. via a QSignalSpy on
+    // &AbstractComposer::syllableReady) is connected to
+    // AbstractComposer::syllableReady and would never see it. Every
+    // `&HangulComposer::syllableReady`/`&HangulComposer::syllableCleared`
+    // connection elsewhere (examples/widgets_example/main.cpp,
+    // tests/tst_hangulcomposer.cpp) still resolves correctly through
+    // inheritance without this redeclaration.
 
 private:
     QString composeCurrent() const;

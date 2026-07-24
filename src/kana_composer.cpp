@@ -62,6 +62,20 @@ const QMap<QString, QString> &smallKanaMap()
     return map;
 }
 
+// Finds the key whose value is `value` in `map` (dakutenMap()/handakutenMap()/
+// smallKanaMap() are all small enough that a linear scan is fine, and none of
+// them are large or hot-path enough to warrant a second, value-to-key map
+// just for this). Returns an empty string if no key maps to `value` - used by
+// KanaComposer::backspace() to undo whichever modifier (if any) produced the
+// current kana.
+QString reverseLookup(const QMap<QString, QString> &map, const QString &value)
+{
+    for (auto it = map.constBegin(); it != map.constEnd(); ++it) {
+        if (it.value() == value) return it.key();
+    }
+    return QString();
+}
+
 } // namespace
 
 KanaComposer::KanaComposer(QObject *parent) : AbstractComposer(parent)
@@ -77,6 +91,7 @@ bool KanaComposer::feed(const QString &text)
         if (!isComposing()) return false;
         if (dakutenMap().contains(_currentKana)) {
             _currentKana = dakutenMap().value(_currentKana);
+            _lastModifier = LastModifier::Dakuten;
             emit syllableReady(_currentKana, true);
             return true;
         }
@@ -88,6 +103,7 @@ bool KanaComposer::feed(const QString &text)
         if (!isComposing()) return false;
         if (handakutenMap().contains(_currentKana)) {
             _currentKana = handakutenMap().value(_currentKana);
+            _lastModifier = LastModifier::Handakuten;
             emit syllableReady(_currentKana, true);
             return true;
         }
@@ -99,6 +115,7 @@ bool KanaComposer::feed(const QString &text)
         if (!isComposing()) return false;
         if (smallKanaMap().contains(_currentKana)) {
             _currentKana = smallKanaMap().value(_currentKana);
+            _lastModifier = LastModifier::SmallKana;
             emit syllableReady(_currentKana, true);
             return true;
         }
@@ -107,6 +124,7 @@ bool KanaComposer::feed(const QString &text)
 
     // Standard new kana entry
     _currentKana = text;
+    _lastModifier = LastModifier::None;
     emit syllableReady(_currentKana, false);
     return true;
 }
@@ -115,31 +133,28 @@ bool KanaComposer::backspace()
 {
     if (!isComposing()) return false;
 
-    // Reverse dakuten
-    const QString origDakuten = reverseLookup(dakutenMap(), _currentKana);
-    if (!origDakuten.isEmpty()) {
-        _currentKana = origDakuten;
-        emit syllableReady(_currentKana, true);
-        return true;
+    // Undo whichever modifier produced the current kana, tracked explicitly
+    // in _lastModifier rather than guessed from map membership - see the
+    // comment on _lastModifier's declaration for why that guess is
+    // unreliable specifically for smallKanaMap().
+    QString original;
+    switch (_lastModifier) {
+        case LastModifier::Dakuten: original = reverseLookup(dakutenMap(), _currentKana); break;
+        case LastModifier::Handakuten: original = reverseLookup(handakutenMap(), _currentKana); break;
+        case LastModifier::SmallKana: original = reverseLookup(smallKanaMap(), _currentKana); break;
+        case LastModifier::None: break;
     }
 
-    // Reverse handakuten
-    const QString origHandakuten = reverseLookup(handakutenMap(), _currentKana);
-    if (!origHandakuten.isEmpty()) {
-        _currentKana = origHandakuten;
-        emit syllableReady(_currentKana, true);
-        return true;
-    }
-
-    const QString origSmallKana = reverseLookup(smallKanaMap(), _currentKana);
-    if (!origSmallKana.isEmpty()) {
-        _currentKana = origSmallKana;
+    if (!original.isEmpty()) {
+        _currentKana = original;
+        _lastModifier = LastModifier::None;
         emit syllableReady(_currentKana, true);
         return true;
     }
 
     // Clear lone kana
     _currentKana.clear();
+    _lastModifier = LastModifier::None;
     emit syllableCleared();
     return true;
 }
@@ -148,6 +163,7 @@ void KanaComposer::reset()
 {
     if (!_currentKana.isEmpty()) {
         _currentKana.clear();
+        _lastModifier = LastModifier::None;
         emit syllableCleared();
     }
 }

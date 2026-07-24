@@ -217,7 +217,7 @@ void TestTranslations::sourceContextMatchesRuntimeTranslationLookup()
     // "QKeyboardWidget" and its <message><source> text must match one of
     // those exact capitalized strings.
     static const QStringList kLocales = {QStringLiteral("de"), QStringLiteral("es"), QStringLiteral("fr"),
-                                          QStringLiteral("ja"), QStringLiteral("ru")};
+                                         QStringLiteral("ja"), QStringLiteral("ru")};
 
     for (const QString &localeSuffix : kLocales) {
         const ParsedTs ts = parseTsFile(i18nFilePath(localeSuffix));
