@@ -8,5 +8,6 @@
     <qresource prefix="/layouts">
         <file alias="en.json">layouts/en.json</file>
         <file alias="ko.json">layouts/ko.json</file>
+        <file alias="schema/keyboard-layout.schema.json">layouts/schema/keyboard-layout.schema.json</file>
     </qresource>
 </RCC>

@@ -122,8 +122,17 @@ KeyboardLayout KeyboardLayout::fromJson(const QByteArray &json, QString *errorMe
     }
 
     const QJsonObject root = document.object();
+    if (!root.contains(QStringLiteral("locale")) || !root.value(QStringLiteral("locale")).isString() ||
+        root.value(QStringLiteral("locale")).toString().isEmpty()) {
+        if (errorMessage) *errorMessage = QStringLiteral("layout must declare a non-empty 'locale'");
+        return KeyboardLayout();
+    }
     layout._locale = root.value(QStringLiteral("locale")).toString();
 
+    if (!root.contains(QStringLiteral("pages")) || !root.value(QStringLiteral("pages")).isArray()) {
+        if (errorMessage) *errorMessage = QStringLiteral("layout must declare a 'pages' array");
+        return KeyboardLayout();
+    }
     const QJsonArray pagesArray = root.value(QStringLiteral("pages")).toArray();
     if (pagesArray.isEmpty()) {
         if (errorMessage) *errorMessage = QStringLiteral("layout must declare at least one page");
