@@ -116,7 +116,7 @@ bool KanaComposer::backspace()
     if (!isComposing()) return false;
 
     // Reverse dakuten
-    const QString origDakuten = dakutenMap().key(_currentKana);
+    const QString origDakuten = reverseLookup(dakutenMap(), _currentKana);
     if (!origDakuten.isEmpty()) {
         _currentKana = origDakuten;
         emit syllableReady(_currentKana, true);
@@ -124,9 +124,16 @@ bool KanaComposer::backspace()
     }
 
     // Reverse handakuten
-    const QString origHandakuten = handakutenMap().key(_currentKana);
+    const QString origHandakuten = reverseLookup(handakutenMap(), _currentKana);
     if (!origHandakuten.isEmpty()) {
         _currentKana = origHandakuten;
+        emit syllableReady(_currentKana, true);
+        return true;
+    }
+
+    const QString origSmallKana = reverseLookup(smallKanaMap(), _currentKana);
+    if (!origSmallKana.isEmpty()) {
+        _currentKana = origSmallKana;
         emit syllableReady(_currentKana, true);
         return true;
     }
