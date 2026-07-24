@@ -17,6 +17,8 @@ private slots:
     void backspaceReversesModifiers();
     void backspaceClearsLoneKana();
     void resetClearsState();
+    void feedEmptyOrUnsupportedModifiersReturnsFalse();
+    void backspaceReversesHandakutenAndIdleReturnsFalse();
 };
 
 void TestKanaComposer::feedsKanaAndEmitsSignal()
@@ -97,8 +99,38 @@ void TestKanaComposer::resetClearsState()
     composer.feed(QStringLiteral("あ"));
     QVERIFY(composer.isComposing());
 
+    QSignalSpy spy(&composer, &KanaComposer::syllableCleared);
     composer.reset();
     QVERIFY(!composer.isComposing());
+    QCOMPARE(spy.count(), 1);
+}
+
+void TestKanaComposer::feedEmptyOrUnsupportedModifiersReturnsFalse()
+{
+    KanaComposer composer;
+    QVERIFY(!composer.feed(QString()));
+    QVERIFY(!composer.feed(QStringLiteral("゛")));
+    QVERIFY(!composer.feed(QStringLiteral("゜")));
+    QVERIFY(!composer.feed(QStringLiteral("小")));
+
+    composer.feed(QStringLiteral("あ"));
+    QVERIFY(!composer.feed(QStringLiteral("゛")));
+    QVERIFY(!composer.feed(QStringLiteral("゜")));
+}
+
+void TestKanaComposer::backspaceReversesHandakutenAndIdleReturnsFalse()
+{
+    KanaComposer composer;
+    QVERIFY(!composer.backspace());
+
+    composer.feed(QStringLiteral("は"));
+    composer.feed(QStringLiteral("゜"));
+
+    QSignalSpy spy(&composer, &KanaComposer::syllableReady);
+    QVERIFY(composer.backspace());
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.at(0).at(0).toString(), QStringLiteral("は"));
+    QCOMPARE(spy.at(0).at(1).toBool(), true);
 }
 
 QTEST_GUILESS_MAIN(TestKanaComposer)

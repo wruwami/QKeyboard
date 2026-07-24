@@ -328,7 +328,11 @@ void HangulComposer::commit()
 
 void HangulComposer::reset()
 {
+    const bool wasComposing = isComposing();
     commit();
+    if (wasComposing) {
+        emit syllableCleared();
+    }
 }
 
 bool HangulComposer::isComposing() const
