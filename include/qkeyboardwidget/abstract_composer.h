@@ -14,10 +14,7 @@ class AbstractComposer : public QObject
     Q_OBJECT
 
 public:
-    explicit AbstractComposer(QObject *parent = nullptr)
-        : QObject(parent)
-    {
-    }
+    explicit AbstractComposer(QObject *parent = nullptr);
     ~AbstractComposer() override = default;
 
     /**
@@ -55,6 +52,10 @@ signals:
      */
     void syllableCleared();
 };
+
+inline AbstractComposer::AbstractComposer(QObject *parent) : QObject(parent)
+{
+}
 
 } // namespace qkw
 
