@@ -649,7 +649,7 @@ void TestHangulComposer::explicitResetClearsState()
     composer.reset();
     QVERIFY(!composer.isComposing());
     QCOMPARE(readySpy.count(), 0);
-    QCOMPARE(clearedSpy.count(), 0);
+    QCOMPARE(clearedSpy.count(), 1);
 }
 
 void TestHangulComposer::explicitResetOnIdleComposerIsANoOp()

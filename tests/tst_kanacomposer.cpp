@@ -30,7 +30,7 @@ private slots:
     void alternateSmallKanaGlyphAppliesSameAsCanonical();
     void feedingNewKanaReplacesPreviousComposingState();
     void backspaceReversesHandakuten();
-    void backspaceAfterSmallKanaToggleClearsInsteadOfReverting();
+    void backspaceAfterSmallKanaToggleRestoresNormalKana();
     void emptyStringFeedReturnsFalseAndPreservesState();
     void resetWhileIdleIsANoOp();
 };
@@ -247,12 +247,10 @@ void TestKanaComposer::backspaceReversesHandakuten()
     QVERIFY(composer.isComposing());
 }
 
-void TestKanaComposer::backspaceAfterSmallKanaToggleClearsInsteadOfReverting()
+void TestKanaComposer::backspaceAfterSmallKanaToggleRestoresNormalKana()
 {
-    // Unlike dakuten/handakuten, backspace() has no reverse lookup for the
-    // small-kana map, so backspacing after a small-kana toggle clears the
-    // whole composing character rather than reverting to the large form.
-    // This pins down the current (asymmetric) behavior.
+    // Backspace after a small-kana toggle restores the normal (large) form,
+    // just like it does for dakuten/handakuten modifiers.
     KanaComposer composer;
     composer.feed(QStringLiteral("つ"));
     composer.feed(QStringLiteral("小")); // "っ"
@@ -260,9 +258,10 @@ void TestKanaComposer::backspaceAfterSmallKanaToggleClearsInsteadOfReverting()
     QSignalSpy readySpy(&composer, &KanaComposer::syllableReady);
     QSignalSpy clearedSpy(&composer, &KanaComposer::syllableCleared);
     QVERIFY(composer.backspace());
-    QCOMPARE(readySpy.count(), 0);
-    QCOMPARE(clearedSpy.count(), 1);
-    QVERIFY(!composer.isComposing());
+    QCOMPARE(readySpy.count(), 1);
+    QCOMPARE(readySpy.at(0).at(0).toString(), QStringLiteral("つ"));
+    QCOMPARE(readySpy.at(0).at(1).toBool(), true);
+    QVERIFY(composer.isComposing());
 }
 
 void TestKanaComposer::emptyStringFeedReturnsFalseAndPreservesState()

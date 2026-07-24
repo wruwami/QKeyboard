@@ -2,13 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="de">
 <context>
-    <name>qkw::KeyboardController</name>
+    <name>QKeyboardWidget</name>
     <message>
-        <source>space</source>
-        <translation>Leer</translation>
+        <source>Space</source>
+        <translation>Leertaste</translation>
     </message>
     <message>
-        <source>enter</source>
+        <source>Enter</source>
         <translation>Eingabe</translation>
     </message>
 </context>

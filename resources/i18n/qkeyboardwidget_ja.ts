@@ -2,14 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja">
 <context>
-    <name>qkw::KeyboardController</name>
+    <name>QKeyboardWidget</name>
     <message>
-        <source>space</source>
+        <source>Space</source>
         <translation>空白</translation>
     </message>
     <message>
-        <source>enter</source>
-        <translation>確定</translation>
+        <source>Enter</source>
+        <translation>改行</translation>
     </message>
 </context>
 </TS>

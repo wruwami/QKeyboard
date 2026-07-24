@@ -171,10 +171,12 @@ void TestTranslations::hasNonEmptySpaceAndEnterTranslations()
     const ParsedTs ts = parseTsFile(i18nFilePath(localeSuffix));
     QVERIFY(ts.ok);
 
-    const QString spaceTranslation = translationFor(ts, QStringLiteral("space"));
-    const QString enterTranslation = translationFor(ts, QStringLiteral("enter"));
-    QVERIFY2(!spaceTranslation.isEmpty(), qPrintable(QStringLiteral("missing 'space' translation for '%1'").arg(localeSuffix)));
-    QVERIFY2(!enterTranslation.isEmpty(), qPrintable(QStringLiteral("missing 'enter' translation for '%1'").arg(localeSuffix)));
+    const QString spaceTranslation = translationFor(ts, QStringLiteral("Space"));
+    const QString enterTranslation = translationFor(ts, QStringLiteral("Enter"));
+    QVERIFY2(!spaceTranslation.isEmpty(),
+             qPrintable(QStringLiteral("missing 'Space' translation for '%1'").arg(localeSuffix)));
+    QVERIFY2(!enterTranslation.isEmpty(),
+             qPrintable(QStringLiteral("missing 'Enter' translation for '%1'").arg(localeSuffix)));
 }
 
 void TestTranslations::translationTextDiffersFromEnglishSource_data()
@@ -214,15 +216,6 @@ void TestTranslations::sourceContextMatchesRuntimeTranslationLookup()
     // found at runtime, a .ts file's <context><name> must be
     // "QKeyboardWidget" and its <message><source> text must match one of
     // those exact capitalized strings.
-    //
-    // The five new-locale .ts files added by this PR instead use context
-    // "qkw::KeyboardController" and lowercase sources "space"/"enter",
-    // which QCoreApplication::translate() will never match - these
-    // translations are unreachable at runtime as currently written. This is
-    // flagged as an expected failure (rather than a hard failure) to record
-    // the mismatch without blocking the build; removing the QEXPECT_FAIL
-    // once the .ts files (or the lookup context/source strings) are fixed
-    // to agree with each other should turn each check below green.
     static const QStringList kLocales = {QStringLiteral("de"), QStringLiteral("es"), QStringLiteral("fr"),
                                           QStringLiteral("ja"), QStringLiteral("ru")};
 
@@ -230,17 +223,9 @@ void TestTranslations::sourceContextMatchesRuntimeTranslationLookup()
         const ParsedTs ts = parseTsFile(i18nFilePath(localeSuffix));
         QVERIFY(ts.ok);
 
-        QEXPECT_FAIL("", qPrintable(QStringLiteral("'%1' context '%2' does not match the runtime lookup context "
-                                                    "'QKeyboardWidget'")
-                                         .arg(localeSuffix, ts.contextName)),
-                     Continue);
         QCOMPARE(ts.contextName, QStringLiteral("QKeyboardWidget"));
 
         const bool hasCapitalizedSpaceSource = !translationFor(ts, QStringLiteral("Space")).isEmpty();
-        QEXPECT_FAIL("", qPrintable(QStringLiteral("'%1' has no source text 'Space' (only lowercase 'space'), so "
-                                                    "it will never be matched by QCoreApplication::translate()")
-                                         .arg(localeSuffix)),
-                     Continue);
         QVERIFY(hasCapitalizedSpaceSource);
     }
 }
