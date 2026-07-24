@@ -62,16 +62,6 @@ const QMap<QString, QString> &smallKanaMap()
     return map;
 }
 
-QString reverseLookup(const QMap<QString, QString> &map, const QString &val)
-{
-    for (auto it = map.begin(); it != map.end(); ++it) {
-        if (it.value() == val) {
-            return it.key();
-        }
-    }
-    return QString();
-}
-
 } // namespace
 
 KanaComposer::KanaComposer(QObject *parent) : AbstractComposer(parent)
@@ -126,7 +116,7 @@ bool KanaComposer::backspace()
     if (!isComposing()) return false;
 
     // Reverse dakuten
-    const QString origDakuten = reverseLookup(dakutenMap(), _currentKana);
+    const QString origDakuten = dakutenMap().key(_currentKana);
     if (!origDakuten.isEmpty()) {
         _currentKana = origDakuten;
         emit syllableReady(_currentKana, true);
@@ -134,7 +124,7 @@ bool KanaComposer::backspace()
     }
 
     // Reverse handakuten
-    const QString origHandakuten = reverseLookup(handakutenMap(), _currentKana);
+    const QString origHandakuten = handakutenMap().key(_currentKana);
     if (!origHandakuten.isEmpty()) {
         _currentKana = origHandakuten;
         emit syllableReady(_currentKana, true);
