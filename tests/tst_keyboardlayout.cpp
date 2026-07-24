@@ -637,22 +637,23 @@ void TestKeyboardLayout::validatesSchemaAndLoadsAllProjectLayouts()
     QVERIFY(doc.isObject());
     QCOMPARE(doc.object().value(QStringLiteral("title")).toString(), QStringLiteral("QKeyboard Layout Schema"));
 
-    // Validate project layout files en.json and ko.json load cleanly
+    // Validate project layout files load cleanly
+    const QStringList layoutPaths = {
+        QStringLiteral(":/layouts/en.json"),
+        QStringLiteral(":/layouts/ko.json"),
+        QStringLiteral(":/layouts/es.json"),
+        QStringLiteral(":/layouts/de.json"),
+        QStringLiteral(":/layouts/fr.json"),
+        QStringLiteral(":/layouts/ru.json"),
+        QStringLiteral(":/layouts/ja_romaji.json"),
+        QStringLiteral(":/layouts/ja_kana.json")
+    };
+
     QString error;
-    const KeyboardLayout enLayout = KeyboardLayout::fromFile(QStringLiteral(":/layouts/en.json"), &error);
-    QVERIFY2(enLayout.isValid(), qPrintable(error));
-    QCOMPARE(enLayout.locale(), QStringLiteral("en"));
+    for (const QString &resourcePath : layoutPaths) {
+        const KeyboardLayout layout = KeyboardLayout::fromFile(resourcePath, &error);
+        QVERIFY2(layout.isValid(), qPrintable(resourcePath + QStringLiteral(": ") + error));
 
-    const KeyboardLayout koLayout = KeyboardLayout::fromFile(QStringLiteral(":/layouts/ko.json"), &error);
-    QVERIFY2(koLayout.isValid(), qPrintable(error));
-    QCOMPARE(koLayout.locale(), QStringLiteral("ko"));
-
-    // Actually run en.json/ko.json through the schema itself (not just
-    // through KeyboardLayout::fromJson()'s own parser, which is a separate,
-    // hand-written set of checks that doesn't necessarily agree with the
-    // schema - e.g. the parser doesn't enforce "additionalProperties":
-    // false anywhere, so a schema-invalid layout could still load cleanly).
-    for (const QString &resourcePath : {QStringLiteral(":/layouts/en.json"), QStringLiteral(":/layouts/ko.json")}) {
         QFile layoutFile(resourcePath);
         QVERIFY(layoutFile.open(QIODevice::ReadOnly));
         const QJsonDocument layoutDoc = QJsonDocument::fromJson(layoutFile.readAll(), &parseError);

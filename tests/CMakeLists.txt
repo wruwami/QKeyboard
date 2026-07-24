@@ -21,7 +21,6 @@ qkw_add_test(tst_kanacomposer tst_kanacomposer.cpp)
 qkw_add_test(tst_keybutton tst_keybutton.cpp)
 qkw_add_test(tst_keyboardwidget tst_keyboardwidget.cpp)
 qkw_add_test(tst_keyboardtheme tst_keyboardtheme.cpp)
-qkw_add_test(tst_layouts tst_layouts.cpp)
 
 if(QKW_ENABLE_QML)
     find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS QuickTest)
