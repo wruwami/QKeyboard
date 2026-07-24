@@ -50,10 +50,18 @@ jobs:
         run: |
           files=$(find src include tests examples -name '*.cpp' -o -name '*.h')
           clang-format -i $files
-          if ! git diff --quiet -- $files; then
+          # Diff/add the whole directories rather than re-using the
+          # unquoted $files word list here: this project's filenames never
+          # contain spaces, but if that ever changed, splitting $files on
+          # whitespace could silently miss a changed file in this check
+          # (git add/diff still working file-by-file for clang-format
+          # itself above is fine either way, since a missed word there
+          # would just mean that file wasn't reformatted, not a silent
+          # false "nothing changed").
+          if ! git diff --quiet -- src include tests examples; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add $files
+            git add src include tests examples
             git commit -m "style: apply clang-format"
             git push origin HEAD:${{ github.head_ref || github.ref_name }}
           fi
