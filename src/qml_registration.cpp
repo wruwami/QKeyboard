@@ -1,11 +1,11 @@
-#include "qkeyboardwidget/qml_registration.h"
+#include "qkeyboard/qml_registration.h"
 
 #ifdef QKW_ENABLE_QML
 
 #include <QtQml/qqml.h>
 
-#include "qkeyboardwidget/keyboard_controller.h"
-#include "qkeyboardwidget/keyboard_theme.h"
+#include "qkeyboard/keyboard_controller.h"
+#include "qkeyboard/keyboard_theme.h"
 
 namespace qkw {
 

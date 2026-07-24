@@ -3,6 +3,8 @@
 #include <QWidget>
 #include <QVector>
 
+#include "qkeyboard/qkw_export.h"
+
 class QStackedWidget;
 class QGridLayout;
 
@@ -16,7 +18,7 @@ class KeyButton;
 // KeyButton) per KeyboardLayout page and swaps the visible one when the
 // controller's current page changes; nothing here parses JSON or knows
 // typing semantics, that all lives in KeyboardController.
-class KeyboardWidget : public QWidget
+class QKW_EXPORT KeyboardWidget : public QWidget
 {
     Q_OBJECT
 
@@ -24,8 +26,11 @@ public:
     explicit KeyboardWidget(QWidget *parent = nullptr);
     ~KeyboardWidget() override;
 
-    // Both are owned by this widget and created empty; call
-    // controller()->loadFile(...) and mutate theme() to configure them.
+    // Both are owned by this widget and already usable as constructed: the
+    // controller starts with KeyboardController::Locale::English loaded and
+    // theme() has its own built-in colors/font - call
+    // controller()->setLocale(...)/loadFile(...) and mutate theme() only to
+    // customize away from those defaults.
     KeyboardController *controller() const;
     KeyboardTheme *theme() const;
 

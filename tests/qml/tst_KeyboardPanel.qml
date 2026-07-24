@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import QtTest 1.0
-import QKeyboardWidget 1.0
+import QKeyboard 1.0
 
 TestCase {
     id: testCase
@@ -28,7 +28,7 @@ TestCase {
         return result
     }
 
-    function initTestCase() {
+    function loadBaselineLayout() {
         const json = JSON.stringify({
             locale: "en",
             pages: [ { id: "lower", rows: [
@@ -45,6 +45,18 @@ TestCase {
         }, 3000, "keys did not finish being created in time")
     }
 
+    function initTestCase() {
+        loadBaselineLayout()
+    }
+
+    // Some test functions (the icon ones below) load their own
+    // single-key layout into the shared controller/panel; restore the
+    // 3-key baseline afterward so later tests aren't affected by
+    // whichever test happened to run before them.
+    function cleanup() {
+        loadBaselineLayout()
+    }
+
     function test_rendersEveryKeyOnEveryRow() {
         // Regression test for #24: an outer Repeater delegate shadowing the
         // injected modelData role made the inner Repeater's model resolve to
@@ -54,6 +66,70 @@ TestCase {
         compare(keys[0].keyData.text, "a")
         compare(keys[1].keyData.text, "b")
         compare(keys[2].keyData.text, "c")
+    }
+
+    // Image is the only direct child of KeyboardKey with a "source"
+    // property; Text and MouseArea don't have one, so this distinguishes it
+    // without relying on declaration order.
+    function findIconAndLabel(key) {
+        let icon = null
+        let label = null
+        for (let i = 0; i < key.children.length; ++i) {
+            const child = key.children[i]
+            if (typeof child.source !== "undefined") icon = child
+            else if (typeof child.text !== "undefined") label = child
+        }
+        return { icon: icon, label: label }
+    }
+
+    function test_iconWithRealResourcePathLoadsSuccessfully() {
+        // Regression test for #78: a bare Qt-resource-style icon path (the
+        // same format KeyDefinition::toVariantMap()/the real layout JSON
+        // emits, e.g. resources/layouts/en.json's shift key) failed to load via
+        // Image.source, which needs an explicit "qrc:" URL scheme rather
+        // than the bare ":" prefix QIcon (used by the QWidget view) accepts
+        // directly. Using the real compiled-in resource path here, not a
+        // hand-crafted "qrc:/..." value, so this actually exercises the
+        // conversion. Loaded through the real controller/panel (not a
+        // synthetic KeyboardKey instance) so the key is properly parented
+        // and shown, matching how the bug actually manifested.
+        const json = JSON.stringify({
+            locale: "en",
+            pages: [ { id: "lower", rows: [
+                [ { type: "backspace", icon: ":/qkeyboard/icons/backspace.svg" } ]
+            ] } ]
+        })
+        verify(controller.loadJson(json))
+        tryVerify(function () { return findKeyboardKeys(panel).length === 1 })
+        const found = findIconAndLabel(findKeyboardKeys(panel)[0])
+        verify(found.icon !== null)
+        tryCompare(found.icon, "status", Image.Ready)
+    }
+
+    function test_iconThatFailsToLoadFallsBackToLabel() {
+        // Compounding bug from #78: the label Text's visibility only checked
+        // whether an icon *path* was present, not whether it actually
+        // loaded, so a broken icon path showed neither the icon nor a
+        // fallback letter - a completely blank key. Asserting on the key's
+        // labelShouldBeVisible property rather than the label Text's own
+        // "visible" - see the comment on KeyboardKey.qml's
+        // labelShouldBeVisible property for why (a Qt Quick Test TestCase
+        // quirk, not a production concern: manually verified in the real
+        // qml_example app that the label Text itself does become visible).
+        const json = JSON.stringify({
+            locale: "en",
+            pages: [ { id: "lower", rows: [
+                [ { type: "backspace", icon: ":/qkeyboard/icons/does-not-exist.svg" } ]
+            ] } ]
+        })
+        verify(controller.loadJson(json))
+        tryVerify(function () { return findKeyboardKeys(panel).length === 1 })
+        const key = findKeyboardKeys(panel)[0]
+        const found = findIconAndLabel(key)
+        verify(found.icon !== null)
+        verify(found.label !== null)
+        tryCompare(found.icon, "status", Image.Error)
+        tryVerify(function () { return key.labelShouldBeVisible === true })
     }
 
     function test_clickForwardsRowAndColumnToController() {

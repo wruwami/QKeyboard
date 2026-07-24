@@ -1,9 +1,9 @@
 #include <QtTest>
 
-#include "qkeyboardwidget/key_button.h"
-#include "qkeyboardwidget/keyboard_controller.h"
-#include "qkeyboardwidget/keyboard_theme.h"
-#include "qkeyboardwidget/keyboard_widget.h"
+#include "qkeyboard/key_button.h"
+#include "qkeyboard/keyboard_controller.h"
+#include "qkeyboard/keyboard_theme.h"
+#include "qkeyboard/keyboard_widget.h"
 
 using namespace qkw;
 
@@ -36,14 +36,25 @@ class TestKeyboardWidget : public QObject
 {
     Q_OBJECT
 private slots:
+    void constructedWithDefaultLocaleAlreadyShowingButtons();
     void buildsOneButtonPerKeyAcrossAllPages();
     void accentsShiftAndSwitchKeysOnly();
     void rebuildDoesNotCrashOnReload();
     void invalidLayoutKeepsPreviousButtons();
-    void firstLoadInvalidLeavesNoButtons();
     void themeChangeRerendersExistingButtons();
-    void showCurrentPageIsANoOpWithoutAValidLayout();
 };
+
+void TestKeyboardWidget::constructedWithDefaultLocaleAlreadyShowingButtons()
+{
+    // A freshly constructed widget already has KeyboardController's default
+    // (Locale::English) layout loaded and rendered - no explicit
+    // controller()->loadFile()/loadJson() call needed to see a working
+    // keyboard.
+    KeyboardWidget widget;
+    QVERIFY(widget.controller()->isValid());
+    QCOMPARE(widget.controller()->locale(), QStringLiteral("en"));
+    QVERIFY(!widget.findChildren<KeyButton *>().isEmpty());
+}
 
 void TestKeyboardWidget::buildsOneButtonPerKeyAcrossAllPages()
 {
@@ -102,17 +113,6 @@ void TestKeyboardWidget::invalidLayoutKeepsPreviousButtons()
     QVERIFY(!widget.controller()->errorString().isEmpty());
 }
 
-void TestKeyboardWidget::firstLoadInvalidLeavesNoButtons()
-{
-    // Unlike invalidLayoutKeepsPreviousButtons above, this is the widget's
-    // very first load attempt: there's no previously-valid layout to fall
-    // back on, so the controller is genuinely invalid and rebuildPages()
-    // must take its early-return path without crashing.
-    KeyboardWidget widget;
-    QVERIFY(!widget.controller()->loadJson(QByteArrayLiteral("not json")));
-    QCOMPARE(widget.findChildren<KeyButton *>().size(), 0);
-}
-
 void TestKeyboardWidget::themeChangeRerendersExistingButtons()
 {
     KeyboardWidget widget;
@@ -126,19 +126,6 @@ void TestKeyboardWidget::themeChangeRerendersExistingButtons()
 
     widget.theme()->setKeyColor(newColor);
     QVERIFY(charButton->styleSheet().contains(newColor.name(QColor::HexArgb), Qt::CaseInsensitive));
-}
-
-void TestKeyboardWidget::showCurrentPageIsANoOpWithoutAValidLayout()
-{
-    // showCurrentPage()'s "!_controller->isValid()" guard is defensive:
-    // KeyboardController::setCurrentPageIndex() requires a valid layout
-    // before it will ever emit currentPageChanged(), so nothing in the
-    // public API can reach this branch. Invoke the private slot directly
-    // via the meta-object system to exercise it without crashing.
-    KeyboardWidget widget;
-    QVERIFY(!widget.controller()->isValid());
-    QVERIFY(QMetaObject::invokeMethod(&widget, "showCurrentPage"));
-    QCOMPARE(widget.findChildren<KeyButton *>().size(), 0);
 }
 
 QTEST_MAIN(TestKeyboardWidget)

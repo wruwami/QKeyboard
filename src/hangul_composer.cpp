@@ -1,4 +1,4 @@
-#include "qkeyboardwidget/hangul_composer.h"
+#include "qkeyboard/hangul_composer.h"
 
 namespace qkw {
 
@@ -7,7 +7,7 @@ namespace {
 // Hangul Compatibility Jamo (U+3131..U+3163), in the fixed order used by the
 // standard Unicode Hangul syllable composition formula:
 //   syllable = 0xAC00 + (choseongIndex * 21 + jungseongIndex) * 28 + jongseongIndex
-// This is the same block layouts/ko.json's "char" keys emit one at a time.
+// This is the same block resources/layouts/ko.json's "char" keys emit one at a time.
 const QString kChoseong = QStringLiteral("ㄱㄲㄴㄷㄸㄹㅁㅂ"
                                          "ㅃㅅㅆㅇㅈㅉㅊㅋ"
                                          "ㅌㅍㅎ");
@@ -175,7 +175,7 @@ int decomposeCompoundJungseong(int jungseongIndex)
 
 } // namespace
 
-HangulComposer::HangulComposer(QObject *parent) : QObject(parent), _cho(-1), _jung(-1), _jong(0)
+HangulComposer::HangulComposer(QObject *parent) : AbstractComposer(parent), _cho(-1), _jung(-1), _jong(0)
 {
 }
 
@@ -324,6 +324,15 @@ void HangulComposer::commit()
     _cho = -1;
     _jung = -1;
     _jong = 0;
+}
+
+void HangulComposer::reset()
+{
+    const bool wasComposing = isComposing();
+    commit();
+    if (wasComposing) {
+        emit syllableCleared();
+    }
 }
 
 bool HangulComposer::isComposing() const

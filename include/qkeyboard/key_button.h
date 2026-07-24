@@ -2,6 +2,8 @@
 
 #include <QPushButton>
 
+#include "qkeyboard/qkw_export.h"
+
 namespace qkw {
 
 class KeyboardTheme;
@@ -10,7 +12,7 @@ class KeyboardTheme;
 // resize, and appearance (colors, corner radius, font) comes entirely from
 // a KeyboardTheme rather than being hardcoded, so the whole keyboard can be
 // re-skinned by swapping/mutating one theme object.
-class KeyButton : public QPushButton
+class QKW_EXPORT KeyButton : public QPushButton
 {
     Q_OBJECT
 

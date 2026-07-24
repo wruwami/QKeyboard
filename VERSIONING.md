@@ -4,14 +4,14 @@ QKeyboard follows [Semantic Versioning 2.0.0](https://semver.org/):
 `MAJOR.MINOR.PATCH`.
 
 The single source of truth for the current version is
-`project(QKeyboardWidget VERSION X.Y.Z ...)` in the top-level
+`project(QKeyboard VERSION X.Y.Z ...)` in the top-level
 `CMakeLists.txt`. Nothing else (README, tags, packaging metadata) should
 hardcode a version separately from it.
 
 ## Current status: 0.1.0 (pre-1.0)
 
 The project is pre-1.0: the public API (headers under
-`include/qkeyboardwidget/`, the `Q_PROPERTY`/`Q_INVOKABLE` surface, the QML
+`include/qkeyboard/`, the `Q_PROPERTY`/`Q_INVOKABLE` surface, the QML
 types in `qml/`, and the `layouts/*.json` schema) is **not yet stable** and
 may change in a MINOR bump. Per the SemVer spec, `0.x.y` gives no
 compatibility guarantee — treat it accordingly until 1.0.0.

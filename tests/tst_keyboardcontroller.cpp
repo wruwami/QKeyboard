@@ -1,7 +1,8 @@
 #include <QtTest>
 #include <QSignalSpy>
+#include <QTemporaryFile>
 
-#include "qkeyboardwidget/keyboard_controller.h"
+#include "qkeyboard/keyboard_controller.h"
 
 using namespace qkw;
 
@@ -41,6 +42,10 @@ class TestKeyboardController : public QObject
     Q_OBJECT
 
 private slots:
+    // Default locale
+    void constructedWithEnglishLocaleByDefault();
+    void setLocaleSwitchesToKorean();
+
     // Loading
     void loadsValidJson();
     void invalidJsonReportsError();
@@ -48,6 +53,7 @@ private slots:
     void reloadingJsonResetsToFirstPage();
     void setSourceTriggersLoad();
     void setSourceWithBadPathEmitsLoadFailedNotSourceChanged();
+    void loadFileSwitchesBetweenBundledAndExternalCustomLayout();
 
     // Signal emissions
     void emitsCharacterEnteredForCharKey();
@@ -70,13 +76,42 @@ private slots:
 
     // Boundary / safety
     void activateKeyAtOutOfRangeIsIgnored();
-    void activateKeyAtOnInvalidControllerIsIgnored();
 
     // New tests for issue #82
     void resolveLabelTranslatesControlKeys();
     void behaviorOnLoadFailure();
     void activateKeyAtEmitsAllActionSignals();
 };
+
+// ---------------------------------------------------------------------------
+// Default locale
+// ---------------------------------------------------------------------------
+
+void TestKeyboardController::constructedWithEnglishLocaleByDefault()
+{
+    // No loadFile()/loadJson()/setLocale() call: a freshly constructed
+    // controller is already usable, with Locale::English's bundled layout
+    // loaded (the whole point of having a default is not needing to set one
+    // explicitly for the common case).
+    KeyboardController controller;
+    QVERIFY(controller.isValid());
+    QCOMPARE(controller.locale(), QStringLiteral("en"));
+    QCOMPARE(controller.source(), QStringLiteral(":/layouts/en.json"));
+    QVERIFY(controller.pageCount() > 0);
+    QVERIFY(!controller.rows().isEmpty());
+}
+
+void TestKeyboardController::setLocaleSwitchesToKorean()
+{
+    KeyboardController controller;
+    QSignalSpy layoutSpy(&controller, &KeyboardController::layoutChanged);
+
+    QVERIFY(controller.setLocale(KeyboardController::Locale::Korean));
+    QVERIFY(controller.isValid());
+    QCOMPARE(controller.locale(), QStringLiteral("ko"));
+    QCOMPARE(controller.source(), QStringLiteral(":/layouts/ko.json"));
+    QCOMPARE(layoutSpy.count(), 1);
+}
 
 // ---------------------------------------------------------------------------
 // Loading
@@ -97,7 +132,10 @@ void TestKeyboardController::invalidJsonReportsError()
 {
     KeyboardController controller;
     QVERIFY(!controller.loadJson(QByteArrayLiteral("not json")));
-    QVERIFY(!controller.isValid());
+    // Leaves the default-constructed controller's prior (valid) layout in
+    // place - see invalidJsonEmitsLoadFailedNotSourceChanged() below for the
+    // full "leaves prior state" contract.
+    QVERIFY(controller.isValid());
     QVERIFY(!controller.errorString().isEmpty());
 }
 
@@ -145,20 +183,20 @@ void TestKeyboardController::reloadingJsonResetsToFirstPage()
 
 void TestKeyboardController::setSourceTriggersLoad()
 {
-    Q_INIT_RESOURCE(qkeyboardwidget);
-
     KeyboardController controller;
-    // source property starts empty and setting it to the same value is a no-op.
-    QVERIFY(controller.source().isEmpty());
+    // A default-constructed controller already has Locale::English's
+    // resource path as its source.
+    QCOMPARE(controller.source(), QStringLiteral(":/layouts/en.json"));
 
     QSignalSpy layoutSpy(&controller, &KeyboardController::layoutChanged);
-    // Setting a valid path should load it and emit layoutChanged.
-    controller.setSource(QStringLiteral(":/layouts/en.json"));
+    // Setting a different valid path should load it and emit layoutChanged.
+    controller.setSource(QStringLiteral(":/layouts/ko.json"));
     QVERIFY(controller.isValid());
+    QCOMPARE(controller.source(), QStringLiteral(":/layouts/ko.json"));
     QCOMPARE(layoutSpy.count(), 1);
 
     // Setting the same path again must be a no-op (no redundant signals).
-    controller.setSource(QStringLiteral(":/layouts/en.json"));
+    controller.setSource(QStringLiteral(":/layouts/ko.json"));
     QCOMPARE(layoutSpy.count(), 1);
 }
 
@@ -166,13 +204,10 @@ void TestKeyboardController::setSourceWithBadPathEmitsLoadFailedNotSourceChanged
 {
     // Issue #47: setSource() is the Q_PROPERTY WRITE function, so it can
     // only be called from QML/setProperty() as a fire-and-forget void — a
-    // failed write must still be observable somehow, via loadFailed(). Set
-    // a valid source first so the failure below has real prior state
+    // failed write must still be observable somehow, via loadFailed(). A
+    // default-constructed controller already has real prior state
     // (source()/valid()) to (not) clobber.
-    Q_INIT_RESOURCE(qkeyboardwidget);
-
     KeyboardController controller;
-    controller.setSource(QStringLiteral(":/layouts/en.json"));
     QVERIFY(controller.isValid());
 
     QSignalSpy failedSpy(&controller, &KeyboardController::loadFailed);
@@ -190,6 +225,47 @@ void TestKeyboardController::setSourceWithBadPathEmitsLoadFailedNotSourceChanged
     // The previously-loaded layout and source must still be intact.
     QVERIFY(controller.isValid());
     QCOMPARE(controller.source(), QStringLiteral(":/layouts/en.json"));
+}
+
+void TestKeyboardController::loadFileSwitchesBetweenBundledAndExternalCustomLayout()
+{
+    // Issue #94: loadFile()/setSource() must work identically for a bundled
+    // qrc layout and a real filesystem path, so a host app can override the
+    // stock layouts with its own custom JSON at runtime, then switch back.
+    QTemporaryFile customFile;
+    QVERIFY(customFile.open());
+    customFile.write(R"({
+        "locale": "custom",
+        "pages": [
+            { "id": "lower", "rows": [ [ { "type": "char", "text": "z" } ] ] }
+        ]
+    })");
+    customFile.close();
+
+    KeyboardController controller;
+    QCOMPARE(controller.locale(), QStringLiteral("en"));
+    QCOMPARE(controller.source(), QStringLiteral(":/layouts/en.json"));
+
+    // Bundled -> external filesystem override.
+    QVERIFY(controller.loadFile(customFile.fileName()));
+    QVERIFY(controller.isValid());
+    QCOMPARE(controller.locale(), QStringLiteral("custom"));
+    QCOMPARE(controller.source(), customFile.fileName());
+    QCOMPARE(controller.pageCount(), 1);
+    QCOMPARE(controller.rows().first().toList().first().toMap().value(QStringLiteral("text")).toString(),
+             QStringLiteral("z"));
+
+    // External override -> back to a different bundled resource.
+    QVERIFY(controller.setLocale(KeyboardController::Locale::Korean));
+    QVERIFY(controller.isValid());
+    QCOMPARE(controller.locale(), QStringLiteral("ko"));
+    QCOMPARE(controller.source(), QStringLiteral(":/layouts/ko.json"));
+
+    // Bundled -> external override again, to confirm the switch isn't
+    // one-directional.
+    QVERIFY(controller.loadFile(customFile.fileName()));
+    QCOMPARE(controller.locale(), QStringLiteral("custom"));
+    QCOMPARE(controller.source(), customFile.fileName());
 }
 
 // ---------------------------------------------------------------------------
@@ -397,15 +473,6 @@ void TestKeyboardController::activateKeyAtOutOfRangeIsIgnored()
     QCOMPARE(bsSpy.count(), 0);
 }
 
-void TestKeyboardController::activateKeyAtOnInvalidControllerIsIgnored()
-{
-    KeyboardController controller; // no layout loaded
-
-    QSignalSpy charSpy(&controller, &KeyboardController::characterEntered);
-    controller.activateKeyAt(0, 0);
-    QCOMPARE(charSpy.count(), 0);
-}
-
 void TestKeyboardController::resolveLabelTranslatesControlKeys()
 {
     const QByteArray json = R"({
@@ -482,22 +549,22 @@ void TestKeyboardController::activateKeyAtEmitsAllActionSignals()
     QSignalSpy pageSpy(&controller, &KeyboardController::currentPageChanged);
 
     // Row 0 on page 0 ("lower"):
-    // Col 0: "a" (Char), Col 1: Backspace, Col 2: Enter, Col 3: Space, Col 4: Shift -> "upper"
+    // Col 0: "a" (Char), Col 1: Shift -> "upper", Col 2: Backspace, Col 3: Enter, Col 4: Space
     controller.activateKeyAt(0, 0); // char 'a'
     QCOMPARE(charSpy.count(), 1);
     QCOMPARE(charSpy.at(0).at(0).toString(), QStringLiteral("a"));
 
-    controller.activateKeyAt(0, 1); // backspace
+    controller.activateKeyAt(0, 2); // backspace
     QCOMPARE(bsSpy.count(), 1);
 
-    controller.activateKeyAt(0, 2); // enter
+    controller.activateKeyAt(0, 3); // enter
     QCOMPARE(enterSpy.count(), 1);
 
-    controller.activateKeyAt(0, 3); // space
+    controller.activateKeyAt(0, 4); // space
     QCOMPARE(charSpy.count(), 2);
     QCOMPARE(charSpy.at(1).at(0).toString(), QStringLiteral(" "));
 
-    controller.activateKeyAt(0, 4); // shift (switches to "upper")
+    controller.activateKeyAt(0, 1); // shift (switches to "upper")
     QCOMPARE(pageSpy.count(), 1);
     QCOMPARE(controller.currentPageId(), QStringLiteral("upper"));
 }

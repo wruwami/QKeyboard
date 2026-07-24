@@ -3,19 +3,20 @@
 #include <QString>
 #include <QVector>
 
-#include "qkeyboardwidget/key_definition.h"
+#include "qkeyboard/key_definition.h"
+#include "qkeyboard/qkw_export.h"
 
 class QIODevice;
 
 namespace qkw {
 
-struct KeyboardPage
+struct QKW_EXPORT KeyboardPage
 {
     QString id;
     QVector<QVector<KeyDefinition>> rows;
 };
 
-// Parses the qkeyboardwidget layout JSON schema:
+// Parses the qkeyboard layout JSON schema:
 //
 // {
 //   "locale": "en",
@@ -28,7 +29,7 @@ struct KeyboardPage
 // This is a from-scratch schema (pages of self-describing key objects)
 // rather than the original project's parallel string-array + modifier-map
 // design, so each key fully describes its own behavior in place.
-class KeyboardLayout
+class QKW_EXPORT KeyboardLayout
 {
 public:
     KeyboardLayout() = default;

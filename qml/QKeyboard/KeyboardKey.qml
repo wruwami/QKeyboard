@@ -1,5 +1,5 @@
 import QtQuick 2.0
-import QKeyboardWidget 1.0
+import QKeyboard 1.0
 
 // A single key rendered from the {row, column, action, text, icon, span}
 // map produced by KeyboardController.rows. Purely presentational: it emits
@@ -18,6 +18,18 @@ Rectangle {
     // matching the KeyAction enum: Character=0 Backspace=1 Enter=2 Space=3
     // Shift=4 Switch=5.
     readonly property bool isAccent: keyData && (keyData.action === 4 || keyData.action === 5)
+
+    readonly property bool hasIcon: !!(keyData && keyData.icon)
+    // Whether keyLabel should show its fallback text: no icon at all, or an
+    // icon that was given but failed to load (issue #78). A plain root-level
+    // property (not keyLabel.visible itself) so it stays observable from a
+    // regression test even when this delegate sits under an ancestor Qt
+    // Quick considers not-visible - such as Qt Quick Test's TestCase, which
+    // stops propagating further changes to a not-visible item's own
+    // "visible" property as a rendering optimization. Real host
+    // applications don't have that ancestor, so keyLabel.visible (bound to
+    // this below) updates normally for them.
+    readonly property bool labelShouldBeVisible: !hasIcon || keyIcon.status === Image.Error
 
     radius: theme ? theme.cornerRadius : 6
     // Instant color swap on press, matching KeyButton's stylesheet-based
@@ -39,9 +51,14 @@ Rectangle {
     onHeightChanged: keyLabel.fitFont()
 
     Image {
-        visible: keyData && keyData.icon
+        id: keyIcon
+        // keyData.icon is a bare Qt-resource path (":/...", the same string
+        // KeyButton's QIcon(iconPath) uses directly in the QWidget view) -
+        // Image.source is a QML url property and only recognizes it with an
+        // explicit "qrc:" scheme prepended (issue #78).
+        visible: status === Image.Ready
         anchors.centerIn: parent
-        source: keyData ? keyData.icon : ""
+        source: root.hasIcon ? "qrc" + keyData.icon : ""
         // Matches KeyButton::fitIconToButton()'s 40%-of-the-smaller-dimension
         // rule in the QWidget view (issue #44 point 2).
         width: Math.min(parent.width, parent.height) * 0.4
@@ -51,9 +68,11 @@ Rectangle {
 
     Text {
         id: keyLabel
-        // Show label text only when there is no icon. When both are present
-        // the icon takes precedence (matches KeyButton behaviour in QWidget).
-        visible: !(keyData && keyData.icon)
+        // Show label text whenever there is no icon to show - including
+        // when an icon path was given but failed to load, so a broken icon
+        // still falls back to something visible instead of a blank key
+        // (issue #78).
+        visible: root.labelShouldBeVisible
         anchors.centerIn: parent
         text: keyData ? keyData.text : ""
         color: theme ? theme.textColor : "white"
