@@ -28,7 +28,7 @@
           { "type": "char", "text": "l" }
         ],
         [
-          { "type": "shift", "target": "upper", "span": 1.5 },
+          { "type": "shift", "target": "upper", "span": 2 },
           { "type": "char", "text": "z" },
           { "type": "char", "text": "x" },
           { "type": "char", "text": "c" },
@@ -36,14 +36,14 @@
           { "type": "char", "text": "b" },
           { "type": "char", "text": "n" },
           { "type": "char", "text": "m" },
-          { "type": "backspace", "span": 1.5 }
+          { "type": "backspace", "span": 2 }
         ],
         [
-          { "type": "switch", "target": "symbols", "label": "?123", "span": 1.5 },
+          { "type": "switch", "target": "symbols", "labelId": "symbols", "span": 2 },
           { "type": "char", "text": "、" },
-          { "type": "space", "span": 5.0 },
+          { "type": "space", "span": 5 },
           { "type": "char", "text": "。" },
-          { "type": "enter", "span": 1.5 }
+          { "type": "enter", "span": 2 }
         ]
       ]
     },
@@ -74,7 +74,7 @@
           { "type": "char", "text": "L" }
         ],
         [
-          { "type": "shift", "target": "lower", "span": 1.5 },
+          { "type": "shift", "target": "lower", "span": 2 },
           { "type": "char", "text": "Z" },
           { "type": "char", "text": "X" },
           { "type": "char", "text": "C" },
@@ -82,14 +82,14 @@
           { "type": "char", "text": "B" },
           { "type": "char", "text": "N" },
           { "type": "char", "text": "M" },
-          { "type": "backspace", "span": 1.5 }
+          { "type": "backspace", "span": 2 }
         ],
         [
-          { "type": "switch", "target": "symbols", "label": "?123", "span": 1.5 },
+          { "type": "switch", "target": "symbols", "labelId": "symbols", "span": 2 },
           { "type": "char", "text": "、" },
-          { "type": "space", "span": 5.0 },
+          { "type": "space", "span": 5 },
           { "type": "char", "text": "。" },
-          { "type": "enter", "span": 1.5 }
+          { "type": "enter", "span": 2 }
         ]
       ]
     },
@@ -109,9 +109,9 @@
           { "type": "char", "text": "0" }
         ],
         [
-          { "type": "char", "text": "¥" },
+          { "type": "char", "text": "@" },
           { "type": "char", "text": "#" },
-          { "type": "char", "text": "$" },
+          { "type": "char", "text": "¥" },
           { "type": "char", "text": "%" },
           { "type": "char", "text": "&" },
           { "type": "char", "text": "-" },
@@ -120,22 +120,19 @@
           { "type": "char", "text": ")" }
         ],
         [
-          { "type": "switch", "target": "lower", "label": "abc", "span": 1.5 },
-          { "type": "char", "text": "*" },
-          { "type": "char", "text": "\"" },
-          { "type": "char", "text": "'" },
-          { "type": "char", "text": ":" },
-          { "type": "char", "text": ";" },
-          { "type": "char", "text": "!" },
-          { "type": "char", "text": "?" },
-          { "type": "backspace", "span": 1.5 }
+          { "type": "switch", "target": "lower", "labelId": "letters", "span": 2 },
+          { "type": "char", "text": "ー" },
+          { "type": "char", "text": "～" },
+          { "type": "char", "text": "「" },
+          { "type": "char", "text": "」" },
+          { "type": "backspace", "span": 2 }
         ],
         [
-          { "type": "switch", "target": "lower", "label": "abc", "span": 1.5 },
+          { "type": "switch", "target": "lower", "labelId": "letters", "span": 2 },
           { "type": "char", "text": "、" },
-          { "type": "space", "span": 5.0 },
+          { "type": "space", "span": 5 },
           { "type": "char", "text": "。" },
-          { "type": "enter", "span": 1.5 }
+          { "type": "enter", "span": 2 }
         ]
       ]
     }

@@ -26,11 +26,11 @@
           { "type": "backspace" }
         ],
         [
-          { "type": "switch", "target": "symbols", "label": "?123", "span": 1.0 },
+          { "type": "switch", "target": "symbols", "labelId": "symbols", "span": 1 },
           { "type": "char", "text": "、" },
-          { "type": "space", "span": 2.0 },
+          { "type": "space", "span": 2 },
           { "type": "char", "text": "。" },
-          { "type": "enter", "span": 1.0 }
+          { "type": "enter", "span": 1 }
         ]
       ]
     },
@@ -52,18 +52,18 @@
           { "type": "char", "text": "0" }
         ],
         [
-          { "type": "switch", "target": "lower", "label": "かな", "span": 1.0 },
+          { "type": "switch", "target": "lower", "labelId": "letters", "span": 1 },
           { "type": "char", "text": "!" },
           { "type": "char", "text": "?" },
           { "type": "char", "text": "ー" },
-          { "type": "backspace", "span": 1.0 }
+          { "type": "backspace", "span": 1 }
         ],
         [
-          { "type": "switch", "target": "lower", "label": "かな", "span": 1.0 },
+          { "type": "switch", "target": "lower", "labelId": "letters", "span": 1 },
           { "type": "char", "text": "、" },
-          { "type": "space", "span": 2.0 },
+          { "type": "space", "span": 2 },
           { "type": "char", "text": "。" },
-          { "type": "enter", "span": 1.0 }
+          { "type": "enter", "span": 1 }
         ]
       ]
     }

@@ -29,7 +29,7 @@
           { "type": "char", "text": "m" }
         ],
         [
-          { "type": "shift", "target": "upper", "span": 1.5 },
+          { "type": "shift", "target": "upper", "span": 2 },
           { "type": "char", "text": "w" },
           { "type": "char", "text": "x" },
           { "type": "char", "text": "c" },
@@ -38,14 +38,14 @@
           { "type": "char", "text": "n" },
           { "type": "char", "text": "é" },
           { "type": "char", "text": "è" },
-          { "type": "backspace", "span": 1.5 }
+          { "type": "backspace", "span": 2 }
         ],
         [
-          { "type": "switch", "target": "symbols", "label": "?123", "span": 1.5 },
-          { "type": "char", "text": "à" },
-          { "type": "space", "span": 5.0 },
-          { "type": "char", "text": "ç" },
-          { "type": "enter", "span": 1.5 }
+          { "type": "switch", "target": "symbols", "labelId": "symbols", "span": 2 },
+          { "type": "char", "text": "," },
+          { "type": "space", "span": 5 },
+          { "type": "char", "text": "." },
+          { "type": "enter", "span": 2 }
         ]
       ]
     },
@@ -77,7 +77,7 @@
           { "type": "char", "text": "M" }
         ],
         [
-          { "type": "shift", "target": "lower", "span": 1.5 },
+          { "type": "shift", "target": "lower", "span": 2 },
           { "type": "char", "text": "W" },
           { "type": "char", "text": "X" },
           { "type": "char", "text": "C" },
@@ -86,14 +86,14 @@
           { "type": "char", "text": "N" },
           { "type": "char", "text": "É" },
           { "type": "char", "text": "È" },
-          { "type": "backspace", "span": 1.5 }
+          { "type": "backspace", "span": 2 }
         ],
         [
-          { "type": "switch", "target": "symbols", "label": "?123", "span": 1.5 },
-          { "type": "char", "text": "À" },
-          { "type": "space", "span": 5.0 },
-          { "type": "char", "text": "Ç" },
-          { "type": "enter", "span": 1.5 }
+          { "type": "switch", "target": "symbols", "labelId": "symbols", "span": 2 },
+          { "type": "char", "text": "ç" },
+          { "type": "space", "span": 5 },
+          { "type": "char", "text": "à" },
+          { "type": "enter", "span": 2 }
         ]
       ]
     },
@@ -124,21 +124,20 @@
           { "type": "char", "text": ")" }
         ],
         [
-          { "type": "switch", "target": "lower", "label": "abc", "span": 1.5 },
-          { "type": "char", "text": "ê" },
-          { "type": "char", "text": "ë" },
-          { "type": "char", "text": "î" },
-          { "type": "char", "text": "ï" },
-          { "type": "char", "text": "ô" },
+          { "type": "switch", "target": "lower", "labelId": "letters", "span": 2 },
+          { "type": "char", "text": "à" },
+          { "type": "char", "text": "ç" },
           { "type": "char", "text": "ù" },
-          { "type": "backspace", "span": 1.5 }
+          { "type": "char", "text": "ô" },
+          { "type": "char", "text": "ê" },
+          { "type": "backspace", "span": 2 }
         ],
         [
-          { "type": "switch", "target": "lower", "label": "abc", "span": 1.5 },
-          { "type": "char", "text": "," },
-          { "type": "space", "span": 5.0 },
-          { "type": "char", "text": "." },
-          { "type": "enter", "span": 1.5 }
+          { "type": "switch", "target": "lower", "labelId": "letters", "span": 2 },
+          { "type": "char", "text": "'" },
+          { "type": "space", "span": 5 },
+          { "type": "char", "text": "-" },
+          { "type": "enter", "span": 2 }
         ]
       ]
     }

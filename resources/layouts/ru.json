@@ -32,7 +32,7 @@
           { "type": "char", "text": "э" }
         ],
         [
-          { "type": "shift", "target": "upper", "span": 1.5 },
+          { "type": "shift", "target": "upper", "span": 2 },
           { "type": "char", "text": "я" },
           { "type": "char", "text": "ч" },
           { "type": "char", "text": "с" },
@@ -42,14 +42,14 @@
           { "type": "char", "text": "ь" },
           { "type": "char", "text": "б" },
           { "type": "char", "text": "ю" },
-          { "type": "backspace", "span": 1.5 }
+          { "type": "backspace", "span": 2 }
         ],
         [
-          { "type": "switch", "target": "symbols", "label": "?123", "span": 1.5 },
-          { "type": "char", "text": "ё" },
-          { "type": "space", "span": 6.0 },
+          { "type": "switch", "target": "symbols", "labelId": "symbols", "span": 2 },
+          { "type": "char", "text": "," },
+          { "type": "space", "span": 6 },
           { "type": "char", "text": "." },
-          { "type": "enter", "span": 1.5 }
+          { "type": "enter", "span": 2 }
         ]
       ]
     },
@@ -84,7 +84,7 @@
           { "type": "char", "text": "Э" }
         ],
         [
-          { "type": "shift", "target": "lower", "span": 1.5 },
+          { "type": "shift", "target": "lower", "span": 2 },
           { "type": "char", "text": "Я" },
           { "type": "char", "text": "Ч" },
           { "type": "char", "text": "С" },
@@ -94,14 +94,14 @@
           { "type": "char", "text": "Ь" },
           { "type": "char", "text": "Б" },
           { "type": "char", "text": "Ю" },
-          { "type": "backspace", "span": 1.5 }
+          { "type": "backspace", "span": 2 }
         ],
         [
-          { "type": "switch", "target": "symbols", "label": "?123", "span": 1.5 },
-          { "type": "char", "text": "Ё" },
-          { "type": "space", "span": 6.0 },
+          { "type": "switch", "target": "symbols", "labelId": "symbols", "span": 2 },
+          { "type": "char", "text": "," },
+          { "type": "space", "span": 6 },
           { "type": "char", "text": "." },
-          { "type": "enter", "span": 1.5 }
+          { "type": "enter", "span": 2 }
         ]
       ]
     },
@@ -132,22 +132,18 @@
           { "type": "char", "text": ")" }
         ],
         [
-          { "type": "switch", "target": "lower", "label": "авг", "span": 1.5 },
-          { "type": "char", "text": "*" },
-          { "type": "char", "text": "\"" },
-          { "type": "char", "text": "'" },
-          { "type": "char", "text": ":" },
-          { "type": "char", "text": ";" },
-          { "type": "char", "text": "!" },
-          { "type": "char", "text": "?" },
-          { "type": "backspace", "span": 1.5 }
+          { "type": "switch", "target": "lower", "labelId": "letters", "span": 2 },
+          { "type": "char", "text": "ё" },
+          { "type": "char", "text": "Ё" },
+          { "type": "char", "text": "№" },
+          { "type": "backspace", "span": 2 }
         ],
         [
-          { "type": "switch", "target": "lower", "label": "авг", "span": 1.5 },
+          { "type": "switch", "target": "lower", "labelId": "letters", "span": 2 },
           { "type": "char", "text": "," },
-          { "type": "space", "span": 5.0 },
+          { "type": "space", "span": 5 },
           { "type": "char", "text": "." },
-          { "type": "enter", "span": 1.5 }
+          { "type": "enter", "span": 2 }
         ]
       ]
     }
