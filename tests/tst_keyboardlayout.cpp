@@ -646,8 +646,7 @@ void TestKeyboardLayout::validatesSchemaAndLoadsAllProjectLayouts()
         QStringLiteral(":/layouts/fr.json"),
         QStringLiteral(":/layouts/ru.json"),
         QStringLiteral(":/layouts/ja_romaji.json"),
-        QStringLiteral(":/layouts/ja_kana.json"),
-    };
+        QStringLiteral(":/layouts/ja_kana.json")};
 
     QString error;
     for (const QString &resourcePath : layoutPaths) {
