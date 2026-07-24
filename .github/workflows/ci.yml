@@ -13,12 +13,20 @@ jobs:
     name: clang-format + cppcheck
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       security-events: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # actions/checkout's default ref for a pull_request event is the
+          # synthetic refs/pull/N/merge commit, which isn't a real branch -
+          # pushing a fix there would go nowhere. Check out the PR's actual
+          # head branch (falling back to the pushed branch for `push`
+          # events, where github.head_ref is unset) so the commit below has
+          # somewhere real to land.
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Install clang-format and cppcheck
         run: sudo apt-get update && sudo apt-get install -y clang-format cppcheck
@@ -26,10 +34,29 @@ jobs:
       # Formatting is config-driven (.clang-format) rather than a fixed
       # tool version's defaults, so this stays stable across clang-format
       # releases. Scans the same source set cppcheck below does.
-      - name: clang-format --dry-run
+      #
+      # Auto-fixes in place and pushes the result instead of just failing
+      # the build: clang-format is deterministic given .clang-format, so
+      # there's no judgment call for a human reviewer to make here - only
+      # failing and waiting for someone to notice, run `clang-format -i`
+      # locally, and push again is a pure round-trip for a mechanical fix.
+      # Pushing a commit here re-triggers this workflow, but that second
+      # run finds nothing left to fix and doesn't push again, so it's
+      # self-terminating. Only works for same-repo branches/PRs - a fork
+      # PR's GITHUB_TOKEN can't push back to the fork, so the push step
+      # below fails closed (correctly still blocking the check) rather
+      # than silently skipping enforcement.
+      - name: clang-format (auto-fix and commit)
         run: |
           files=$(find src include tests examples -name '*.cpp' -o -name '*.h')
-          clang-format --dry-run --Werror $files
+          clang-format -i $files
+          if ! git diff --quiet -- $files; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add $files
+            git commit -m "style: apply clang-format"
+            git push origin HEAD:${{ github.head_ref || github.ref_name }}
+          fi
 
       # --enable=warning,style,performance,portability without
       # unusedFunction/missingIncludeSystem (see .cppcheck-suppressions for
