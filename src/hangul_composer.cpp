@@ -326,6 +326,11 @@ void HangulComposer::commit()
     _jong = 0;
 }
 
+void HangulComposer::reset()
+{
+    commit();
+}
+
 bool HangulComposer::isComposing() const
 {
     return _cho != -1;

@@ -1,0 +1,155 @@
+{
+  "locale": "ru",
+  "pages": [
+    {
+      "id": "lower",
+      "rows": [
+        [
+          { "type": "char", "text": "й" },
+          { "type": "char", "text": "ц" },
+          { "type": "char", "text": "у" },
+          { "type": "char", "text": "к" },
+          { "type": "char", "text": "е" },
+          { "type": "char", "text": "н" },
+          { "type": "char", "text": "г" },
+          { "type": "char", "text": "ш" },
+          { "type": "char", "text": "щ" },
+          { "type": "char", "text": "з" },
+          { "type": "char", "text": "х" },
+          { "type": "char", "text": "ъ" }
+        ],
+        [
+          { "type": "char", "text": "ф" },
+          { "type": "char", "text": "ы" },
+          { "type": "char", "text": "в" },
+          { "type": "char", "text": "а" },
+          { "type": "char", "text": "п" },
+          { "type": "char", "text": "р" },
+          { "type": "char", "text": "о" },
+          { "type": "char", "text": "л" },
+          { "type": "char", "text": "д" },
+          { "type": "char", "text": "ж" },
+          { "type": "char", "text": "э" }
+        ],
+        [
+          { "type": "shift", "target": "upper", "span": 1.5 },
+          { "type": "char", "text": "я" },
+          { "type": "char", "text": "ч" },
+          { "type": "char", "text": "с" },
+          { "type": "char", "text": "м" },
+          { "type": "char", "text": "и" },
+          { "type": "char", "text": "т" },
+          { "type": "char", "text": "ь" },
+          { "type": "char", "text": "б" },
+          { "type": "char", "text": "ю" },
+          { "type": "backspace", "span": 1.5 }
+        ],
+        [
+          { "type": "switch", "target": "symbols", "label": "?123", "span": 1.5 },
+          { "type": "char", "text": "ё" },
+          { "type": "space", "span": 6.0 },
+          { "type": "char", "text": "." },
+          { "type": "enter", "span": 1.5 }
+        ]
+      ]
+    },
+    {
+      "id": "upper",
+      "rows": [
+        [
+          { "type": "char", "text": "Й" },
+          { "type": "char", "text": "Ц" },
+          { "type": "char", "text": "У" },
+          { "type": "char", "text": "К" },
+          { "type": "char", "text": "Е" },
+          { "type": "char", "text": "Н" },
+          { "type": "char", "text": "Г" },
+          { "type": "char", "text": "Ш" },
+          { "type": "char", "text": "Щ" },
+          { "type": "char", "text": "З" },
+          { "type": "char", "text": "Х" },
+          { "type": "char", "text": "Ъ" }
+        ],
+        [
+          { "type": "char", "text": "Ф" },
+          { "type": "char", "text": "Ы" },
+          { "type": "char", "text": "В" },
+          { "type": "char", "text": "А" },
+          { "type": "char", "text": "П" },
+          { "type": "char", "text": "Р" },
+          { "type": "char", "text": "О" },
+          { "type": "char", "text": "Л" },
+          { "type": "char", "text": "Д" },
+          { "type": "char", "text": "Ж" },
+          { "type": "char", "text": "Э" }
+        ],
+        [
+          { "type": "shift", "target": "lower", "span": 1.5 },
+          { "type": "char", "text": "Я" },
+          { "type": "char", "text": "Ч" },
+          { "type": "char", "text": "С" },
+          { "type": "char", "text": "М" },
+          { "type": "char", "text": "И" },
+          { "type": "char", "text": "Т" },
+          { "type": "char", "text": "Ь" },
+          { "type": "char", "text": "Б" },
+          { "type": "char", "text": "Ю" },
+          { "type": "backspace", "span": 1.5 }
+        ],
+        [
+          { "type": "switch", "target": "symbols", "label": "?123", "span": 1.5 },
+          { "type": "char", "text": "Ё" },
+          { "type": "space", "span": 6.0 },
+          { "type": "char", "text": "." },
+          { "type": "enter", "span": 1.5 }
+        ]
+      ]
+    },
+    {
+      "id": "symbols",
+      "rows": [
+        [
+          { "type": "char", "text": "1" },
+          { "type": "char", "text": "2" },
+          { "type": "char", "text": "3" },
+          { "type": "char", "text": "4" },
+          { "type": "char", "text": "5" },
+          { "type": "char", "text": "6" },
+          { "type": "char", "text": "7" },
+          { "type": "char", "text": "8" },
+          { "type": "char", "text": "9" },
+          { "type": "char", "text": "0" }
+        ],
+        [
+          { "type": "char", "text": "@" },
+          { "type": "char", "text": "#" },
+          { "type": "char", "text": "₽" },
+          { "type": "char", "text": "%" },
+          { "type": "char", "text": "&" },
+          { "type": "char", "text": "-" },
+          { "type": "char", "text": "+" },
+          { "type": "char", "text": "(" },
+          { "type": "char", "text": ")" }
+        ],
+        [
+          { "type": "switch", "target": "lower", "label": "авг", "span": 1.5 },
+          { "type": "char", "text": "*" },
+          { "type": "char", "text": "\"" },
+          { "type": "char", "text": "'" },
+          { "type": "char", "text": ":" },
+          { "type": "char", "text": ";" },
+          { "type": "char", "text": "!" },
+          { "type": "char", "text": "?" },
+          { "type": "backspace", "span": 1.5 }
+        ],
+        [
+          { "type": "switch", "target": "lower", "label": "авг", "span": 1.5 },
+          { "type": "char", "text": "," },
+          { "type": "space", "span": 5.0 },
+          { "type": "char", "text": "." },
+          { "type": "enter", "span": 1.5 }
+        ]
+      ]
+    }
+  ]
+}

@@ -23,35 +23,19 @@ namespace qkw {
 // Not registered for QML: composition is a text-editing concern that belongs
 // wherever the host owns the text field, which for the QML view is host QML
 // code, not this library's KeyboardPanel.
-class QKW_EXPORT HangulComposer : public QObject
+class QKW_EXPORT HangulComposer : public AbstractComposer
 {
     Q_OBJECT
 
 public:
     explicit HangulComposer(QObject *parent = nullptr);
 
-    // Feeds one input token (normally a single character, as delivered by
-    // KeyboardController::characterEntered). Returns true if `text` was a
-    // single Hangul jamo consumed into composition — the host should not
-    // insert `text` itself, only react to syllableReady(). Returns false
-    // for anything else (multi-character text, non-jamo characters), after
-    // flushing any in-progress composition first — the host should insert
-    // `text` verbatim as it would without a composer.
-    bool feed(const QString &text);
+    bool feed(const QString &text) override;
+    bool backspace() override;
+    void reset() override;
 
-    // Handles a backspace press. Returns true if it was absorbed by
-    // decomposing in-progress state (host should not also remove a
-    // character itself — syllableReady()/syllableCleared() already reflects
-    // the result). Returns false if nothing was being composed (host should
-    // handle backspace as it would without a composer).
-    bool backspace();
-
-    // Ends any in-progress composition without changing its last emitted
-    // text, so a later feed() starts a fresh syllable. Call this before
-    // Enter, on focus-out, or whenever jamo state shouldn't carry over.
     void commit();
-
-    bool isComposing() const;
+    bool isComposing() const override;
 
 signals:
     // A composed character is ready. `replacePrevious` is true when this

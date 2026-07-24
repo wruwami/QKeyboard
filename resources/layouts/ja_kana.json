@@ -1,0 +1,71 @@
+{
+  "locale": "ja",
+  "pages": [
+    {
+      "id": "lower",
+      "rows": [
+        [
+          { "type": "char", "text": "あ" },
+          { "type": "char", "text": "か" },
+          { "type": "char", "text": "さ" },
+          { "type": "char", "text": "た" },
+          { "type": "char", "text": "な" }
+        ],
+        [
+          { "type": "char", "text": "は" },
+          { "type": "char", "text": "ま" },
+          { "type": "char", "text": "や" },
+          { "type": "char", "text": "ら" },
+          { "type": "char", "text": "わ" }
+        ],
+        [
+          { "type": "char", "text": "゛" },
+          { "type": "char", "text": "゜" },
+          { "type": "char", "text": "小" },
+          { "type": "char", "text": "ん" },
+          { "type": "backspace" }
+        ],
+        [
+          { "type": "switch", "target": "symbols", "label": "?123", "span": 1.0 },
+          { "type": "char", "text": "、" },
+          { "type": "space", "span": 2.0 },
+          { "type": "char", "text": "。" },
+          { "type": "enter", "span": 1.0 }
+        ]
+      ]
+    },
+    {
+      "id": "symbols",
+      "rows": [
+        [
+          { "type": "char", "text": "1" },
+          { "type": "char", "text": "2" },
+          { "type": "char", "text": "3" },
+          { "type": "char", "text": "4" },
+          { "type": "char", "text": "5" }
+        ],
+        [
+          { "type": "char", "text": "6" },
+          { "type": "char", "text": "7" },
+          { "type": "char", "text": "8" },
+          { "type": "char", "text": "9" },
+          { "type": "char", "text": "0" }
+        ],
+        [
+          { "type": "switch", "target": "lower", "label": "かな", "span": 1.0 },
+          { "type": "char", "text": "!" },
+          { "type": "char", "text": "?" },
+          { "type": "char", "text": "ー" },
+          { "type": "backspace", "span": 1.0 }
+        ],
+        [
+          { "type": "switch", "target": "lower", "label": "かな", "span": 1.0 },
+          { "type": "char", "text": "、" },
+          { "type": "space", "span": 2.0 },
+          { "type": "char", "text": "。" },
+          { "type": "enter", "span": 1.0 }
+        ]
+      ]
+    }
+  ]
+}
