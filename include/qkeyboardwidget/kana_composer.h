@@ -7,7 +7,8 @@
 namespace qkw {
 
 /**
- * @brief Handles Japanese Kana input transitions such as Dakuten (濁点), Handakuten (半濁点), and Small Kana (小文字) conversions.
+ * @brief Handles Japanese Kana input transitions such as Dakuten (濁点),
+ * Handakuten (半濁点), and Small Kana (小文字) conversions.
  */
 class QKW_EXPORT KanaComposer : public AbstractComposer
 {

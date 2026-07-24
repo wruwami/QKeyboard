@@ -14,7 +14,10 @@ class AbstractComposer : public QObject
     Q_OBJECT
 
 public:
-    explicit AbstractComposer(QObject *parent = nullptr) : QObject(parent) {}
+    explicit AbstractComposer(QObject *parent = nullptr)
+        : QObject(parent)
+    {
+    }
     ~AbstractComposer() override = default;
 
     /**
