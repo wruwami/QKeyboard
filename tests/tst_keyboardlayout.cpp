@@ -650,8 +650,10 @@ void TestKeyboardLayout::validatesSchemaAndLoadsAllProjectLayouts()
         {QStringLiteral(":/layouts/de.json"), QStringLiteral("de")},
         {QStringLiteral(":/layouts/fr.json"), QStringLiteral("fr")},
         {QStringLiteral(":/layouts/ru.json"), QStringLiteral("ru")},
+        {QStringLiteral(":/layouts/ja.json"), QStringLiteral("ja")},
         {QStringLiteral(":/layouts/ja_romaji.json"), QStringLiteral("ja_romaji")},
         {QStringLiteral(":/layouts/ja_kana.json"), QStringLiteral("ja_kana")},
+        {QStringLiteral(":/layouts/zh.json"), QStringLiteral("zh")},
     };
 
     QString error;

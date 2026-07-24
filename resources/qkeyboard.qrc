@@ -12,8 +12,13 @@
         <file alias="de.json">layouts/de.json</file>
         <file alias="fr.json">layouts/fr.json</file>
         <file alias="ru.json">layouts/ru.json</file>
+        <file alias="ja.json">layouts/ja.json</file>
         <file alias="ja_romaji.json">layouts/ja_romaji.json</file>
         <file alias="ja_kana.json">layouts/ja_kana.json</file>
+        <file alias="zh.json">layouts/zh.json</file>
         <file alias="schema/keyboard-layout.schema.json">layouts/schema/keyboard-layout.schema.json</file>
+    </qresource>
+    <qresource prefix="/i18n">
+        <file alias="qkeyboard_zh.qm">i18n/qkeyboard_zh.qm</file>
     </qresource>
 </RCC>

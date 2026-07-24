@@ -121,6 +121,7 @@ if(QKW_BUILD_TRANSLATIONS)
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboard_fr.ts
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboard_ru.ts
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboard_ja.ts
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboard_zh.ts
     )
 
     # English needs no .ts/.qm: QCoreApplication::translate() falls back to

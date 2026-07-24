@@ -123,6 +123,7 @@ void TestTranslations::parsesAsWellFormedTsXml_data()
     QTest::newRow("fr") << QStringLiteral("fr");
     QTest::newRow("ja") << QStringLiteral("ja");
     QTest::newRow("ru") << QStringLiteral("ru");
+    QTest::newRow("zh") << QStringLiteral("zh");
 }
 
 void TestTranslations::parsesAsWellFormedTsXml()
@@ -142,6 +143,7 @@ void TestTranslations::hasExpectedTsVersionAndLanguageAttribute_data()
     QTest::newRow("fr") << QStringLiteral("fr") << QStringLiteral("fr");
     QTest::newRow("ja") << QStringLiteral("ja") << QStringLiteral("ja");
     QTest::newRow("ru") << QStringLiteral("ru") << QStringLiteral("ru");
+    QTest::newRow("zh") << QStringLiteral("zh") << QStringLiteral("zh");
 }
 
 void TestTranslations::hasExpectedTsVersionAndLanguageAttribute()
@@ -163,6 +165,7 @@ void TestTranslations::hasNonEmptySpaceAndEnterTranslations_data()
     QTest::newRow("fr") << QStringLiteral("fr");
     QTest::newRow("ja") << QStringLiteral("ja");
     QTest::newRow("ru") << QStringLiteral("ru");
+    QTest::newRow("zh") << QStringLiteral("zh");
 }
 
 void TestTranslations::hasNonEmptySpaceAndEnterTranslations()
@@ -187,6 +190,7 @@ void TestTranslations::translationTextDiffersFromEnglishSource_data()
     QTest::newRow("fr") << QStringLiteral("fr");
     QTest::newRow("ja") << QStringLiteral("ja");
     QTest::newRow("ru") << QStringLiteral("ru");
+    QTest::newRow("zh") << QStringLiteral("zh");
 }
 
 void TestTranslations::translationTextDiffersFromEnglishSource()
@@ -217,7 +221,7 @@ void TestTranslations::sourceContextMatchesRuntimeTranslationLookup()
     // "QKeyboard" and its <message><source> text must match one of
     // those exact capitalized strings.
     static const QStringList kLocales = {QStringLiteral("de"), QStringLiteral("es"), QStringLiteral("fr"),
-                                         QStringLiteral("ja"), QStringLiteral("ru")};
+                                         QStringLiteral("ja"), QStringLiteral("ru"), QStringLiteral("zh")};
 
     for (const QString &localeSuffix : kLocales) {
         const ParsedTs ts = parseTsFile(i18nFilePath(localeSuffix));
