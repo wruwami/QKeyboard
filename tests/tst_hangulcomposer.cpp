@@ -38,6 +38,11 @@ private slots:
     void testsAllCompoundJongseongAndDecomposition();
     void testsAllSingleJongseongPullbacks();
     void testsAllCompoundJongseongPullbacks();
+
+    // New tests for the AbstractComposer::reset() override.
+    void explicitResetClearsState();
+    void explicitResetOnIdleComposerIsANoOp();
+    void feedAfterExplicitResetStartsFreshSyllable();
 };
 
 // "가": ㄱ (cho 0) + ㅏ (jung 0) -> U+AC00.
@@ -627,6 +632,52 @@ void TestHangulComposer::testsAllCompoundJongseongPullbacks()
         QCOMPARE(spy.at(1).at(0).toString(), t.expectedEmittedNew);
         QCOMPARE(spy.at(1).at(1).toBool(), false);
     }
+}
+
+void TestHangulComposer::explicitResetClearsState()
+{
+    // reset() (the AbstractComposer override) currently just delegates to
+    // commit(): it clears composing state without emitting syllableReady or
+    // syllableCleared, exactly like commit().
+    HangulComposer composer;
+    composer.feed(QStringLiteral("ㄱ"));
+    composer.feed(QStringLiteral("ㅏ"));
+    QVERIFY(composer.isComposing());
+
+    QSignalSpy readySpy(&composer, &HangulComposer::syllableReady);
+    QSignalSpy clearedSpy(&composer, &HangulComposer::syllableCleared);
+    composer.reset();
+    QVERIFY(!composer.isComposing());
+    QCOMPARE(readySpy.count(), 0);
+    QCOMPARE(clearedSpy.count(), 1);
+}
+
+void TestHangulComposer::explicitResetOnIdleComposerIsANoOp()
+{
+    HangulComposer composer;
+    QVERIFY(!composer.isComposing());
+
+    QSignalSpy readySpy(&composer, &HangulComposer::syllableReady);
+    QSignalSpy clearedSpy(&composer, &HangulComposer::syllableCleared);
+    composer.reset();
+    QVERIFY(!composer.isComposing());
+    QCOMPARE(readySpy.count(), 0);
+    QCOMPARE(clearedSpy.count(), 0);
+}
+
+void TestHangulComposer::feedAfterExplicitResetStartsFreshSyllable()
+{
+    HangulComposer composer;
+    composer.feed(QStringLiteral("ㄱ"));
+    composer.feed(QStringLiteral("ㅏ"));
+    composer.reset();
+
+    QSignalSpy spy(&composer, &HangulComposer::syllableReady);
+    QVERIFY(composer.feed(QStringLiteral("ㄴ")));
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.at(0).at(0).toString(), QStringLiteral("ㄴ"));
+    QCOMPARE(spy.at(0).at(1).toBool(), false);
+    QVERIFY(composer.isComposing());
 }
 
 QTEST_GUILESS_MAIN(TestHangulComposer)

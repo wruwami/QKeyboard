@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QString>
 
+#include "qkeyboardwidget/abstract_composer.h"
 #include "qkeyboardwidget/qkw_export.h"
 
 namespace qkw {
@@ -23,48 +24,33 @@ namespace qkw {
 // Not registered for QML: composition is a text-editing concern that belongs
 // wherever the host owns the text field, which for the QML view is host QML
 // code, not this library's KeyboardPanel.
-class QKW_EXPORT HangulComposer : public QObject
+class QKW_EXPORT HangulComposer : public AbstractComposer
 {
     Q_OBJECT
 
 public:
     explicit HangulComposer(QObject *parent = nullptr);
 
-    // Feeds one input token (normally a single character, as delivered by
-    // KeyboardController::characterEntered). Returns true if `text` was a
-    // single Hangul jamo consumed into composition — the host should not
-    // insert `text` itself, only react to syllableReady(). Returns false
-    // for anything else (multi-character text, non-jamo characters), after
-    // flushing any in-progress composition first — the host should insert
-    // `text` verbatim as it would without a composer.
-    bool feed(const QString &text);
+    bool feed(const QString &text) override;
+    bool backspace() override;
+    void reset() override;
 
-    // Handles a backspace press. Returns true if it was absorbed by
-    // decomposing in-progress state (host should not also remove a
-    // character itself — syllableReady()/syllableCleared() already reflects
-    // the result). Returns false if nothing was being composed (host should
-    // handle backspace as it would without a composer).
-    bool backspace();
-
-    // Ends any in-progress composition without changing its last emitted
-    // text, so a later feed() starts a fresh syllable. Call this before
-    // Enter, on focus-out, or whenever jamo state shouldn't carry over.
     void commit();
+    bool isComposing() const override;
 
-    bool isComposing() const;
-
-signals:
-    // A composed character is ready. `replacePrevious` is true when this
-    // updates the syllable currently being composed (the host should remove
-    // the one character it previously inserted for this composition, then
-    // insert `text`); false when it starts a brand-new character (the host
-    // should just insert `text`).
-    void syllableReady(const QString &text, bool replacePrevious);
-
-    // The in-progress composition was fully backspaced away with nothing
-    // left; the host should remove the one character it had displayed for
-    // it (there is no replacement text).
-    void syllableCleared();
+    // syllableReady(text, replacePrevious)/syllableCleared() are inherited
+    // from AbstractComposer, not redeclared here: Qt signals aren't virtual,
+    // so a same-name/same-signature redeclaration in a subclass doesn't
+    // override the base signal, it *shadows* it with a second, distinct
+    // signal - emit syllableReady(...) inside this class's own methods would
+    // then fire HangulComposer::syllableReady while code holding an
+    // AbstractComposer* (e.g. via a QSignalSpy on
+    // &AbstractComposer::syllableReady) is connected to
+    // AbstractComposer::syllableReady and would never see it. Every
+    // `&HangulComposer::syllableReady`/`&HangulComposer::syllableCleared`
+    // connection elsewhere (examples/widgets_example/main.cpp,
+    // tests/tst_hangulcomposer.cpp) still resolves correctly through
+    // inheritance without this redeclaration.
 
 private:
     QString composeCurrent() const;

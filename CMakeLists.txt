@@ -35,9 +35,11 @@ set(QKW_SOURCES
     src/key_button.cpp
     src/keyboard_widget.cpp
     src/hangul_composer.cpp
+    src/kana_composer.cpp
 )
 
 set(QKW_HEADERS
+    include/qkeyboardwidget/abstract_composer.h
     include/qkeyboardwidget/key_definition.h
     include/qkeyboardwidget/keyboard_layout.h
     include/qkeyboardwidget/keyboard_controller.h
@@ -45,6 +47,7 @@ set(QKW_HEADERS
     include/qkeyboardwidget/key_button.h
     include/qkeyboardwidget/keyboard_widget.h
     include/qkeyboardwidget/hangul_composer.h
+    include/qkeyboardwidget/kana_composer.h
 )
 
 # No explicit STATIC/SHARED: follows BUILD_SHARED_LIBS (CMake's own default
@@ -111,7 +114,14 @@ endif()
 if(QKW_BUILD_TRANSLATIONS)
     find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS LinguistTools)
 
-    set(QKW_TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboardwidget_ko.ts)
+    set(QKW_TS_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboardwidget_ko.ts
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboardwidget_es.ts
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboardwidget_de.ts
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboardwidget_fr.ts
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboardwidget_ru.ts
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboardwidget_ja.ts
+    )
 
     # English needs no .ts/.qm: QCoreApplication::translate() falls back to
     # the (English) source text whenever no translator is installed for the

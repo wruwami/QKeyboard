@@ -29,3 +29,13 @@ unmatchedSuppression
 # like Q_PROPERTY, Q_OBJECT, signals:, and slots:, and reports each as an
 # "unknown macro" error.
 unknownMacro
+
+# tst_translations.cpp's i18nFilePath() uses adjacent-string-literal
+# concatenation with the build-injected QKW_I18N_DIR macro
+# (QStringLiteral(QKW_I18N_DIR "/qkeyboardwidget_%1.ts")) - a normal,
+# valid C++ pattern (same as __FILE__ ": message"), but cppcheck's
+# QKW_I18N_DIR-defined configuration variant substitutes a placeholder
+# value it can't actually concatenate with the adjacent string literal,
+# producing a false "syntax error" purely from cppcheck's own macro
+# substitution, not a real problem in the source.
+syntaxError:tests/tst_translations.cpp
