@@ -47,23 +47,20 @@ jobs:
       # below fails closed (correctly still blocking the check) rather
       # than silently skipping enforcement.
       - name: clang-format (auto-fix and commit)
+        env:
+          # Passed through env: rather than interpolated directly into the
+          # script below, so a branch name can't be read as shell syntax
+          # (GitHub Actions script injection via untrusted ref names).
+          TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
-          files=$(find src include tests examples -name '*.cpp' -o -name '*.h')
-          clang-format -i $files
-          # Diff/add the whole directories rather than re-using the
-          # unquoted $files word list here: this project's filenames never
-          # contain spaces, but if that ever changed, splitting $files on
-          # whitespace could silently miss a changed file in this check
-          # (git add/diff still working file-by-file for clang-format
-          # itself above is fine either way, since a missed word there
-          # would just mean that file wasn't reformatted, not a silent
-          # false "nothing changed").
-          if ! git diff --quiet -- src include tests examples; then
+          mapfile -d '' files < <(find src include tests examples \( -name '*.cpp' -o -name '*.h' \) -print0)
+          clang-format -i "${files[@]}"
+          if ! git diff --quiet -- "${files[@]}"; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add src include tests examples
+            git add -- "${files[@]}"
             git commit -m "style: apply clang-format"
-            git push origin HEAD:${{ github.head_ref || github.ref_name }}
+            git push origin "HEAD:$TARGET_BRANCH"
           fi
 
       # --enable=warning,style,performance,portability without
