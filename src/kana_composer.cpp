@@ -28,8 +28,7 @@ const QMap<QString, QString> &dakutenMap()
         {QStringLiteral("ツ"), QStringLiteral("ヅ")}, {QStringLiteral("テ"), QStringLiteral("デ")},
         {QStringLiteral("ト"), QStringLiteral("ド")}, {QStringLiteral("ハ"), QStringLiteral("バ")},
         {QStringLiteral("ヒ"), QStringLiteral("ビ")}, {QStringLiteral("フ"), QStringLiteral("ブ")},
-        {QStringLiteral("ヘ"), QStringLiteral("ベ")},
-        {QStringLiteral("ホ"), QStringLiteral("ボ")}
+        {QStringLiteral("ヘ"), QStringLiteral("ベ")}, {QStringLiteral("ホ"), QStringLiteral("ボ")},
     };
     return map;
 }
@@ -41,8 +40,7 @@ const QMap<QString, QString> &handakutenMap()
         {QStringLiteral("ふ"), QStringLiteral("ぷ")}, {QStringLiteral("へ"), QStringLiteral("ぺ")},
         {QStringLiteral("ほ"), QStringLiteral("ぽ")}, {QStringLiteral("ハ"), QStringLiteral("パ")},
         {QStringLiteral("ヒ"), QStringLiteral("ピ")}, {QStringLiteral("フ"), QStringLiteral("プ")},
-        {QStringLiteral("ヘ"), QStringLiteral("ペ")},
-        {QStringLiteral("ホ"), QStringLiteral("ポ")}
+        {QStringLiteral("ヘ"), QStringLiteral("ペ")}, {QStringLiteral("ホ"), QStringLiteral("ポ")},
     };
     return map;
 }
@@ -54,14 +52,12 @@ const QMap<QString, QString> &smallKanaMap()
         {QStringLiteral("う"), QStringLiteral("ぅ")}, {QStringLiteral("え"), QStringLiteral("ぇ")},
         {QStringLiteral("お"), QStringLiteral("ぉ")}, {QStringLiteral("つ"), QStringLiteral("っ")},
         {QStringLiteral("や"), QStringLiteral("ゃ")}, {QStringLiteral("ゆ"), QStringLiteral("ゅ")},
-        {QStringLiteral("よ"), QStringLiteral("ょ")},
-        {QStringLiteral("わ"), QStringLiteral("ゎ")},
+        {QStringLiteral("よ"), QStringLiteral("ょ")}, {QStringLiteral("わ"), QStringLiteral("ゎ")},
         {QStringLiteral("ぁ"), QStringLiteral("あ")}, {QStringLiteral("ぃ"), QStringLiteral("い")},
         {QStringLiteral("ぅ"), QStringLiteral("う")}, {QStringLiteral("ぇ"), QStringLiteral("え")},
         {QStringLiteral("ぉ"), QStringLiteral("お")}, {QStringLiteral("っ"), QStringLiteral("つ")},
         {QStringLiteral("ゃ"), QStringLiteral("や")}, {QStringLiteral("ゅ"), QStringLiteral("ゆ")},
-        {QStringLiteral("ょ"), QStringLiteral("よ")},
-        {QStringLiteral("ゎ"), QStringLiteral("わ")}
+        {QStringLiteral("ょ"), QStringLiteral("よ")}, {QStringLiteral("ゎ"), QStringLiteral("わ")},
     };
     return map;
 }
