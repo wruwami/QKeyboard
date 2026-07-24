@@ -1,4 +1,4 @@
-#include "qkeyboardwidget/keyboard_layout.h"
+#include "qkeyboard/keyboard_layout.h"
 
 #include <QFile>
 #include <QIODevice>

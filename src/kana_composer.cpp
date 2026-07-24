@@ -1,4 +1,4 @@
-#include "qkeyboardwidget/kana_composer.h"
+#include "qkeyboard/kana_composer.h"
 
 #include <QMap>
 

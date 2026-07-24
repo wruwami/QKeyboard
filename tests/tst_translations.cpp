@@ -81,7 +81,7 @@ const QString &translationFor(const ParsedTs &ts, const QString &source)
 } // namespace
 
 // Covers the five new-locale translation files added by this PR:
-// resources/i18n/qkeyboardwidget_{de,es,fr,ja,ru}.ts. qkeyboardwidget_ko.ts
+// resources/i18n/qkeyboard_{de,es,fr,ja,ru}.ts. qkeyboard_ko.ts
 // predates this PR (different context/source strings) and is intentionally
 // out of scope here.
 class TestTranslations : public QObject
@@ -108,9 +108,9 @@ namespace {
 QString i18nFilePath(const QString &localeSuffix)
 {
 #ifdef QKW_I18N_DIR
-    return QStringLiteral(QKW_I18N_DIR "/qkeyboardwidget_%1.ts").arg(localeSuffix);
+    return QStringLiteral(QKW_I18N_DIR "/qkeyboard_%1.ts").arg(localeSuffix);
 #else
-    return QStringLiteral(":/i18n/qkeyboardwidget_%1.ts").arg(localeSuffix);
+    return QStringLiteral(":/i18n/qkeyboard_%1.ts").arg(localeSuffix);
 #endif
 }
 } // namespace
@@ -210,11 +210,11 @@ void TestTranslations::sourceContextMatchesRuntimeTranslationLookup()
 {
     // KeyboardController::resolveLabel() (src/keyboard_controller.cpp) looks
     // up UI strings via QCoreApplication::translate() with a fixed literal
-    // context of "QKeyboardWidget" and literal English source strings
+    // context of "QKeyboard" and literal English source strings
     // "Space" / "Enter" (capitalized) - see the "kContext" constant and the
     // translate() calls right below it. For a translation to actually be
     // found at runtime, a .ts file's <context><name> must be
-    // "QKeyboardWidget" and its <message><source> text must match one of
+    // "QKeyboard" and its <message><source> text must match one of
     // those exact capitalized strings.
     static const QStringList kLocales = {QStringLiteral("de"), QStringLiteral("es"), QStringLiteral("fr"),
                                          QStringLiteral("ja"), QStringLiteral("ru")};
@@ -223,7 +223,7 @@ void TestTranslations::sourceContextMatchesRuntimeTranslationLookup()
         const ParsedTs ts = parseTsFile(i18nFilePath(localeSuffix));
         QVERIFY(ts.ok);
 
-        QCOMPARE(ts.contextName, QStringLiteral("QKeyboardWidget"));
+        QCOMPARE(ts.contextName, QStringLiteral("QKeyboard"));
 
         const bool hasCapitalizedSpaceSource = !translationFor(ts, QStringLiteral("Space")).isEmpty();
         QVERIFY(hasCapitalizedSpaceSource);

@@ -1,4 +1,4 @@
-#include "qkeyboardwidget/keyboard_theme.h"
+#include "qkeyboard/keyboard_theme.h"
 
 namespace qkw {
 

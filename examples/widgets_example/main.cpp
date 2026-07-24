@@ -6,10 +6,10 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "qkeyboardwidget/hangul_composer.h"
-#include "qkeyboardwidget/keyboard_controller.h"
-#include "qkeyboardwidget/keyboard_theme.h"
-#include "qkeyboardwidget/keyboard_widget.h"
+#include "qkeyboard/hangul_composer.h"
+#include "qkeyboard/keyboard_controller.h"
+#include "qkeyboard/keyboard_theme.h"
+#include "qkeyboard/keyboard_widget.h"
 
 // Minimal demo: a QLineEdit driven entirely by a KeyboardWidget, with a
 // combo box that swaps the active layout (and therefore language) at

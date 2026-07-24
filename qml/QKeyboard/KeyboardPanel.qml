@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.0
-import QKeyboardWidget 1.0
+import QKeyboard 1.0
 
 // Qt Quick view for a KeyboardController. Mirrors what KeyboardWidget does
 // for QWidget apps: render whatever `controller.rows` currently holds and

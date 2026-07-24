@@ -1,5 +1,5 @@
 add_executable(qkw_qml_example main.cpp)
-target_link_libraries(qkw_qml_example PRIVATE qkw::qkeyboardwidget Qt${QT_VERSION_MAJOR}::Qml Qt${QT_VERSION_MAJOR}::Quick)
+target_link_libraries(qkw_qml_example PRIVATE qkw::qkeyboard Qt${QT_VERSION_MAJOR}::Qml Qt${QT_VERSION_MAJOR}::Quick)
 
 # For this from-source example, point the QML import path straight at the
 # library's qml/ source directory instead of a deployed install location

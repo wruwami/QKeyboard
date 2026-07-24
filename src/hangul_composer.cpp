@@ -1,4 +1,4 @@
-#include "qkeyboardwidget/hangul_composer.h"
+#include "qkeyboard/hangul_composer.h"
 
 namespace qkw {
 

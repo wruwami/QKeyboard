@@ -12,7 +12,7 @@
 # the -I include/ path we do provide.
 missingIncludeSystem
 
-# This is a library: most public API in include/qkeyboardwidget/*.h is
+# This is a library: most public API in include/qkeyboard/*.h is
 # called by consumers (examples/, tests/, or external users) outside what
 # a single-repo cppcheck run can see, and Qt's moc/signal-slot machinery
 # calls slots/signals that never appear as a direct call in source either.
@@ -32,7 +32,7 @@ unknownMacro
 
 # tst_translations.cpp's i18nFilePath() uses adjacent-string-literal
 # concatenation with the build-injected QKW_I18N_DIR macro
-# (QStringLiteral(QKW_I18N_DIR "/qkeyboardwidget_%1.ts")) - a normal,
+# (QStringLiteral(QKW_I18N_DIR "/qkeyboard_%1.ts")) - a normal,
 # valid C++ pattern (same as __FILE__ ": message"), but cppcheck's
 # QKW_I18N_DIR-defined configuration variant substitutes a placeholder
 # value it can't actually concatenate with the adjacent string literal,

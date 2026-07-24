@@ -1,9 +1,9 @@
 #include <QtTest>
 #include <QSignalSpy>
 
-#include "qkeyboardwidget/abstract_composer.h"
-#include "qkeyboardwidget/hangul_composer.h"
-#include "qkeyboardwidget/kana_composer.h"
+#include "qkeyboard/abstract_composer.h"
+#include "qkeyboard/hangul_composer.h"
+#include "qkeyboard/kana_composer.h"
 
 using namespace qkw;
 

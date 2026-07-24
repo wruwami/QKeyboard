@@ -2,7 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QUrl>
 
-#include "qkeyboardwidget/qml_registration.h"
+#include "qkeyboard/qml_registration.h"
 
 int main(int argc, char *argv[])
 {

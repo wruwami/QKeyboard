@@ -3,7 +3,7 @@
 #include <QWidget>
 #include <QVector>
 
-#include "qkeyboardwidget/qkw_export.h"
+#include "qkeyboard/qkw_export.h"
 
 class QStackedWidget;
 class QGridLayout;

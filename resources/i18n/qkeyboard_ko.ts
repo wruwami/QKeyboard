@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko_KR" sourcelanguage="en">
 <context>
-    <name>QKeyboardWidget</name>
+    <name>QKeyboard</name>
     <message>
         <source>Backspace</source>
         <extracomment>keyboard control key label</extracomment>

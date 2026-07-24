@@ -4,7 +4,7 @@
 #include <QColor>
 #include <QFont>
 
-#include "qkeyboardwidget/qkw_export.h"
+#include "qkeyboard/qkw_export.h"
 
 namespace qkw {
 

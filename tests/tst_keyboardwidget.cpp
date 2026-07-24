@@ -1,9 +1,9 @@
 #include <QtTest>
 
-#include "qkeyboardwidget/key_button.h"
-#include "qkeyboardwidget/keyboard_controller.h"
-#include "qkeyboardwidget/keyboard_theme.h"
-#include "qkeyboardwidget/keyboard_widget.h"
+#include "qkeyboard/key_button.h"
+#include "qkeyboard/keyboard_controller.h"
+#include "qkeyboard/keyboard_theme.h"
+#include "qkeyboard/keyboard_widget.h"
 
 using namespace qkw;
 

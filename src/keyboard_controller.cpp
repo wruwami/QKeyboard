@@ -1,4 +1,4 @@
-#include "qkeyboardwidget/keyboard_controller.h"
+#include "qkeyboard/keyboard_controller.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -6,13 +6,13 @@
 // Q_INIT_RESOURCE() expands to an `extern` declaration of the rcc-generated
 // (un-namespaced) initializer function and must therefore be invoked from
 // outside any C++ namespace - calling it from within `namespace qkw` would
-// instead declare and look up qkw::qInitResources_qkeyboardwidget(), which
+// instead declare and look up qkw::qInitResources_qkeyboard(), which
 // doesn't exist, and fail to link. This wrapper is the one place that calls
 // it; KeyboardController's constructor below just calls this ordinary
 // function, which has no such restriction.
 //
-// Needed because qkeyboardwidget's layouts/icons are compiled into this
-// static library's own resources/qkeyboardwidget.qrc: the linker only pulls
+// Needed because qkeyboard's layouts/icons are compiled into this
+// static library's own resources/qkeyboard.qrc: the linker only pulls
 // the generated resource-initializer object file into a consumer's binary
 // if something actually references it, so without this, a statically-linked
 // KeyboardController's own default-locale auto-load below would silently
@@ -21,7 +21,7 @@
 // do explicitly).
 static void qkwInitBundledResources()
 {
-    Q_INIT_RESOURCE(qkeyboardwidget);
+    Q_INIT_RESOURCE(qkeyboard);
 }
 
 namespace qkw {
@@ -31,7 +31,7 @@ KeyboardController::KeyboardController(QObject *parent) : QObject(parent)
     qkwInitBundledResources();
     // Only fails if the bundled resource itself is missing/corrupted (a
     // broken build/deployment, not a normal runtime condition, and not
-    // reproducible without actually shipping a broken qkeyboardwidget.qrc)
+    // reproducible without actually shipping a broken qkeyboard.qrc)
     // - isValid() and errorString() still correctly reflect that failure
     // afterward (same "leaves observable state behind" contract
     // loadFile()/loadJson() always have), but nothing could have connected
@@ -205,12 +205,12 @@ QString KeyboardController::resolveLabel(const KeyDefinition &key) const
     }
 
     // Every recognized id must appear here as a literal QCoreApplication::translate()
-    // call (fixed context "QKeyboardWidget") so that `lupdate` can discover it
+    // call (fixed context "QKeyboard") so that `lupdate` can discover it
     // statically and the translation lookup at runtime doesn't depend on how a
     // given Qt version mangles a namespaced class name into a tr() context.
     // Unknown ids fall back to whatever the layout JSON put in "labelId" so a
     // new layout still works (untranslated) without needing a code change.
-    static const char *kContext = "QKeyboardWidget";
+    static const char *kContext = "QKeyboard";
     if (labelId == QLatin1String("backspace"))
         return QCoreApplication::translate(kContext, "Backspace", "keyboard control key label");
     if (labelId == QLatin1String("enter"))

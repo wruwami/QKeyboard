@@ -1,6 +1,6 @@
 #include <QtTest>
 
-#include "qkeyboardwidget/hangul_composer.h"
+#include "qkeyboard/hangul_composer.h"
 
 using namespace qkw;
 

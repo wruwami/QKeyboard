@@ -9,16 +9,16 @@
           {"type": "char", "text": "r"}, {"type": "char", "text": "t"}, {"type": "char", "text": "y"},
           {"type": "char", "text": "u"}, {"type": "char", "text": "i"}, {"type": "char", "text": "o"},
           {"type": "char", "text": "p"},
-          {"type": "backspace", "span": 2, "icon": ":/qkeyboardwidget/icons/backspace.svg"}
+          {"type": "backspace", "span": 2, "icon": ":/qkeyboard/icons/backspace.svg"}
         ],
         [
           {"type": "char", "text": "a"}, {"type": "char", "text": "s"}, {"type": "char", "text": "d"},
           {"type": "char", "text": "f"}, {"type": "char", "text": "g"}, {"type": "char", "text": "h"},
           {"type": "char", "text": "j"}, {"type": "char", "text": "k"}, {"type": "char", "text": "l"},
-          {"type": "enter", "span": 2, "icon": ":/qkeyboardwidget/icons/enter.svg"}
+          {"type": "enter", "span": 2, "icon": ":/qkeyboard/icons/enter.svg"}
         ],
         [
-          {"type": "shift", "target": "upper", "span": 2, "icon": ":/qkeyboardwidget/icons/shift.svg"},
+          {"type": "shift", "target": "upper", "span": 2, "icon": ":/qkeyboard/icons/shift.svg"},
           {"type": "char", "text": "z"}, {"type": "char", "text": "x"}, {"type": "char", "text": "c"},
           {"type": "char", "text": "v"}, {"type": "char", "text": "b"}, {"type": "char", "text": "n"},
           {"type": "char", "text": "m"},
@@ -42,16 +42,16 @@
           {"type": "char", "text": "R"}, {"type": "char", "text": "T"}, {"type": "char", "text": "Y"},
           {"type": "char", "text": "U"}, {"type": "char", "text": "I"}, {"type": "char", "text": "O"},
           {"type": "char", "text": "P"},
-          {"type": "backspace", "span": 2, "icon": ":/qkeyboardwidget/icons/backspace.svg"}
+          {"type": "backspace", "span": 2, "icon": ":/qkeyboard/icons/backspace.svg"}
         ],
         [
           {"type": "char", "text": "A"}, {"type": "char", "text": "S"}, {"type": "char", "text": "D"},
           {"type": "char", "text": "F"}, {"type": "char", "text": "G"}, {"type": "char", "text": "H"},
           {"type": "char", "text": "J"}, {"type": "char", "text": "K"}, {"type": "char", "text": "L"},
-          {"type": "enter", "span": 2, "icon": ":/qkeyboardwidget/icons/enter.svg"}
+          {"type": "enter", "span": 2, "icon": ":/qkeyboard/icons/enter.svg"}
         ],
         [
-          {"type": "shift", "target": "lower", "span": 2, "icon": ":/qkeyboardwidget/icons/shift.svg"},
+          {"type": "shift", "target": "lower", "span": 2, "icon": ":/qkeyboard/icons/shift.svg"},
           {"type": "char", "text": "Z"}, {"type": "char", "text": "X"}, {"type": "char", "text": "C"},
           {"type": "char", "text": "V"}, {"type": "char", "text": "B"}, {"type": "char", "text": "N"},
           {"type": "char", "text": "M"},
@@ -75,13 +75,13 @@
           {"type": "char", "text": "4"}, {"type": "char", "text": "5"}, {"type": "char", "text": "6"},
           {"type": "char", "text": "7"}, {"type": "char", "text": "8"}, {"type": "char", "text": "9"},
           {"type": "char", "text": "0"},
-          {"type": "backspace", "span": 2, "icon": ":/qkeyboardwidget/icons/backspace.svg"}
+          {"type": "backspace", "span": 2, "icon": ":/qkeyboard/icons/backspace.svg"}
         ],
         [
           {"type": "char", "text": "-"}, {"type": "char", "text": "/"}, {"type": "char", "text": ":"},
           {"type": "char", "text": ";"}, {"type": "char", "text": "("}, {"type": "char", "text": ")"},
           {"type": "char", "text": "€"}, {"type": "char", "text": "&"}, {"type": "char", "text": "@"},
-          {"type": "enter", "span": 2, "icon": ":/qkeyboardwidget/icons/enter.svg"}
+          {"type": "enter", "span": 2, "icon": ":/qkeyboard/icons/enter.svg"}
         ],
         [
           {"type": "switch", "target": "symbols", "labelId": "symbols", "span": 2},
@@ -107,13 +107,13 @@
           {"type": "char", "text": "}"}, {"type": "char", "text": "#"}, {"type": "char", "text": "%"},
           {"type": "char", "text": "^"}, {"type": "char", "text": "*"}, {"type": "char", "text": "+"},
           {"type": "char", "text": "="},
-          {"type": "backspace", "span": 2, "icon": ":/qkeyboardwidget/icons/backspace.svg"}
+          {"type": "backspace", "span": 2, "icon": ":/qkeyboard/icons/backspace.svg"}
         ],
         [
           {"type": "char", "text": "_"}, {"type": "char", "text": "\\"}, {"type": "char", "text": "|"},
           {"type": "char", "text": "~"}, {"type": "char", "text": "<"}, {"type": "char", "text": ">"},
           {"type": "char", "text": "$"}, {"type": "char", "text": "@"},
-          {"type": "enter", "span": 2, "icon": ":/qkeyboardwidget/icons/enter.svg"}
+          {"type": "enter", "span": 2, "icon": ":/qkeyboard/icons/enter.svg"}
         ],
         [
           {"type": "switch", "target": "numeric", "labelId": "numbers", "span": 2},

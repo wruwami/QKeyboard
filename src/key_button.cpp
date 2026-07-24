@@ -1,5 +1,5 @@
-#include "qkeyboardwidget/key_button.h"
-#include "qkeyboardwidget/keyboard_theme.h"
+#include "qkeyboard/key_button.h"
+#include "qkeyboard/keyboard_theme.h"
 
 #include <QColor>
 #include <QFontMetrics>

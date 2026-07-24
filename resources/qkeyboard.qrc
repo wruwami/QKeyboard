@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/qkeyboardwidget/icons">
+    <qresource prefix="/qkeyboard/icons">
         <file alias="backspace.svg">../assets/icons/backspace.svg</file>
         <file alias="enter.svg">../assets/icons/enter.svg</file>
         <file alias="shift.svg">../assets/icons/shift.svg</file>

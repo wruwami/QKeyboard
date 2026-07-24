@@ -8,7 +8,7 @@
 #include <QStringList>
 #include <cmath>
 
-#include "qkeyboardwidget/keyboard_layout.h"
+#include "qkeyboard/keyboard_layout.h"
 
 using namespace qkw;
 
@@ -564,7 +564,7 @@ void TestKeyboardLayout::parsesLayoutFromDevice()
 
 void TestKeyboardLayout::parsesLayoutFromFile()
 {
-    Q_INIT_RESOURCE(qkeyboardwidget);
+    Q_INIT_RESOURCE(qkeyboard);
 
     QString error;
     const KeyboardLayout layout = KeyboardLayout::fromFile(QStringLiteral(":/layouts/en.json"), &error);
@@ -631,7 +631,7 @@ void TestKeyboardLayout::reportsErrorOnNonArrayPages()
 
 void TestKeyboardLayout::validatesSchemaAndLoadsAllProjectLayouts()
 {
-    Q_INIT_RESOURCE(qkeyboardwidget);
+    Q_INIT_RESOURCE(qkeyboard);
 
     // Validate schema file resource is valid JSON document
     QFile schemaFile(QStringLiteral(":/layouts/schema/keyboard-layout.schema.json"));
@@ -682,7 +682,7 @@ void TestKeyboardLayout::rejectsLayoutWithSchemaForbiddenExtraProperty()
     // fields it cares about), so this same layout would load without error
     // through the normal parsing path - schema validation is what actually
     // catches it.
-    Q_INIT_RESOURCE(qkeyboardwidget);
+    Q_INIT_RESOURCE(qkeyboard);
 
     QFile schemaFile(QStringLiteral(":/layouts/schema/keyboard-layout.schema.json"));
     QVERIFY(schemaFile.open(QIODevice::ReadOnly));
@@ -762,7 +762,7 @@ void TestKeyboardLayout::localeErrorTakesPrecedenceOverPagesError()
 
 void TestKeyboardLayout::schemaTopLevelRequiresLocaleAndPagesAndForbidsExtras()
 {
-    Q_INIT_RESOURCE(qkeyboardwidget);
+    Q_INIT_RESOURCE(qkeyboard);
 
     QFile schemaFile(QStringLiteral(":/layouts/schema/keyboard-layout.schema.json"));
     QVERIFY(schemaFile.open(QIODevice::ReadOnly));
@@ -791,7 +791,7 @@ void TestKeyboardLayout::schemaTopLevelRequiresLocaleAndPagesAndForbidsExtras()
 
 void TestKeyboardLayout::schemaKeyDefinitionEnumMatchesSupportedKeyTypes()
 {
-    Q_INIT_RESOURCE(qkeyboardwidget);
+    Q_INIT_RESOURCE(qkeyboard);
 
     QFile schemaFile(QStringLiteral(":/layouts/schema/keyboard-layout.schema.json"));
     QVERIFY(schemaFile.open(QIODevice::ReadOnly));
@@ -821,7 +821,7 @@ void TestKeyboardLayout::schemaKeyDefinitionEnumMatchesSupportedKeyTypes()
 
 void TestKeyboardLayout::schemaConditionalRequirementsForShiftAndSwitchKeys()
 {
-    Q_INIT_RESOURCE(qkeyboardwidget);
+    Q_INIT_RESOURCE(qkeyboard);
 
     QFile schemaFile(QStringLiteral(":/layouts/schema/keyboard-layout.schema.json"));
     QVERIFY(schemaFile.open(QIODevice::ReadOnly));
@@ -874,7 +874,7 @@ void TestKeyboardLayout::schemaConditionalRequirementsForShiftAndSwitchKeys()
 
 void TestKeyboardLayout::qrcResourceRegistersSchemaFileAlongsideLayouts()
 {
-    Q_INIT_RESOURCE(qkeyboardwidget);
+    Q_INIT_RESOURCE(qkeyboard);
 
     // The qrc change adds the schema file under the existing /layouts
     // prefix without disturbing the existing en.json / ko.json entries.
@@ -910,7 +910,7 @@ void TestKeyboardLayout::newLocaleLayoutHasExpectedLocaleAndPageIds_data()
 
 void TestKeyboardLayout::newLocaleLayoutHasExpectedLocaleAndPageIds()
 {
-    Q_INIT_RESOURCE(qkeyboardwidget);
+    Q_INIT_RESOURCE(qkeyboard);
 
     QFETCH(QString, resourcePath);
     QFETCH(QString, expectedLocale);
@@ -929,9 +929,9 @@ void TestKeyboardLayout::newLocaleLayoutHasExpectedLocaleAndPageIds()
 
 void TestKeyboardLayout::qrcResourceRegistersNewLocaleLayoutFiles()
 {
-    Q_INIT_RESOURCE(qkeyboardwidget);
+    Q_INIT_RESOURCE(qkeyboard);
 
-    // Every new-locale layout file this PR adds to resources/qkeyboardwidget.qrc
+    // Every new-locale layout file this PR adds to resources/qkeyboard.qrc
     // under the existing /layouts prefix must actually resolve as a Qt
     // resource, alongside the pre-existing en.json/ko.json entries.
     const QStringList newLayoutFiles = {

@@ -2,7 +2,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
 
 function(qkw_add_test name)
     add_executable(${name} ${ARGN})
-    target_link_libraries(${name} PRIVATE qkw::qkeyboardwidget Qt${QT_VERSION_MAJOR}::Test)
+    target_link_libraries(${name} PRIVATE qkw::qkeyboard Qt${QT_VERSION_MAJOR}::Test)
     # Qt::Widgets pulls in a Windows entry-point helper (Qt5::WinMain /
     # Qt6::EntryPointPrivate) that defaults linked executables to the
     # WIN32 GUI subsystem, which has no console attached — on Windows this
@@ -33,7 +33,7 @@ if(QKW_ENABLE_QML)
     find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS QuickTest)
 
     add_executable(tst_quick tst_quick.cpp)
-    target_link_libraries(tst_quick PRIVATE qkw::qkeyboardwidget Qt${QT_VERSION_MAJOR}::QuickTest)
+    target_link_libraries(tst_quick PRIVATE qkw::qkeyboard Qt${QT_VERSION_MAJOR}::QuickTest)
     # See qkw_add_test()'s WIN32_EXECUTABLE comment above — same reasoning.
     set_target_properties(tst_quick PROPERTIES WIN32_EXECUTABLE FALSE)
     target_compile_definitions(tst_quick PRIVATE

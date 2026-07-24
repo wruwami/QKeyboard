@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru">
+<TS version="2.1" language="fr">
 <context>
-    <name>QKeyboardWidget</name>
+    <name>QKeyboard</name>
     <message>
         <source>Space</source>
-        <translation>Пробел</translation>
+        <translation>Espace</translation>
     </message>
     <message>
         <source>Enter</source>
-        <translation>Ввод</translation>
+        <translation>Entrée</translation>
     </message>
 </context>
 </TS>
