@@ -18,7 +18,4 @@
         <file alias="zh.json">layouts/zh.json</file>
         <file alias="schema/keyboard-layout.schema.json">layouts/schema/keyboard-layout.schema.json</file>
     </qresource>
-    <qresource prefix="/i18n">
-        <file alias="qkeyboard_zh.qm">i18n/qkeyboard_zh.qm</file>
-    </qresource>
 </RCC>
