@@ -12,6 +12,7 @@ namespace qkw {
 class QKW_EXPORT KanaComposer : public AbstractComposer
 {
     Q_OBJECT
+
 public:
     explicit KanaComposer(QObject *parent = nullptr);
 

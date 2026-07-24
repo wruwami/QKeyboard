@@ -1,5 +1,5 @@
-#include <QtTest>
 #include <QFile>
+#include <QtTest>
 
 #include "qkeyboardwidget/keyboard_layout.h"
 

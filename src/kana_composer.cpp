@@ -64,7 +64,8 @@ const QMap<QString, QString> &smallKanaMap()
 
 } // namespace
 
-KanaComposer::KanaComposer(QObject *parent) : AbstractComposer(parent)
+KanaComposer::KanaComposer(QObject *parent)
+    : AbstractComposer(parent)
 {
 }
 
