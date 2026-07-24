@@ -139,7 +139,10 @@ bool KanaComposer::backspace()
 
 void KanaComposer::reset()
 {
-    _currentKana.clear();
+    if (!_currentKana.isEmpty()) {
+        _currentKana.clear();
+        emit syllableCleared();
+    }
 }
 
 bool KanaComposer::isComposing() const
