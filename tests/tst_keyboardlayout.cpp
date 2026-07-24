@@ -643,16 +643,24 @@ void TestKeyboardLayout::validatesSchemaAndLoadsAllProjectLayouts()
     QCOMPARE(doc.object().value(QStringLiteral("title")).toString(), QStringLiteral("QKeyboard Layout Schema"));
 
     // Validate project layout files load cleanly
-    QStringList layoutPaths;
-    layoutPaths << QStringLiteral(":/layouts/en.json") << QStringLiteral(":/layouts/ko.json")
-                << QStringLiteral(":/layouts/es.json") << QStringLiteral(":/layouts/de.json")
-                << QStringLiteral(":/layouts/fr.json") << QStringLiteral(":/layouts/ru.json")
-                << QStringLiteral(":/layouts/ja_romaji.json") << QStringLiteral(":/layouts/ja_kana.json");
+    const QList<QPair<QString, QString>> layoutSpecs = {
+        {QStringLiteral(":/layouts/en.json"), QStringLiteral("en")},
+        {QStringLiteral(":/layouts/ko.json"), QStringLiteral("ko")},
+        {QStringLiteral(":/layouts/es.json"), QStringLiteral("es")},
+        {QStringLiteral(":/layouts/de.json"), QStringLiteral("de")},
+        {QStringLiteral(":/layouts/fr.json"), QStringLiteral("fr")},
+        {QStringLiteral(":/layouts/ru.json"), QStringLiteral("ru")},
+        {QStringLiteral(":/layouts/ja_romaji.json"), QStringLiteral("ja_romaji")},
+        {QStringLiteral(":/layouts/ja_kana.json"), QStringLiteral("ja_kana")},
+    };
 
     QString error;
-    for (const QString &resourcePath : layoutPaths) {
+    for (const auto &spec : layoutSpecs) {
+        const QString &resourcePath = spec.first;
+        const QString &expectedLocale = spec.second;
         const KeyboardLayout layout = KeyboardLayout::fromFile(resourcePath, &error);
         QVERIFY2(layout.isValid(), qPrintable(resourcePath + QStringLiteral(": ") + error));
+        QCOMPARE(layout.locale(), expectedLocale);
 
         QFile layoutFile(resourcePath);
         QVERIFY(layoutFile.open(QIODevice::ReadOnly));
