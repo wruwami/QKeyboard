@@ -638,15 +638,14 @@ void TestKeyboardLayout::validatesSchemaAndLoadsAllProjectLayouts()
     QCOMPARE(doc.object().value(QStringLiteral("title")).toString(), QStringLiteral("QKeyboard Layout Schema"));
 
     // Validate project layout files load cleanly
-    const QStringList layoutPaths = {
-        QStringLiteral(":/layouts/en.json"),
-        QStringLiteral(":/layouts/ko.json"),
-        QStringLiteral(":/layouts/es.json"),
-        QStringLiteral(":/layouts/de.json"),
-        QStringLiteral(":/layouts/fr.json"),
-        QStringLiteral(":/layouts/ru.json"),
-        QStringLiteral(":/layouts/ja_romaji.json"),
-        QStringLiteral(":/layouts/ja_kana.json")};
+    const QStringList layoutPaths = {QStringLiteral(":/layouts/en.json"),
+                                     QStringLiteral(":/layouts/ko.json"),
+                                     QStringLiteral(":/layouts/es.json"),
+                                     QStringLiteral(":/layouts/de.json"),
+                                     QStringLiteral(":/layouts/fr.json"),
+                                     QStringLiteral(":/layouts/ru.json"),
+                                     QStringLiteral(":/layouts/ja_romaji.json"),
+                                     QStringLiteral(":/layouts/ja_kana.json")};
 
     QString error;
     for (const QString &resourcePath : layoutPaths) {
