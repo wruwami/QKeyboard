@@ -208,6 +208,7 @@ private slots:
     void newLocaleLayoutHasExpectedLocaleAndPageIds_data();
     void newLocaleLayoutHasExpectedLocaleAndPageIds();
     void qrcResourceRegistersNewLocaleLayoutFiles();
+    void jaKanaLayoutContainsHiraganaCharacters();
 };
 
 // ---------------------------------------------------------------------------
@@ -950,6 +951,36 @@ void TestKeyboardLayout::qrcResourceRegistersNewLocaleLayoutFiles()
 
     QVERIFY(QFile::exists(QStringLiteral(":/layouts/en.json")));
     QVERIFY(QFile::exists(QStringLiteral(":/layouts/ko.json")));
+}
+
+void TestKeyboardLayout::jaKanaLayoutContainsHiraganaCharacters()
+{
+    Q_INIT_RESOURCE(qkeyboard);
+
+    // Verify ja_kana.json contains expected hiragana key text on the lower page.
+    // This ensures the hiragana layout has actual Japanese characters rather
+    // than Latin characters like the romaji layouts.
+    QString error;
+    const KeyboardLayout layout = KeyboardLayout::fromFile(QStringLiteral(":/layouts/ja_kana.json"), &error);
+    QVERIFY2(layout.isValid(), qPrintable(error));
+    QCOMPARE(layout.locale(), QStringLiteral("ja_kana"));
+
+    const int lowerPageIndex = layout.indexOfPage(QStringLiteral("lower"));
+    QVERIFY(lowerPageIndex != -1);
+
+    const KeyboardPage &lowerPage = layout.pages()[lowerPageIndex];
+    QVERIFY(!lowerPage.rows.isEmpty());
+    QVERIFY(!lowerPage.rows[0].isEmpty());
+
+    // Check for representative hiragana character "あ" (a) in first row
+    bool foundHiragana = false;
+    for (const KeyDefinition &key : lowerPage.rows[0]) {
+        if (key.action == KeyAction::Character && key.text == QStringLiteral("あ")) {
+            foundHiragana = true;
+            break;
+        }
+    }
+    QVERIFY2(foundHiragana, "Expected hiragana character 'あ' in ja_kana.json lower page");
 }
 
 QTEST_GUILESS_MAIN(TestKeyboardLayout)
