@@ -3,8 +3,8 @@
 #include <QObject>
 #include <QString>
 
-#include "qkeyboardwidget/abstract_composer.h"
-#include "qkeyboardwidget/qkw_export.h"
+#include "qkeyboard/abstract_composer.h"
+#include "qkeyboard/qkw_export.h"
 
 namespace qkw {
 

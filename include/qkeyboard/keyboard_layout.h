@@ -3,8 +3,8 @@
 #include <QString>
 #include <QVector>
 
-#include "qkeyboardwidget/key_definition.h"
-#include "qkeyboardwidget/qkw_export.h"
+#include "qkeyboard/key_definition.h"
+#include "qkeyboard/qkw_export.h"
 
 class QIODevice;
 
@@ -16,7 +16,7 @@ struct QKW_EXPORT KeyboardPage
     QVector<QVector<KeyDefinition>> rows;
 };
 
-// Parses the qkeyboardwidget layout JSON schema:
+// Parses the qkeyboard layout JSON schema:
 //
 // {
 //   "locale": "en",

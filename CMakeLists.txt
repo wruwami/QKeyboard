@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(QKeyboardWidget VERSION 0.1.0 LANGUAGES CXX)
+project(QKeyboard VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -39,24 +39,24 @@ set(QKW_SOURCES
 )
 
 set(QKW_HEADERS
-    include/qkeyboardwidget/abstract_composer.h
-    include/qkeyboardwidget/key_definition.h
-    include/qkeyboardwidget/keyboard_layout.h
-    include/qkeyboardwidget/keyboard_controller.h
-    include/qkeyboardwidget/keyboard_theme.h
-    include/qkeyboardwidget/key_button.h
-    include/qkeyboardwidget/keyboard_widget.h
-    include/qkeyboardwidget/hangul_composer.h
-    include/qkeyboardwidget/kana_composer.h
+    include/qkeyboard/abstract_composer.h
+    include/qkeyboard/key_definition.h
+    include/qkeyboard/keyboard_layout.h
+    include/qkeyboard/keyboard_controller.h
+    include/qkeyboard/keyboard_theme.h
+    include/qkeyboard/key_button.h
+    include/qkeyboard/keyboard_widget.h
+    include/qkeyboard/hangul_composer.h
+    include/qkeyboard/kana_composer.h
 )
 
 # No explicit STATIC/SHARED: follows BUILD_SHARED_LIBS (CMake's own default
 # is STATIC when unset), so downstream consumers pick the link type with the
 # standard -DBUILD_SHARED_LIBS=ON/OFF rather than this project hardcoding one.
-add_library(qkeyboardwidget ${QKW_SOURCES} ${QKW_HEADERS} resources/qkeyboardwidget.qrc)
-add_library(qkw::qkeyboardwidget ALIAS qkeyboardwidget)
+add_library(qkeyboard ${QKW_SOURCES} ${QKW_HEADERS} resources/qkeyboard.qrc)
+add_library(qkw::qkeyboard ALIAS qkeyboard)
 
-target_include_directories(qkeyboardwidget PUBLIC
+target_include_directories(qkeyboard PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
@@ -70,57 +70,57 @@ target_include_directories(qkeyboardwidget PUBLIC
 # only the target's own STATIC/SHARED TYPE, resolved after add_library()
 # above.
 include(GenerateExportHeader)
-generate_export_header(qkeyboardwidget
+generate_export_header(qkeyboard
     BASE_NAME QKW
-    EXPORT_FILE_NAME "${CMAKE_CURRENT_BINARY_DIR}/include/qkeyboardwidget/qkw_export.h"
+    EXPORT_FILE_NAME "${CMAKE_CURRENT_BINARY_DIR}/include/qkeyboard/qkw_export.h"
 )
-get_target_property(QKW_LIBRARY_TYPE qkeyboardwidget TYPE)
+get_target_property(QKW_LIBRARY_TYPE qkeyboard TYPE)
 if(QKW_LIBRARY_TYPE STREQUAL "STATIC_LIBRARY")
-    target_compile_definitions(qkeyboardwidget PUBLIC QKW_STATIC_DEFINE)
+    target_compile_definitions(qkeyboard PUBLIC QKW_STATIC_DEFINE)
 endif()
-target_include_directories(qkeyboardwidget PUBLIC
+target_include_directories(qkeyboard PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(qkeyboardwidget PUBLIC Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(qkeyboard PUBLIC Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Widgets)
 
 if(QKW_ENABLE_QML)
     find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Qml Quick)
-    target_sources(qkeyboardwidget PRIVATE
+    target_sources(qkeyboard PRIVATE
         src/qml_registration.cpp
-        include/qkeyboardwidget/qml_registration.h
+        include/qkeyboard/qml_registration.h
     )
-    target_compile_definitions(qkeyboardwidget PUBLIC QKW_ENABLE_QML)
-    target_link_libraries(qkeyboardwidget PUBLIC Qt${QT_VERSION_MAJOR}::Qml Qt${QT_VERSION_MAJOR}::Quick)
+    target_compile_definitions(qkeyboard PUBLIC QKW_ENABLE_QML)
+    target_link_libraries(qkeyboard PUBLIC Qt${QT_VERSION_MAJOR}::Qml Qt${QT_VERSION_MAJOR}::Quick)
 
-    # qml/QKeyboardWidget/KeyboardKey.qml, qml/QKeyboardWidget/KeyboardPanel.qml,
-    # and the hand-written qml/QKeyboardWidget/qmldir are shipped as plain
+    # qml/QKeyboard/KeyboardKey.qml, qml/QKeyboard/KeyboardPanel.qml,
+    # and the hand-written qml/QKeyboard/qmldir are shipped as plain
     # files (not a compiled qt_add_qml_module, which is Qt6-only): the
-    # QKeyboardWidget/ subdirectory name is required by Qt's module-import
-    # resolution ("import QKeyboardWidget 1.0" looks for
-    # <import path>/QKeyboardWidget/qmldir). Host apps add qml/ (the parent
-    # of QKeyboardWidget/) to the QML import path and call
+    # QKeyboard/ subdirectory name is required by Qt's module-import
+    # resolution ("import QKeyboard 1.0" looks for
+    # <import path>/QKeyboard/qmldir). Host apps add qml/ (the parent
+    # of QKeyboard/) to the QML import path and call
     # qkw::registerQmlTypes() before loading QML that imports
-    # "QKeyboardWidget". See README.md.
-    install(DIRECTORY qml/ DESTINATION ${CMAKE_INSTALL_DATADIR}/qkeyboardwidget/qml)
+    # "QKeyboard". See README.md.
+    install(DIRECTORY qml/ DESTINATION ${CMAKE_INSTALL_DATADIR}/qkeyboard/qml)
 endif()
 
 if(QKW_ENABLE_COVERAGE)
-    target_compile_options(qkeyboardwidget PUBLIC --coverage -O0 -g)
-    target_link_options(qkeyboardwidget PUBLIC --coverage)
+    target_compile_options(qkeyboard PUBLIC --coverage -O0 -g)
+    target_link_options(qkeyboard PUBLIC --coverage)
 endif()
 
 if(QKW_BUILD_TRANSLATIONS)
     find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS LinguistTools)
 
     set(QKW_TS_FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboardwidget_ko.ts
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboardwidget_es.ts
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboardwidget_de.ts
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboardwidget_fr.ts
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboardwidget_ru.ts
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboardwidget_ja.ts
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboard_ko.ts
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboard_es.ts
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboard_de.ts
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboard_fr.ts
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboard_ru.ts
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/i18n/qkeyboard_ja.ts
     )
 
     # English needs no .ts/.qm: QCoreApplication::translate() falls back to
@@ -133,20 +133,20 @@ if(QKW_BUILD_TRANSLATIONS)
     # invoking a command whose name is only known at configure time.
     cmake_language(CALL "qt${QT_VERSION_MAJOR}_add_translation" QKW_QM_FILES ${QKW_TS_FILES})
 
-    add_custom_target(qkeyboardwidget_translations ALL DEPENDS ${QKW_QM_FILES})
-    add_dependencies(qkeyboardwidget qkeyboardwidget_translations)
+    add_custom_target(qkeyboard_translations ALL DEPENDS ${QKW_QM_FILES})
+    add_dependencies(qkeyboard qkeyboard_translations)
 
-    install(FILES ${QKW_QM_FILES} DESTINATION ${CMAKE_INSTALL_DATADIR}/qkeyboardwidget/i18n)
+    install(FILES ${QKW_QM_FILES} DESTINATION ${CMAKE_INSTALL_DATADIR}/qkeyboard/i18n)
 endif()
 
-install(TARGETS qkeyboardwidget
+install(TARGETS qkeyboard
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-install(DIRECTORY include/qkeyboardwidget DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/qkeyboardwidget/qkw_export.h"
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/qkeyboardwidget)
+install(DIRECTORY include/qkeyboard DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/qkeyboard/qkw_export.h"
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/qkeyboard)
 
 enable_testing()
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")

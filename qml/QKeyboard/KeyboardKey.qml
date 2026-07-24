@@ -1,5 +1,5 @@
 import QtQuick 2.0
-import QKeyboardWidget 1.0
+import QKeyboard 1.0
 
 // A single key rendered from the {row, column, action, text, icon, span}
 // map produced by KeyboardController.rows. Purely presentational: it emits

@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.0
-import QKeyboardWidget 1.0
+import QKeyboard 1.0
 
 ApplicationWindow {
     id: window

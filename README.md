@@ -69,7 +69,7 @@ assume that.
 ## Using the QWidget view
 
 ```cpp
-#include "qkeyboardwidget/keyboard_widget.h"
+#include "qkeyboard/keyboard_widget.h"
 
 auto *keyboard = new qkw::KeyboardWidget(parentWidget);
 // Already shows a working English keyboard with a default dark theme - no
@@ -94,22 +94,22 @@ keyboard->theme()->setCornerRadius(10);
 ## Using the QML view
 
 Register the C++ types once, before loading any QML that imports
-`QKeyboardWidget`, and add `qml/` to the import path so the `qmldir` there
+`QKeyboard`, and add `qml/` to the import path so the `qmldir` there
 (which declares the `KeyboardKey`/`KeyboardPanel` QML components) is found:
 
 ```cpp
 #include <QQmlApplicationEngine>
-#include "qkeyboardwidget/qml_registration.h"
+#include "qkeyboard/qml_registration.h"
 
 QQmlApplicationEngine engine;
 qkw::registerQmlTypes(); // registers KeyboardController and KeyboardTheme
-engine.addImportPath(QStringLiteral(":/qkeyboardwidget/qml")); // or wherever qml/ is deployed
+engine.addImportPath(QStringLiteral(":/qkeyboard/qml")); // or wherever qml/ is deployed
 engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 ```
 
 ```qml
 import QtQuick 2.0
-import QKeyboardWidget 1.0
+import QKeyboard 1.0
 
 Item {
     KeyboardController {
@@ -139,9 +139,9 @@ Item {
 ```
 
 Requires linking `Qml`/`Quick` (`QKW_ENABLE_QML`, on by default in
-`CMakeLists.txt`). `qml/QKeyboardWidget/KeyboardKey.qml` and
-`qml/QKeyboardWidget/KeyboardPanel.qml` are shipped as plain files plus a
-hand-written `qml/QKeyboardWidget/qmldir` — not a compiled
+`CMakeLists.txt`). `qml/QKeyboard/KeyboardKey.qml` and
+`qml/QKeyboard/KeyboardPanel.qml` are shipped as plain files plus a
+hand-written `qml/QKeyboard/qmldir` — not a compiled
 Qt6-only `qt_add_qml_module` — so the same setup works on Qt5 and Qt6.
 
 ## Switching languages at runtime
@@ -155,7 +155,7 @@ Two independent things can change per language:
    call `controller->loadFile(...)` (C++) or set `controller.source` (QML)
    with a path to your own `<locale>.json` instead.
 2. **UI string translation** (Enter/Backspace/Shift/... labels) — install a
-   `QTranslator` loaded from the compiled `qkeyboardwidget_<locale>.qm`
+   `QTranslator` loaded from the compiled `qkeyboard_<locale>.qm`
    before switching the layout, so `KeyboardController::resolveLabel()`
    picks up the translated strings on the next `rows` rebuild. English needs
    no translator at all: `QCoreApplication::translate()` falls back to the
@@ -164,23 +164,23 @@ Two independent things can change per language:
 
 ```cpp
 auto *translator = new QTranslator(qApp);
-// CMAKE_INSTALL_DATADIR/qkeyboardwidget/i18n if installed system-wide, or
+// CMAKE_INSTALL_DATADIR/qkeyboard/i18n if installed system-wide, or
 // wherever your app embeds/deploys the .qm files it needs.
-translator->load(QLocale(QLocale::Korean), QStringLiteral("qkeyboardwidget"),
-                  QStringLiteral("_"), QStringLiteral("/usr/share/qkeyboardwidget/i18n"));
+translator->load(QLocale(QLocale::Korean), QStringLiteral("qkeyboard"),
+                  QStringLiteral("_"), QStringLiteral("/usr/share/qkeyboard/i18n"));
 qApp->installTranslator(translator);
 keyboard->controller()->setLocale(qkw::KeyboardController::Locale::Korean);
 ```
 
-`resources/i18n/qkeyboardwidget_ko.ts` is the Korean translation source;
+`resources/i18n/qkeyboard_ko.ts` is the Korean translation source;
 `QKW_BUILD_TRANSLATIONS` (on by default) compiles it to `.qm` via CMake at
 build time and installs it. To add another language's JSON layout, add
 `resources/layouts/<locale>.json` — no code change needed to use it via
 `loadFile()`/`source`. To also make it reachable through `setLocale()`,
 additionally add a `KeyboardController::Locale` enum value and a case in
 `setLocale()`'s mapping (`src/keyboard_controller.cpp`). For UI string
-translation, add `resources/i18n/qkeyboardwidget_<locale>.ts` (run
-`lupdate` against `src/keyboard_controller.cpp`, context `QKeyboardWidget`,
+translation, add `resources/i18n/qkeyboard_<locale>.ts` (run
+`lupdate` against `src/keyboard_controller.cpp`, context `QKeyboard`,
 to seed it with the current source strings), list it in `QKW_TS_FILES` in
 `CMakeLists.txt`, and translate it in Qt Linguist.
 
@@ -195,13 +195,13 @@ to seed it with the current source strings), list it in `QKW_TS_FILES` in
       "rows": [
         [
           { "type": "char", "text": "q" },
-          { "type": "backspace", "span": 2, "icon": ":/qkeyboardwidget/icons/backspace.svg" }
+          { "type": "backspace", "span": 2, "icon": ":/qkeyboard/icons/backspace.svg" }
         ],
         [
-          { "type": "shift", "target": "upper", "span": 2, "icon": ":/qkeyboardwidget/icons/shift.svg" },
+          { "type": "shift", "target": "upper", "span": 2, "icon": ":/qkeyboard/icons/shift.svg" },
           { "type": "switch", "target": "numeric", "labelId": "numbers", "span": 2 },
           { "type": "space", "span": 5 },
-          { "type": "enter", "span": 2, "icon": ":/qkeyboardwidget/icons/enter.svg" }
+          { "type": "enter", "span": 2, "icon": ":/qkeyboard/icons/enter.svg" }
         ]
       ]
     },
@@ -228,7 +228,7 @@ file — no code changes required. See `resources/layouts/en.json` and
 > 2-beolsik keyboard. Composing them into syllable blocks (e.g. ㄱ+ㅏ+ㄴ →
 > 간) is an opt-in step: feed `KeyboardController::characterEntered` /
 > `backspaceRequested` through a `qkw::HangulComposer` (see
-> `include/qkeyboardwidget/hangul_composer.h` and
+> `include/qkeyboard/hangul_composer.h` and
 > `examples/widgets_example/main.cpp`) before touching your text field. Left
 > unwired, jamo are inserted uncomposed and composition falls back to
 > whatever the receiving text field / OS IME does with them.
@@ -249,10 +249,10 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-By default `qkeyboardwidget` builds as a static library. Pass the standard
+By default `qkeyboard` builds as a static library. Pass the standard
 CMake `-DBUILD_SHARED_LIBS=ON` to build it as a shared library instead; the
 library exports symbols correctly either way (a `qkw_export.h` header is
-generated and installed alongside the rest of `include/qkeyboardwidget`).
+generated and installed alongside the rest of `include/qkeyboard`).
 
 `.github/workflows/ci.yml` runs this same build+test on a full matrix of
 Linux, Windows, and macOS, each on both Qt 5.15 and Qt 6.7 (the two ends of
@@ -290,10 +290,10 @@ a full Qt install) — see the comments in that file before adding to it.
 ## Repository layout
 
 ```
-include/qkeyboardwidget/   public headers (namespace qkw)
+include/qkeyboard/   public headers (namespace qkw)
 src/                       implementation
 qml/                       Qt Quick components
-resources/                 resources/qkeyboardwidget.qrc + everything it embeds
+resources/                 resources/qkeyboard.qrc + everything it embeds
 resources/layouts/         per-locale layout JSON
 resources/i18n/            Qt Linguist translation sources
 assets/icons/              key icons (SVG)

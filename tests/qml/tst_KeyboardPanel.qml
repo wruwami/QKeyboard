@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import QtTest 1.0
-import QKeyboardWidget 1.0
+import QKeyboard 1.0
 
 TestCase {
     id: testCase
@@ -96,7 +96,7 @@ TestCase {
         const json = JSON.stringify({
             locale: "en",
             pages: [ { id: "lower", rows: [
-                [ { type: "backspace", icon: ":/qkeyboardwidget/icons/backspace.svg" } ]
+                [ { type: "backspace", icon: ":/qkeyboard/icons/backspace.svg" } ]
             ] } ]
         })
         verify(controller.loadJson(json))
@@ -119,7 +119,7 @@ TestCase {
         const json = JSON.stringify({
             locale: "en",
             pages: [ { id: "lower", rows: [
-                [ { type: "backspace", icon: ":/qkeyboardwidget/icons/does-not-exist.svg" } ]
+                [ { type: "backspace", icon: ":/qkeyboard/icons/does-not-exist.svg" } ]
             ] } ]
         })
         verify(controller.loadJson(json))

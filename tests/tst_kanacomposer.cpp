@@ -1,7 +1,7 @@
 #include <QtTest>
 #include <QSignalSpy>
 
-#include "qkeyboardwidget/kana_composer.h"
+#include "qkeyboard/kana_composer.h"
 
 using namespace qkw;
 

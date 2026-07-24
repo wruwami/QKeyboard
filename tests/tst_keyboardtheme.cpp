@@ -1,7 +1,7 @@
 #include <QSignalSpy>
 #include <QtTest>
 
-#include "qkeyboardwidget/keyboard_theme.h"
+#include "qkeyboard/keyboard_theme.h"
 
 using namespace qkw;
 

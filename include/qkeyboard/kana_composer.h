@@ -1,8 +1,8 @@
 #ifndef QKW_KANA_COMPOSER_H
 #define QKW_KANA_COMPOSER_H
 
-#include "qkeyboardwidget/abstract_composer.h"
-#include "qkeyboardwidget/qkw_export.h"
+#include "qkeyboard/abstract_composer.h"
+#include "qkeyboard/qkw_export.h"
 
 namespace qkw {
 

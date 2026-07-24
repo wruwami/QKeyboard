@@ -3,8 +3,8 @@
 #include <QObject>
 #include <QVariantList>
 
-#include "qkeyboardwidget/keyboard_layout.h"
-#include "qkeyboardwidget/qkw_export.h"
+#include "qkeyboard/keyboard_layout.h"
+#include "qkeyboard/qkw_export.h"
 
 namespace qkw {
 
@@ -33,7 +33,7 @@ class QKW_EXPORT KeyboardController : public QObject
 public:
     // One value per layout bundled into the library's own resources
     // (resources/layouts/<name>.json in the source tree, compiled in via
-    // resources/qkeyboardwidget.qrc). setLocale() maps each value to its
+    // resources/qkeyboard.qrc). setLocale() maps each value to its
     // resource path, so a host app that only wants a stock layout never has
     // to spell out a ":/layouts/..." path itself. loadFile()/loadJson()
     // remain the way to use a layout that isn't one of these - adding a

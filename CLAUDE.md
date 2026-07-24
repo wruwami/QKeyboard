@@ -28,7 +28,7 @@ re-stated.
      `qml_registration.h`/`.cpp`), not `QML_ELEMENT`.
    - QML files: versioned imports (e.g. `import QtQuick 2.0`), not
      unversioned Qt6-only imports.
-   - Translations: `QCoreApplication::translate("QKeyboardWidget", ...)`
+   - Translations: `QCoreApplication::translate("QKeyboard", ...)`
      with a fixed literal context, not `tr()`'s implicit class-name
      context, since that depends on how a given Qt/lupdate version mangles
      a namespaced QObject's class name.
@@ -112,7 +112,7 @@ Treat them as checks to run before opening or merging a PR, not aspirations.
 
 Semantic Versioning; current version is `0.1.0` (pre-1.0, API not yet
 stable). The version lives in exactly one place —
-`project(QKeyboardWidget VERSION X.Y.Z ...)` in the top-level
+`project(QKeyboard VERSION X.Y.Z ...)` in the top-level
 `CMakeLists.txt` — and the rules for what bumps MAJOR/MINOR/PATCH, and the
 release checklist, are in `VERSIONING.md`. See that file before cutting a
 release or deciding whether a change is breaking.
